@@ -1,61 +1,40 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#111111" />
-    <meta name="description" content="가입 없이 연결되는 작은 대화방. 대화 기록은 브라우저를 떠나면 사라집니다." />
-    <meta name="referrer" content="no-referrer" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <title>TALK — 익명 대화실</title>
-  </head>
-  <body>
-    <div class="desktop-bar"><span><span class="tiny-icon">T</span> talk.exe</span><span>ANONYMOUS COMMUNICATION UTILITY</span><span>v1.0</span></div>
-    <div class="app-shell">
-      <header class="masthead">
-        <a class="brand" href="./" aria-label="TALK 홈">TALK<span class="brand-period">.</span></a>
-        <div class="brand-caption">익명 대화실<span>잠깐 연결되고, 조용히 사라지는 대화.</span></div>
-        <button class="text-button" id="help-button">이용 안내 <span aria-hidden="true">↗</span></button>
-      </header>
-      <div class="workspace-heading"><span><b>01</b> COMMUNICATION DESK</span><span>NO ACCOUNT. NO ARCHIVE.</span></div>
-      <main class="workspace">
-        <aside class="channel-panel">
-          <div class="panel-label">CHANNEL <span>01 / 채널</span></div>
-          <h1>어디서 만날까요?</h1>
-          <p class="intro">같은 채널명으로 들어오면<br />바로 대화할 수 있습니다.</p>
-          <form id="join-form">
-            <label for="channel-input">채널명</label>
-            <div class="channel-input-wrap"><span aria-hidden="true">#</span><input id="channel-input" name="channel" maxlength="32" placeholder="예: midnight" autocomplete="off" autocapitalize="none" spellcheck="false" required /></div>
-            <label for="nickname-input">닉네임 <span class="optional">선택</span></label>
-            <input id="nickname-input" name="nickname" maxlength="20" placeholder="비워두면 자동으로 정해져요" autocomplete="off" />
-            <button class="button primary" id="join-button" type="submit">채널 입장</button>
-            <button class="button" id="random-button" type="button">무작위 채널 만들기</button>
-            <p class="form-error" id="form-error" role="alert"></p>
-          </form>
-          <div class="channel-note"><span class="note-symbol" aria-hidden="true">※</span><p>이름을 아는 누구나 입장할 수 있습니다. 친구끼리라면 무작위 채널의 링크를 공유하세요.</p></div>
-          <div class="session-card"><div class="panel-label">MY SESSION</div><div class="identity"><span class="avatar" aria-hidden="true">?</span><div><strong id="my-name">익명 사용자</strong><span id="my-session">입장을 기다리고 있습니다</span></div></div><div class="session-foot"><span>계정 연결</span><b>없음</b></div></div>
-        </aside>
-        <section class="chat-panel" aria-label="채팅">
-          <header class="chat-header"><div><span class="room-prefix">#</span><h2 id="room-title">대기실</h2><span class="tag" id="room-tag">STANDBY</span></div><div class="room-actions"><button id="share-button" class="icon-button" aria-label="초대 링크 복사" title="초대 링크 복사" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="8" width="12" height="12"/><path d="M16 8V4H4v12h4"/></svg></button><button id="leave-button" class="icon-button" aria-label="채널 나가기" title="채널 나가기" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 4H4v16h6M9 12h11m-4-4 4 4-4 4"/></svg></button></div></header>
-          <div class="notice-strip"><span aria-hidden="true">[ i ]</span><span>대화는 저장되지 않습니다. 나가면 내 화면의 기록이 사라집니다.</span></div>
-          <div class="message-area" id="message-area">
-            <div class="empty-state" id="empty-state"><div class="empty-mark" aria-hidden="true">#<span>_</span></div><span class="eyebrow">READY WHEN YOU ARE</span><h3 id="empty-title">대화만 남기세요.<br />기록은 남기지 않을게요.</h3><p id="empty-description">채널을 만들거나 친구가 알려준 채널에 입장하세요.<br />가입도, 설치도 필요 없습니다.</p><div class="empty-meta"><span>회원가입 없음</span><span>기록 보관 없음</span><span>우리끼리 대화</span></div></div>
-            <div id="messages" role="log" aria-label="대화 메시지" aria-live="polite" aria-relevant="additions"></div>
-          </div>
-          <div id="connection-notice" class="connection-notice" role="status" hidden></div>
-          <form id="message-form" class="composer"><div class="composer-top"><label for="message-input" id="composer-label">MESSAGE</label><span id="typing-status" aria-live="polite"></span><span id="character-count">0 / 2,000</span></div><div class="composer-input"><textarea id="message-input" rows="2" maxlength="2000" placeholder="채널에 입장하면 대화를 시작할 수 있습니다." disabled></textarea><button class="button primary send-button" id="send-button" disabled>전송 <span aria-hidden="true">↵</span></button></div><div class="composer-hint"><span>Enter 전송 <span class="divider">/</span> Shift + Enter 줄바꿈</span><span>TEXT ONLY</span></div></form>
-        </section>
-        <aside class="info-panel">
-          <div class="panel-label">PARTICIPANTS <span id="participant-count">00</span></div><div class="participant-status"><span class="status-square" id="status-square"></span><span id="connection-status">입장 전</span></div><ul class="participants" id="participants"><li class="no-participants">아직 연결된 사람이 없습니다.</li></ul>
-          <div class="info-block"><div class="panel-label">이 대화실의 원칙</div><ol class="principles"><li><span>01</span><div><strong>이름 대신, 익명</strong><p>개인정보 없이 만납니다.</p></div></li><li><span>02</span><div><strong>지금 이 순간만</strong><p>이전 대화는 불러오지 않습니다.</p></div></li><li><span>03</span><div><strong>나가면, 빈 화면</strong><p>내 기록은 나갈 때 지워집니다.</p></div></li></ol></div>
-          <div class="retention"><span class="retention-value">0<span> DAYS</span></span><span>대화 기록 보관 기간</span></div>
-          <p class="small-print">모두 나가면 대화 기록은 사라집니다.<br />다른 참여자가 따로 저장한 내용은<br />삭제할 수 없습니다.</p>
-        </aside>
-      </main>
-      <footer class="footer"><span><span class="footer-square" aria-hidden="true"></span> 작은 대화를 위한 작은 공간.</span><span>NO DATABASE <span class="divider">/</span> SESSION ONLY</span></footer>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="description" content="로그인 없는 채팅" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="stylesheet" href="./src/style.css" />
+  <title>talk</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="header"><a href="./" class="brand">talk</a><button id="help-button" class="help-button">도움말</button></header>
+    <form id="join-form" class="join-form">
+      <label for="channel-input">채널<input id="channel-input" name="channel" maxlength="32" placeholder="채널명" autocomplete="off" autocapitalize="none" spellcheck="false" required /></label>
+      <label for="nickname-input">닉네임<input id="nickname-input" name="nickname" maxlength="20" placeholder="자동 지정" autocomplete="off" /></label>
+      <button id="join-button" type="submit">입장</button>
+      <button id="random-button" type="button">새 채널</button>
+      <p id="form-error" class="form-error" role="alert"></p>
+    </form>
+    <div class="workspace">
+      <section class="chat-panel" aria-label="채팅">
+        <header class="chat-header"><h1 id="room-title">대기실</h1><span id="room-tag">입장 전</span><div class="room-actions"><button id="share-button" disabled>링크 복사</button><button id="leave-button" aria-label="채널 나가기" disabled>나가기</button></div></header>
+        <div class="message-area" id="message-area">
+          <div class="empty-state" id="empty-state"><p id="empty-title">채널에 입장하세요.</p><p id="empty-description">같은 채널명을 입력하면 연결됩니다.</p></div>
+          <div id="messages" role="log" aria-label="대화 메시지" aria-live="polite" aria-relevant="additions"></div>
+        </div>
+        <div id="connection-notice" class="connection-notice" role="status" hidden></div>
+        <form id="message-form" class="composer"><label for="message-input" class="sr-only">메시지</label><div class="composer-input"><textarea id="message-input" rows="2" maxlength="2000" placeholder="메시지 입력" disabled></textarea><button id="send-button" disabled>전송</button></div><div class="composer-hint"><span id="typing-status" aria-live="polite"></span><span>Enter 전송 · Shift+Enter 줄바꿈</span><span id="character-count">0 / 2,000</span></div></form>
+      </section>
+      <aside class="info-panel"><h2>접속자 <span id="participant-count">0</span></h2><p id="connection-status">입장 전</p><ul id="participants" class="participants"><li class="no-participants">없음</li></ul></aside>
     </div>
-    <div class="toast" id="toast" role="status" hidden></div>
-    <dialog id="help-dialog"><div class="dialog-header"><span>TALK / 이용 안내</span><button id="close-help" class="icon-button" aria-label="안내 닫기">×</button></div><div class="dialog-body"><h2>가볍게 들어와서,<br />가볍게 나가세요.</h2><p>같은 채널명으로 입장하거나 초대 링크를 열면 연결됩니다. 닉네임을 비워두면 임의의 이름이 정해집니다.</p><h3>기록이 사라지는 시점</h3><p>채널에서 나가거나 새로고침하면 내 대화 기록이 지워집니다. 다른 참여자의 열린 화면에는 남아 있으며, 모두 나가면 앱에서 보관하는 기록은 없습니다. 늦게 들어온 사람에게 이전 메시지를 보내지 않습니다.</p><h3>익명의 범위</h3><p>로그인·분석 도구·대화 DB를 사용하지 않습니다. 다만 GitHub와 연결 중계 서비스는 접속 IP를 볼 수 있고, 직접 연결된 참여자에게도 IP가 노출될 수 있습니다. 상대방의 캡처나 복사는 막을 수 없습니다.</p><h3>연결이 안 될 때</h3><p>친구도 같은 채널에 들어왔는지 확인해 주세요. 무료 공개 중계 서비스나 회사·학교망의 제한으로 연결되지 않을 수 있습니다. 잠시 기다리거나 다른 네트워크로 다시 접속해 주세요. 연결 전 작성한 메시지는 자동으로 재전송하지 않습니다.</p><button id="help-done" class="button primary">확인했습니다</button></div></dialog>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+    <p class="footnote">나가거나 새로고침하면 내 대화 기록이 삭제됩니다.</p>
+  </main>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <dialog id="help-dialog"><div class="dialog-header"><h2>도움말</h2><button id="close-help" aria-label="안내 닫기">닫기</button></div><div class="dialog-body"><p>같은 채널명으로 입장하세요. 채널명을 아는 사람은 누구나 들어올 수 있습니다. ‘새 채널’을 누르면 무작위 이름의 채널이 만들어집니다.</p><p>나가거나 새로고침하면 내 기록만 삭제됩니다. 다른 사람의 화면에는 남아 있고, 모두 나가면 앱의 기록이 사라집니다. 이전 대화는 새 참여자에게 보내지 않습니다.</p><p>로그인은 없지만 IP를 숨겨 주지는 않습니다. 상대방의 복사나 캡처도 막을 수 없습니다.</p><p>연결되지 않으면 채널명을 확인하거나 다른 네트워크에서 시도하세요. 학교·회사망이나 무료 중계 서버의 상태에 따라 연결이 안 될 수 있습니다.</p><button id="help-done">확인</button></div></dialog>
+  <script type="module" src="./src/main.js"></script>
+</body>
 </html>
