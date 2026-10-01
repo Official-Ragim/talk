@@ -1,4 +1,5 @@
 import { joinRoom, selfId } from '../vendor/trystero.js';
+import { resolveIpRoom, validChannel } from './rooms.js';
 
 const $ = (id) => document.getElementById(id);
 const peers = new Map();
@@ -8,6 +9,8 @@ let profile = null;
 let typing = null;
 let myName = '';
 let currentChannel = '';
+let mode = 'custom';
+let lookupController = null;
 let generation = 0;
 let connectionTimer;
 let toastTimer;
@@ -42,8 +45,34 @@ function normalizeChannel(value) {
   return value.toLowerCase();
 }
 
-function validChannel(value) {
-  return /^[A-Za-z0-9]{1,32}$/.test(value);
+function renderMode() {
+  const isIp = mode === 'ip';
+  const busy = Boolean(room || lookupController);
+  $('custom-mode').setAttribute('aria-pressed', String(!isIp));
+  $('ip-mode').setAttribute('aria-pressed', String(isIp));
+  $('channel-field').hidden = isIp;
+  $('random-button').hidden = isIp;
+  $('share-button').hidden = isIp;
+  $('mode-description').textContent = isIp
+    ? '현재 접속 IP를 기준으로 입장합니다. 같은 공인 IP를 쓰는 사람끼리 연결됩니다.'
+    : '채널 ID를 정해서 입장하세요. 같은 ID를 입력한 사람끼리 연결됩니다.';
+  $('join-button').textContent = room ? '참여 중' : lookupController ? 'IP 확인 중…' : isIp ? 'IP방 입장' : '입장 / 만들기';
+  $('channel-input').disabled = $('nickname-input').disabled = $('join-button').disabled = $('random-button').disabled = busy;
+  $('leave-button').disabled = !busy;
+  if (!room) {
+    $('empty-title').textContent = isIp ? 'IP방 입장을 누르세요.' : '채널 ID를 입력하세요.';
+    $('empty-description').textContent = isIp ? '채널 ID는 필요하지 않습니다.' : '영문·숫자 1~32자를 사용할 수 있습니다.';
+  }
+}
+
+function setMode(next, { updateUrl = true } = {}) {
+  if (next !== mode) {
+    leave({ resetUrl: false, announce: false });
+    mode = next;
+  }
+  $('form-error').textContent = '';
+  renderMode();
+  if (updateUrl) history.replaceState(null, '', location.pathname + location.search + (mode === 'ip' ? '#mode=ip' : ''));
 }
 
 function cleanName(value) {
@@ -107,6 +136,8 @@ function updateTyping() {
 
 function leave({ resetUrl = true, announce = true } = {}) {
   generation++;
+  lookupController?.abort();
+  lookupController = null;
   const oldRoom = room;
   room = chat = profile = typing = null;
   // Clear references and DOM immediately, even if the network is unavailable.
@@ -119,29 +150,53 @@ function leave({ resetUrl = true, announce = true } = {}) {
   $('message-input').placeholder = '메시지 입력';
   $('typing-status').textContent = '';
   $('empty-state').hidden = false;
-  $('empty-title').textContent = '채널명을 정해서 입장하세요.';
-  $('empty-description').textContent = '같은 채널명을 입력하면 연결됩니다.';
   $('room-title').textContent = '대기실';
   $('share-button').disabled = $('leave-button').disabled = true;
-  $('join-button').textContent = '입장 / 만들기';
-  $('channel-input').disabled = $('nickname-input').disabled = $('join-button').disabled = $('random-button').disabled = false;
   document.body.classList.remove('in-room');
   myName = currentChannel = '';
   sending = false;
   lastSendAt = lastTypingAt = 0;
-  notice(); updateParticipants();
-  if (resetUrl) history.replaceState(null, '', location.pathname + location.search);
+  notice(); updateParticipants(); renderMode();
+  if (resetUrl) history.replaceState(null, '', location.pathname + location.search + (mode === 'ip' ? '#mode=ip' : ''));
   try { Promise.resolve(oldRoom?.leave()).catch(() => {}); } catch { /* Local data is already cleared. */ }
   if (oldRoom && announce) toast('퇴장했습니다.');
 }
 
 function enter(value) {
+  if (mode !== 'custom' || room || lookupController) return;
   $('form-error').textContent = '';
   if (!validChannel(value)) {
-    $('form-error').textContent = '채널명은 영문·숫자만 1~32자 입력하세요.';
+    $('form-error').textContent = '채널 ID는 영문·숫자만 1~32자 입력하세요.';
     return;
   }
   const channel = normalizeChannel(value);
+  connect(channel);
+}
+
+async function enterIp() {
+  if (mode !== 'ip' || room || lookupController) return;
+  $('form-error').textContent = '';
+  if (!navigator.onLine) { $('form-error').textContent = '인터넷 연결을 확인해 주세요.'; return; }
+  const token = ++generation;
+  const controller = new AbortController();
+  lookupController = controller;
+  renderMode();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const channel = await resolveIpRoom(controller.signal);
+    if (token !== generation || mode !== 'ip') return;
+    lookupController = null;
+    connect(channel);
+  } catch {
+    if (token === generation) $('form-error').textContent = 'IP를 확인하지 못했습니다. 다시 입장하거나 커스텀 방을 이용하세요.';
+  } finally {
+    clearTimeout(timeout);
+    if (lookupController === controller) lookupController = null;
+    renderMode();
+  }
+}
+
+function connect(channel) {
   if (!navigator.onLine) { $('form-error').textContent = '인터넷 연결을 확인해 주세요.'; return; }
   if (room) return;
   const token = ++generation;
@@ -201,18 +256,16 @@ function enter(value) {
     $('form-error').textContent = '이 브라우저에서 연결을 시작하지 못했습니다. 최신 Chrome, Edge 또는 Safari로 열어 주세요.';
     return;
   }
-  history.replaceState(null, '', `#channel=${encodeURIComponent(channel)}`);
-  $('channel-input').value = channel;
-  $('channel-input').disabled = $('nickname-input').disabled = $('join-button').disabled = $('random-button').disabled = true;
-  $('join-button').textContent = '입장 중';
-  $('room-title').textContent = channel;
+  history.replaceState(null, '', mode === 'ip' ? '#mode=ip' : `#channel=${encodeURIComponent(channel)}`);
+  if (mode === 'custom') $('channel-input').value = channel;
+  $('room-title').textContent = mode === 'ip' ? 'IP방' : channel;
   $('share-button').disabled = $('leave-button').disabled = false;
   $('message-input').disabled = false;
   $('message-input').placeholder = '메시지 입력';
   $('empty-title').textContent = '연결된 참여자가 없습니다.';
-  $('empty-description').textContent = '링크를 공유하거나 같은 채널명으로 입장하세요.';
+  $('empty-description').textContent = mode === 'ip' ? '같은 공인 IP에서 IP방에 입장하면 연결됩니다.' : '링크를 공유하거나 같은 채널 ID로 입장하세요.';
   document.body.classList.add('in-room');
-  updateParticipants();
+  updateParticipants(); renderMode();
   typingTimer = setInterval(updateTyping, 1000);
   connectionTimer = setTimeout(() => {
     if (token === generation && !peers.size) notice('아직 연결된 친구가 없습니다. 둘 다 입장했다면 잠시 기다리거나 다른 네트워크에서 다시 시도해 주세요.');
@@ -220,10 +273,12 @@ function enter(value) {
   $('message-input').focus();
 }
 
-$('join-form').addEventListener('submit', event => { event.preventDefault(); enter($('channel-input').value); });
+$('custom-mode').addEventListener('click', () => { if (mode !== 'custom') setMode('custom'); });
+$('ip-mode').addEventListener('click', () => { if (mode !== 'ip') setMode('ip'); });
+$('join-form').addEventListener('submit', event => { event.preventDefault(); if (mode === 'ip') void enterIp(); else enter($('channel-input').value); });
 $('channel-input').addEventListener('input', () => { $('form-error').textContent = ''; });
 $('random-button').addEventListener('click', () => enter(`room${crypto.randomUUID().replaceAll('-', '').slice(0, 24)}`));
-$('leave-button').addEventListener('click', () => { leave(); $('channel-input').focus(); });
+$('leave-button').addEventListener('click', () => { leave(); $(mode === 'ip' ? 'join-button' : 'channel-input').focus(); });
 $('share-button').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(location.href); toast('링크를 복사했습니다.'); }
   catch { toast('링크를 복사하지 못했습니다. 주소창의 주소를 복사해 주세요.'); }
@@ -278,12 +333,16 @@ window.addEventListener('pagehide', () => leave({ announce: false }));
 // A restored back/forward-cache page must never restore a previous conversation.
 window.addEventListener('pageshow', event => { if (event.persisted) leave({ announce: false }); });
 function readInvite() {
-  const value = new URLSearchParams(location.hash.slice(1)).get('channel');
-  if (value !== null && !room) {
+  if (room || lookupController) return;
+  const params = new URLSearchParams(location.hash.slice(1));
+  if (params.get('mode') === 'ip') { setMode('ip', { updateUrl: false }); return; }
+  const value = params.get('channel');
+  setMode('custom', { updateUrl: false });
+  if (value !== null) {
     const valid = validChannel(value);
     // Do not silently turn an invalid invitation into a different valid room.
     $('channel-input').value = valid ? normalizeChannel(value) : value.slice(0, 33);
-    $('form-error').textContent = valid ? '' : '유효하지 않은 초대 링크입니다. 채널명은 영문·숫자만 1~32자 입력하세요.';
+    $('form-error').textContent = valid ? '' : '유효하지 않은 초대 링크입니다. 채널 ID는 영문·숫자만 1~32자 입력하세요.';
   }
 }
 window.addEventListener('hashchange', readInvite);
