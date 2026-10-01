@@ -1,4 +1,4 @@
-# TALK.
+# talk
 
 친구 2~3명이 쓰는 흑백 익명 채팅. GitHub Pages에 올리는 정적 웹 앱입니다.
 
@@ -13,25 +13,37 @@ npm run dev
 
 `npm run build`로 `dist/`를 생성합니다. `npm run preview`로 빌드 결과를 확인합니다.
 
+빌드 없이도 정적 서버에서 바로 실행됩니다. `node scripts/serve-static.mjs` 후 `http://127.0.0.1:5174/talk/`를 열면 GitHub Pages와 같은 하위 경로로 확인할 수 있습니다. `vendor/trystero.js`는 의존성을 포함한 배포 파일입니다. 패키지를 업데이트할 때만 `npm run vendor`로 다시 생성하고 라이선스 파일과 함께 커밋하세요.
+
 ## 검증
 
 `npm test`는 설치된 Microsoft Edge를 사용합니다. Edge가 없는 환경에서는 `npx playwright install chromium` 후 `playwright.config.js`의 `channel: 'msedge'`를 제거하세요. 첫 검사는 UI·모바일·초대 링크를, 두 번째 검사는 독립 브라우저 3개 사이의 실제 WebRTC 통신·문자열 안전 표시·과거 대화 미전달·퇴장/새로고침 삭제를 확인합니다. 실시간 검사는 외부 공개 중계 서버와 WebRTC에 대한 네트워크 접근이 필요합니다.
 
-## GitHub Pages 배포
+## 웹에서 파일을 올리는 경우
+
+1. `npm run pack`으로 업로드용 파일을 `github-upload` 폴더에 모읍니다.
+2. **github-upload 폴더 안의 내용**을 GitHub 저장소 최상위에 올리고 기존 파일을 덮어씁니다. 폴더 자체를 올리면 안 됩니다.
+3. 포함할 항목: `index.html`, `src/`, `vendor/`, `favicon.svg`, `.nojekyll`.
+4. **Settings → Pages → Source → Deploy from a branch**, 브랜치 `main`, 폴더 `/(root)`를 선택하고 저장합니다.
+5. Pages 배포 완료 후 사이트를 새로고침합니다. 이 방식에는 빌드나 GitHub Actions 설정이 필요하지 않습니다.
+
+이전 버전이 깨진 원인은 빌드 전 HTML이 그대로 배포되고 스크립트가 저장소 경로를 제외한 `/src/main.js`를 참조했기 때문입니다. 현재 버전은 CSS, JavaScript, 통신 라이브러리를 모두 상대 경로의 파일로 불러옵니다. 새 업로드 파일에는 이전 소스의 bare import나 빌드 전용 CSS import가 없습니다.
+
+## Git으로 전체 소스를 관리하는 경우
 
 1. GitHub에 공개 저장소를 만들고 이 프로젝트를 `main` 브랜치에 올립니다.
 2. 저장소 **Settings → Pages → Build and deployment → Source**에서 **GitHub Actions**를 선택합니다.
 3. `main`에 push하거나 Actions에서 **Deploy TALK to GitHub Pages → Run workflow**를 실행합니다.
 4. 배포가 완료되면 `https://계정.github.io/저장소/`에 접속합니다.
 
-`.github/workflows/pages.yml`에 자동 배포가 준비되어 있습니다. Vite의 상대 경로와 URL 해시 채널을 사용하므로 저장소 하위 경로와 초대 링크 새로고침도 동작합니다. 비밀 키나 환경변수, DB 설정은 없습니다. 무료 GitHub 계정은 공개 저장소의 Pages를 사용할 수 있습니다. 이 작업에서는 원격 저장소를 만들거나 실제 배포하지 않았습니다.
+자동 빌드를 사용하려면 로컬 프로젝트의 `.github/workflows/pages.yml`도 함께 올리세요. `vendor/`도 커밋해야 합니다. 상대 경로와 URL 해시 채널을 사용하므로 저장소 하위 경로와 초대 링크 새로고침도 동작합니다. 비밀 키나 환경변수, DB 설정은 없습니다. 무료 GitHub 계정은 공개 저장소의 Pages를 사용할 수 있습니다.
 
 ## 사용
 
 - 같은 채널명으로 입장합니다. 영문은 소문자로 정규화합니다.
 - 닉네임을 생략하면 매 입장 시 임의의 익명 이름을 부여합니다. 이름은 인증되지 않으므로 서로 같을 수 있습니다.
 - 무작위 채널은 96비트 무작위 부분을 사용합니다. 입장 후 우측 상단 복사 버튼으로 링크를 공유하세요.
-- 초대받은 사람은 링크를 열고 **초대받은 채널 입장**을 누릅니다.
+- 초대받은 사람은 링크를 열고 **입장**을 누릅니다.
 - 연결된 참여자가 있을 때만 전송할 수 있습니다. Enter로 전송하고 Shift+Enter로 줄바꿈합니다. 한글 조합 중 Enter는 전송하지 않습니다.
 - 나가거나 새로고침하면 내 화면의 대화가 지워집니다. 새로운 입장자에게 과거 메시지를 전송하지 않습니다.
 

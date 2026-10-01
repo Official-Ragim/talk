@@ -4,6 +4,6 @@ export default defineConfig({
   testDir: './tests',
   timeout: 90000,
   workers: 1,
-  use: { baseURL: 'http://127.0.0.1:5173', channel: 'msedge', headless: true },
-  webServer: { command: 'npm run dev -- --port 5173 --strictPort', url: 'http://127.0.0.1:5173', reuseExistingServer: true },
+  use: { baseURL: 'http://127.0.0.1:5174/talk/', channel: 'msedge', headless: true },
+  webServer: { command: 'node scripts/serve-static.mjs', url: 'http://127.0.0.1:5174/talk/', reuseExistingServer: true },
 });
