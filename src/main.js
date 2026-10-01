@@ -1,5 +1,4 @@
-import './style.css';
-import { joinRoom, selfId } from 'trystero';
+import { joinRoom, selfId } from '../vendor/trystero.js';
 
 const $ = (id) => document.getElementById(id);
 const peers = new Map();
@@ -61,19 +60,18 @@ function updateComposer() {
 function updateParticipants() {
   const list = $('participants');
   list.replaceChildren();
-  if (!room) list.append(element('li', 'no-participants', '아직 연결된 사람이 없습니다.'));
+  if (!room) list.append(element('li', 'no-participants', '없음'));
   else {
     for (const [id, name] of [[selfId, myName], ...Array.from(peers, ([id, p]) => [id, p.name])]) {
       const li = element('li');
-      li.append(element('span', 'participant-avatar', name.slice(0, 1)), element('span', '', name));
+      li.append(element('span', '', name));
       if (id === selfId) li.append(element('span', 'you-tag', '나'));
       list.append(li);
     }
   }
-  $('participant-count').textContent = String(room ? peers.size + 1 : 0).padStart(2, '0');
+  $('participant-count').textContent = String(room ? peers.size + 1 : 0);
   $('connection-status').textContent = !room ? '입장 전' : !navigator.onLine ? '인터넷 연결 끊김' : peers.size ? `${peers.size + 1}명 연결됨` : '친구 연결 대기 중';
-  $('status-square').classList.toggle('connected', Boolean(room && peers.size && navigator.onLine));
-  $('room-tag').textContent = !room ? 'STANDBY' : !navigator.onLine ? 'OFFLINE' : peers.size ? `${peers.size + 1} ONLINE` : 'WAITING';
+  $('room-tag').textContent = !room ? '입장 전' : !navigator.onLine ? '오프라인' : peers.size ? `${peers.size + 1}명` : '연결 대기';
   updateComposer();
 }
 
@@ -90,7 +88,6 @@ function system(message) { appendMessage(element('div', 'system-message', messag
 
 function renderMessage(message, name, own = false) {
   const row = element('article', `message${own ? ' own' : ''}`);
-  row.append(element('div', 'message-avatar', name.slice(0, 1)));
   const body = element('div');
   const meta = element('div', 'message-meta');
   const time = element('time', '', new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }));
@@ -119,16 +116,14 @@ function leave({ resetUrl = true, announce = true } = {}) {
   $('messages').replaceChildren();
   $('message-input').value = '';
   $('message-input').disabled = true;
-  $('message-input').placeholder = '채널에 입장하면 대화를 시작할 수 있습니다.';
+  $('message-input').placeholder = '메시지 입력';
   $('typing-status').textContent = '';
   $('empty-state').hidden = false;
-  $('empty-title').replaceChildren(document.createTextNode('대화만 남기세요.'), document.createElement('br'), document.createTextNode('기록은 남기지 않을게요.'));
-  $('empty-description').textContent = '채널을 만들거나 친구가 알려준 채널에 입장하세요. 가입도, 설치도 필요 없습니다.';
+  $('empty-title').textContent = '채널에 입장하세요.';
+  $('empty-description').textContent = '같은 채널명을 입력하면 연결됩니다.';
   $('room-title').textContent = '대기실';
-  $('my-name').textContent = '익명 사용자';
-  $('my-session').textContent = '입장을 기다리고 있습니다';
   $('share-button').disabled = $('leave-button').disabled = true;
-  $('join-button').textContent = '채널 입장';
+  $('join-button').textContent = '입장';
   $('channel-input').disabled = $('nickname-input').disabled = $('join-button').disabled = $('random-button').disabled = false;
   document.body.classList.remove('in-room');
   myName = currentChannel = '';
@@ -137,7 +132,7 @@ function leave({ resetUrl = true, announce = true } = {}) {
   notice(); updateParticipants();
   if (resetUrl) history.replaceState(null, '', location.pathname + location.search);
   try { Promise.resolve(oldRoom?.leave()).catch(() => {}); } catch { /* Local data is already cleared. */ }
-  if (oldRoom && announce) toast('채널에서 나왔습니다. 내 대화 기록이 지워졌습니다.');
+  if (oldRoom && announce) toast('퇴장했습니다.');
 }
 
 function enter(value) {
@@ -164,7 +159,7 @@ function enter(value) {
       peers.set(id, { name: alias(id), typingUntil: 0 });
       profile.send(myName, { target: id }).catch(() => {});
       notice(); updateParticipants();
-      system('새로운 참여자가 연결되었습니다.');
+      system('참여자가 연결되었습니다.');
     };
     room.onPeerLeave = (id) => {
       if (token !== generation) return;
@@ -172,7 +167,7 @@ function enter(value) {
       peers.delete(id); receiveRates.delete(id);
       updateParticipants(); updateTyping();
       system(`${name} 님이 연결을 종료했습니다.`);
-      if (!peers.size) notice('연결된 친구가 없습니다. 친구가 다시 입장하면 새 메시지를 주고받을 수 있습니다.');
+      if (!peers.size) notice('연결된 참여자가 없습니다.');
     };
     profile.onMessage = (value, { peerId }) => {
       if (token !== generation || !peers.has(peerId)) return;
@@ -209,15 +204,13 @@ function enter(value) {
   history.replaceState(null, '', `#channel=${encodeURIComponent(channel)}`);
   $('channel-input').value = channel;
   $('channel-input').disabled = $('nickname-input').disabled = $('join-button').disabled = $('random-button').disabled = true;
-  $('join-button').textContent = '채널 참여 중';
+  $('join-button').textContent = '입장 중';
   $('room-title').textContent = channel;
-  $('my-name').textContent = myName;
-  $('my-session').textContent = '이번 접속에서만 사용하는 이름';
   $('share-button').disabled = $('leave-button').disabled = false;
   $('message-input').disabled = false;
-  $('message-input').placeholder = '친구와 나눌 이야기를 입력하세요.';
-  $('empty-title').textContent = '친구를 기다리고 있습니다.';
-  $('empty-description').textContent = '오른쪽 위 복사 버튼으로 초대 링크를 보내세요. 친구가 연결되면 대화가 시작됩니다.';
+  $('message-input').placeholder = '메시지 입력';
+  $('empty-title').textContent = '연결된 참여자가 없습니다.';
+  $('empty-description').textContent = '링크를 공유하거나 같은 채널명으로 입장하세요.';
   document.body.classList.add('in-room');
   updateParticipants();
   typingTimer = setInterval(updateTyping, 1000);
@@ -232,7 +225,7 @@ $('channel-input').addEventListener('input', () => { $('form-error').textContent
 $('random-button').addEventListener('click', () => enter(`room-${crypto.randomUUID().replaceAll('-', '').slice(0, 24)}`));
 $('leave-button').addEventListener('click', () => { leave(); $('channel-input').focus(); });
 $('share-button').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(location.href); toast('초대 링크를 복사했습니다. 친구에게 보내주세요.'); }
+  try { await navigator.clipboard.writeText(location.href); toast('링크를 복사했습니다.'); }
   catch { toast('링크를 복사하지 못했습니다. 주소창의 주소를 복사해 주세요.'); }
 });
 $('message-input').addEventListener('input', () => {
@@ -289,7 +282,7 @@ function readInvite() {
   if (value && !room) {
     $('channel-input').value = normalizeChannel(value).slice(0, 32);
     if (!validChannel(normalizeChannel(value))) $('form-error').textContent = '유효하지 않은 초대 링크입니다. 채널명을 다시 입력해 주세요.';
-    else $('join-button').textContent = '초대받은 채널 입장';
+    else $('join-button').textContent = '입장';
   }
 }
 window.addEventListener('hashchange', readInvite);
