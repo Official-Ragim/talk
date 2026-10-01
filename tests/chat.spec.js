@@ -7,9 +7,12 @@ test('lobby, validation, help dialog, mobile layout and invitation', async ({ pa
   await expect(page.getByRole('heading', { name: '대기실' })).toBeVisible();
   expect(await page.locator('.workspace').evaluate(el => getComputedStyle(el).display)).toBe('grid');
   await expect(page.locator('#send-button')).toBeDisabled();
-  await page.locator('#channel-input').fill('invalid channel');
-  await page.locator('#join-button').click();
-  await expect(page.locator('#form-error')).toContainText('1~32자');
+  for (const invalid of ['', '한글', 'room-name', 'room_name', 'room name', 'a!', 'Ａ123', 'K123']) {
+    await page.locator('#channel-input').fill(invalid);
+    await page.locator('#join-button').click();
+    await expect(page.locator('#form-error')).toContainText('영문·숫자만 1~32자');
+    await expect(page.locator('#room-title')).toHaveText('대기실');
+  }
   await page.locator('#help-button').click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Escape');
@@ -26,27 +29,38 @@ test('lobby, validation, help dialog, mobile layout and invitation', async ({ pa
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'test-results/mobile.png', fullPage: true });
-  await page.goto('./#channel=Friends');
-  await expect(page.locator('#channel-input')).toHaveValue('friends');
-  await expect(page.locator('#join-button')).toHaveText('입장');
+  await page.goto('./#channel=Friends123');
+  await expect(page.locator('#channel-input')).toHaveValue('friends123');
+  await expect(page.locator('#join-button')).toHaveText('입장 / 만들기');
   await page.locator('#join-button').click();
-  await expect(page.locator('#room-title')).toHaveText('friends');
+  await expect(page.locator('#room-title')).toHaveText('friends123');
   await expect(page.locator('#send-button')).toBeDisabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.locator('#leave-button').click();
   await expect(page.locator('#messages')).toBeEmpty();
   expect(new URL(page.url()).hash).toBe('');
+  await page.locator('#random-button').click();
+  await expect(page.locator('#room-title')).toHaveText(/^[a-z0-9]{1,32}$/);
+  await page.locator('#leave-button').click();
+  await page.goto(`./#channel=${'a'.repeat(33)}`);
+  await expect(page.locator('#form-error')).toContainText('유효하지 않은');
+  await page.locator('#join-button').click();
+  await expect(page.locator('#room-title')).toHaveText('대기실');
   expect(errors).toEqual([]);
 });
 
-test('real WebRTC peers exchange text and never replay history', async ({ browser }) => {
-  const contexts = await Promise.all([browser.newContext(), browser.newContext(), browser.newContext()]);
-  const [a, b, c] = await Promise.all(contexts.map(ctx => ctx.newPage()));
-  const channel = `test-${Date.now()}`;
+test('same-IP tabs and a separate browser session exchange text without history replay', async ({ browser }) => {
+  const contexts = await Promise.all([browser.newContext(), browser.newContext()]);
+  // A and B share the same browser profile and network; C uses an isolated profile.
+  // Each document receives its own peer ID, regardless of IP or shared cookies.
+  const [a, b, c] = await Promise.all([contexts[0].newPage(), contexts[0].newPage(), contexts[1].newPage()]);
+  const channel = `Test${Date.now()}`;
   async function join(page, name) {
-    await page.goto(`./#channel=${channel}`);
+    await page.goto('./');
+    await page.locator('#channel-input').fill(page === a ? channel : channel.toLowerCase());
     await page.locator('#nickname-input').fill(name);
     await page.locator('#join-button').click();
+    await expect(page.locator('#room-title')).toHaveText(channel.toLowerCase());
   }
   try {
     await join(a, '친구 A');

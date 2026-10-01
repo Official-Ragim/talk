@@ -12,18 +12,18 @@
 <body>
   <main class="app-shell">
     <header class="header"><a href="./" class="brand">talk</a><button id="help-button" class="help-button">도움말</button></header>
-    <form id="join-form" class="join-form">
-      <label for="channel-input">채널<input id="channel-input" name="channel" maxlength="32" placeholder="채널명" autocomplete="off" autocapitalize="none" spellcheck="false" required /></label>
+    <form id="join-form" class="join-form" novalidate>
+      <label for="channel-input">채널명<input id="channel-input" name="channel" maxlength="32" pattern="[A-Za-z0-9]{1,32}" title="영문·숫자 1~32자" placeholder="영문·숫자 1~32자" autocomplete="off" autocapitalize="none" spellcheck="false" required /></label>
       <label for="nickname-input">닉네임<input id="nickname-input" name="nickname" maxlength="20" placeholder="자동 지정" autocomplete="off" /></label>
-      <button id="join-button" type="submit">입장</button>
-      <button id="random-button" type="button">새 채널</button>
+      <button id="join-button" type="submit">입장 / 만들기</button>
+      <button id="random-button" type="button">무작위</button>
       <p id="form-error" class="form-error" role="alert"></p>
     </form>
     <div class="workspace">
       <section class="chat-panel" aria-label="채팅">
         <header class="chat-header"><h1 id="room-title">대기실</h1><span id="room-tag">입장 전</span><div class="room-actions"><button id="share-button" disabled>링크 복사</button><button id="leave-button" aria-label="채널 나가기" disabled>나가기</button></div></header>
         <div class="message-area" id="message-area">
-          <div class="empty-state" id="empty-state"><p id="empty-title">채널에 입장하세요.</p><p id="empty-description">같은 채널명을 입력하면 연결됩니다.</p></div>
+          <div class="empty-state" id="empty-state"><p id="empty-title">채널명을 정해서 입장하세요.</p><p id="empty-description">같은 채널명을 입력하면 연결됩니다.</p></div>
           <div id="messages" role="log" aria-label="대화 메시지" aria-live="polite" aria-relevant="additions"></div>
         </div>
         <div id="connection-notice" class="connection-notice" role="status" hidden></div>
@@ -34,7 +34,7 @@
     <p class="footnote">나가거나 새로고침하면 내 대화 기록이 삭제됩니다.</p>
   </main>
   <div class="toast" id="toast" role="status" hidden></div>
-  <dialog id="help-dialog"><div class="dialog-header"><h2>도움말</h2><button id="close-help" aria-label="안내 닫기">닫기</button></div><div class="dialog-body"><p>같은 채널명으로 입장하세요. 채널명을 아는 사람은 누구나 들어올 수 있습니다. ‘새 채널’을 누르면 무작위 이름의 채널이 만들어집니다.</p><p>나가거나 새로고침하면 내 기록만 삭제됩니다. 다른 사람의 화면에는 남아 있고, 모두 나가면 앱의 기록이 사라집니다. 이전 대화는 새 참여자에게 보내지 않습니다.</p><p>로그인은 없지만 IP를 숨겨 주지는 않습니다. 상대방의 복사나 캡처도 막을 수 없습니다.</p><p>연결되지 않으면 채널명을 확인하거나 다른 네트워크에서 시도하세요. 학교·회사망이나 무료 중계 서버의 상태에 따라 연결이 안 될 수 있습니다.</p><button id="help-done">확인</button></div></dialog>
+  <dialog id="help-dialog"><div class="dialog-header"><h2>도움말</h2><button id="close-help" aria-label="안내 닫기">닫기</button></div><div class="dialog-body"><p>원하는 채널명을 영문·숫자 1~32자로 입력하고 ‘입장 / 만들기’를 누르세요. 대소문자는 구분하지 않습니다. 같은 이름으로 들어오면 연결됩니다. 채널명을 아는 사람은 누구나 들어올 수 있습니다.</p><p>같은 IP에서도 접속할 수 있습니다. 같은 와이파이나 같은 브라우저의 여러 탭을 별도 참여자로 처리합니다.</p><p>나가거나 새로고침하면 내 기록만 삭제됩니다. 다른 사람의 화면에는 남아 있고, 모두 나가면 앱의 기록이 사라집니다. 이전 대화는 새 참여자에게 보내지 않습니다.</p><p>로그인은 없지만 IP를 숨겨 주지는 않습니다. 상대방의 복사나 캡처도 막을 수 없습니다.</p><p>연결되지 않으면 채널명을 확인하거나 다른 네트워크에서 시도하세요. 학교·회사망이나 무료 중계 서버의 상태에 따라 연결이 안 될 수 있습니다.</p><button id="help-done">확인</button></div></dialog>
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>

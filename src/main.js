@@ -39,11 +39,11 @@ function notice(message = '') {
 }
 
 function normalizeChannel(value) {
-  return value.normalize('NFKC').trim().toLowerCase();
+  return value.toLowerCase();
 }
 
 function validChannel(value) {
-  return /^[\p{L}\p{N}_-]{1,32}$/u.test(value);
+  return /^[A-Za-z0-9]{1,32}$/.test(value);
 }
 
 function cleanName(value) {
@@ -119,11 +119,11 @@ function leave({ resetUrl = true, announce = true } = {}) {
   $('message-input').placeholder = '메시지 입력';
   $('typing-status').textContent = '';
   $('empty-state').hidden = false;
-  $('empty-title').textContent = '채널에 입장하세요.';
+  $('empty-title').textContent = '채널명을 정해서 입장하세요.';
   $('empty-description').textContent = '같은 채널명을 입력하면 연결됩니다.';
   $('room-title').textContent = '대기실';
   $('share-button').disabled = $('leave-button').disabled = true;
-  $('join-button').textContent = '입장';
+  $('join-button').textContent = '입장 / 만들기';
   $('channel-input').disabled = $('nickname-input').disabled = $('join-button').disabled = $('random-button').disabled = false;
   document.body.classList.remove('in-room');
   myName = currentChannel = '';
@@ -136,12 +136,12 @@ function leave({ resetUrl = true, announce = true } = {}) {
 }
 
 function enter(value) {
-  const channel = normalizeChannel(value);
   $('form-error').textContent = '';
-  if (!validChannel(channel)) {
-    $('form-error').textContent = '채널명은 한글·영문·숫자·밑줄·하이픈으로 1~32자 입력해 주세요.';
+  if (!validChannel(value)) {
+    $('form-error').textContent = '채널명은 영문·숫자만 1~32자 입력하세요.';
     return;
   }
+  const channel = normalizeChannel(value);
   if (!navigator.onLine) { $('form-error').textContent = '인터넷 연결을 확인해 주세요.'; return; }
   if (room) return;
   const token = ++generation;
@@ -222,7 +222,7 @@ function enter(value) {
 
 $('join-form').addEventListener('submit', event => { event.preventDefault(); enter($('channel-input').value); });
 $('channel-input').addEventListener('input', () => { $('form-error').textContent = ''; });
-$('random-button').addEventListener('click', () => enter(`room-${crypto.randomUUID().replaceAll('-', '').slice(0, 24)}`));
+$('random-button').addEventListener('click', () => enter(`room${crypto.randomUUID().replaceAll('-', '').slice(0, 24)}`));
 $('leave-button').addEventListener('click', () => { leave(); $('channel-input').focus(); });
 $('share-button').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(location.href); toast('링크를 복사했습니다.'); }
@@ -279,10 +279,11 @@ window.addEventListener('pagehide', () => leave({ announce: false }));
 window.addEventListener('pageshow', event => { if (event.persisted) leave({ announce: false }); });
 function readInvite() {
   const value = new URLSearchParams(location.hash.slice(1)).get('channel');
-  if (value && !room) {
-    $('channel-input').value = normalizeChannel(value).slice(0, 32);
-    if (!validChannel(normalizeChannel(value))) $('form-error').textContent = '유효하지 않은 초대 링크입니다. 채널명을 다시 입력해 주세요.';
-    else $('join-button').textContent = '입장';
+  if (value !== null && !room) {
+    const valid = validChannel(value);
+    // Do not silently turn an invalid invitation into a different valid room.
+    $('channel-input').value = valid ? normalizeChannel(value) : value.slice(0, 33);
+    $('form-error').textContent = valid ? '' : '유효하지 않은 초대 링크입니다. 채널명은 영문·숫자만 1~32자 입력하세요.';
   }
 }
 window.addEventListener('hashchange', readInvite);
