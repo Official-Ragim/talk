@@ -31,10 +31,39 @@
         <div id="connection-notice" class="connection-notice" role="status" hidden></div>
         <form id="message-form" class="composer"><label for="message-input" class="sr-only">메시지</label><div class="composer-input"><textarea id="message-input" rows="2" maxlength="2000" placeholder="메시지 입력" disabled></textarea><button id="send-button" disabled>전송</button></div><div class="composer-hint"><span id="typing-status" aria-live="polite"></span><span>Enter 전송 · Shift+Enter 줄바꿈</span><span id="character-count">0 / 2,000</span></div></form>
       </section>
-      <aside class="info-panel"><h2>접속자 <span id="participant-count">0</span></h2><p id="connection-status">입장 전</p><ul id="participants" class="participants"><li class="no-participants">없음</li></ul></aside>
+      <aside class="info-panel"><h2>접속자 <span id="participant-count">0</span></h2><p id="connection-status">입장 전</p><ul id="participants" class="participants"><li class="no-participants">없음</li></ul><p class="participant-hint">참가자를 누르면 DM을 시작합니다.</p></aside>
     </div>
+    <section id="minigame-entry" class="minigame-entry" hidden>
+      <div><span class="eyebrow">IP ROOM · FREE FOR ALL</span><h2>DEPOT / 창고 구역</h2><p>팀 없이, 모두가 상대. 게임방에 들어온 사람끼리 전투합니다.</p></div>
+      <button id="arena-enter" type="button">미니게임 방 입장 <span id="arena-count">0명</span></button>
+    </section>
+    <p id="team-game-note" class="footnote" hidden>커스텀 방 팀전 · 1 vs 1 / 2 vs 2 / 3 vs 3 준비 중</p>
     <p class="footnote">나가거나 새로고침하면 내 대화 기록이 삭제됩니다.</p>
   </main>
+  <dialog id="dm-dialog" aria-labelledby="dm-title">
+    <div class="dialog-header"><h2 id="dm-title">DM</h2><button id="dm-leave" type="button">DM 나가기</button></div>
+    <p id="dm-status" role="status"></p><div id="dm-messages" role="log" aria-live="polite" aria-label="DM 메시지"></div>
+    <form id="dm-form"><label class="sr-only" for="dm-input">DM 메시지 입력</label><textarea id="dm-input" rows="2" maxlength="2000" placeholder="이 상대에게만 보내는 메시지"></textarea><button id="dm-send">전송</button></form>
+    <p class="footnote">두 사람이 모두 DM에서 나가면 이 대화가 삭제됩니다.</p>
+  </dialog>
+  <dialog id="arena-dialog" aria-labelledby="arena-title">
+    <header class="arena-header"><div><span class="eyebrow">FREE FOR ALL · 20 KILLS TO WIN</span><h2 id="arena-title">DEPOT <span>창고 구역</span></h2></div><button id="arena-leave" type="button">게임방 나가기</button></header>
+    <div id="arena-lobby">
+      <p class="arena-intro">장비를 고르고 출격하세요. <span id="arena-lobby-count">0명</span>이 게임방에 있습니다.</p>
+      <div id="weapon-options" class="weapon-options" role="group" aria-label="무기 선택">
+        <button type="button" data-weapon="m870" aria-pressed="false"><span>01 / SHOTGUN</span><strong>M870</strong><small>근거리 산탄 · 8발 · 펌프 액션</small></button>
+        <button type="button" data-weapon="m4" aria-pressed="true"><span>02 / ASSAULT RIFLE</span><strong>M4 Carbin</strong><small>자동 사격 · 30발 · 균형 잡힌 연사</small></button>
+        <button type="button" data-weapon="deagle" aria-pressed="false"><span>03 / HAND CANNON</span><strong>Desert Eagle</strong><small>2발 명중 시 처치 · 7발 · 반자동</small></button>
+      </div>
+      <div class="arena-brief"><div><h3>창고를 가로질러, 골목을 장악하세요.</h3><p>중앙 적재장, 양쪽 통로, 콘크리트 엄폐물. 벽 뒤로는 총알이 통과하지 않습니다.</p><p>WASD / 방향키 이동 · 마우스 조준 · 클릭 사격 · R 재장전<br>모바일: 왼쪽 패드 이동 · 맵을 터치해 조준 · 사격 버튼</p></div><button id="arena-play" type="button">출격하기 →</button></div>
+    </div>
+    <div id="arena-battle" hidden>
+      <div class="arena-hud"><span id="arena-health">HP 100</span><span id="arena-weapon">M4 Carbin</span><span id="arena-ammo">30 / 30</span><button id="arena-reload" type="button">재장전 R</button><button id="arena-back" type="button">장비 변경</button></div>
+      <div class="arena-stage"><canvas id="arena-canvas" width="1200" height="760" tabindex="0" aria-label="FFA 전장. WASD 이동, 마우스 조준, 클릭 사격, R 재장전"></canvas><div id="arena-banner" role="status"></div></div>
+      <div class="touch-controls"><div id="move-pad" aria-label="이동 패드"><span>이동</span></div><button id="touch-fire" type="button">사격</button></div>
+      <div class="arena-bottom"><p id="arena-status" role="status"></p><ol id="arena-scoreboard" aria-label="FFA 점수판"></ol></div>
+    </div>
+  </dialog>
   <div class="toast" id="toast" role="status" hidden></div>
   <dialog id="help-dialog"><div class="dialog-header"><h2>도움말</h2><button id="close-help" aria-label="안내 닫기">닫기</button></div><div class="dialog-body"><p><b>커스텀 방:</b> 채널 ID를 영문·숫자 1~32자로 입력합니다. 대소문자는 구분하지 않으며, 같은 ID를 아는 사람끼리 연결됩니다.</p><p><b>공용방(IP):</b> 채널 ID 없이 현재 공인 IPv4 주소를 기준으로 입장합니다. 입장할 때 ipify 서비스로 IP를 확인합니다. VPN이나 통신사 공유 IP에 따라 같은 방에 모이는 사람이 달라질 수 있습니다. IP 확인은 방을 자동 선택하기 위한 것으로, 외부인의 접근을 인증해 차단하는 기능은 아닙니다.</p><p>방 종류를 바꾸거나 나가거나 새로고침하면 내 기록이 삭제됩니다. 다른 사람의 화면에는 남아 있고, 모두 나가면 앱의 기록이 사라집니다. 이전 대화는 새 참여자에게 보내지 않습니다.</p><p>로그인은 없지만 IP를 숨겨 주지는 않습니다. 상대방의 복사나 캡처도 막을 수 없습니다.</p><p>학교·회사망이나 무료 중계 서버의 상태에 따라 연결이 안 될 수 있습니다. IP방이 안 되면 커스텀 방을 이용하세요.</p><button id="help-done">확인</button></div></dialog>
   <script type="module" src="./src/main.js"></script>

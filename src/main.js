@@ -1,5 +1,7 @@
 import { joinRoom, selfId } from '../vendor/trystero.js';
 import { resolveIpRoom, validChannel } from './rooms.js';
+import { createDirectMessages } from './dm.js';
+import { createArena } from './arena.js';
 
 const $ = (id) => document.getElementById(id);
 const peers = new Map();
@@ -7,6 +9,8 @@ let room = null;
 let chat = null;
 let profile = null;
 let typing = null;
+let directMessages = null;
+let arena = null;
 let myName = '';
 let currentChannel = '';
 let mode = 'custom';
@@ -53,6 +57,8 @@ function renderMode() {
   $('channel-field').hidden = isIp;
   $('random-button').hidden = isIp;
   $('share-button').hidden = isIp;
+  $('minigame-entry').hidden = !room || !isIp;
+  $('team-game-note').hidden = !room || isIp;
   $('mode-description').textContent = isIp
     ? '현재 접속 IP를 기준으로 입장합니다. 같은 공인 IP를 쓰는 사람끼리 연결됩니다.'
     : '채널 ID를 정해서 입장하세요. 같은 ID를 입력한 사람끼리 연결됩니다.';
@@ -93,8 +99,15 @@ function updateParticipants() {
   else {
     for (const [id, name] of [[selfId, myName], ...Array.from(peers, ([id, p]) => [id, p.name])]) {
       const li = element('li');
-      li.append(element('span', '', name));
-      if (id === selfId) li.append(element('span', 'you-tag', '나'));
+      if (id === selfId) li.append(element('span', '', name), element('span', 'you-tag', '나'));
+      else {
+        const button = element('button', 'participant-button');
+        button.type = 'button';
+        button.setAttribute('aria-label', `${name}에게 DM`);
+        button.append(element('span', '', name), element('small', 'dm-badge', directMessages?.badge(id) || 'DM'));
+        button.addEventListener('click', () => directMessages?.open(id));
+        li.append(button);
+      }
       list.append(li);
     }
   }
@@ -139,6 +152,8 @@ function leave({ resetUrl = true, announce = true } = {}) {
   lookupController?.abort();
   lookupController = null;
   const oldRoom = room;
+  directMessages?.destroy(); arena?.destroy();
+  directMessages = arena = null;
   room = chat = profile = typing = null;
   // Clear references and DOM immediately, even if the network is unavailable.
   clearTimeout(connectionTimer);
@@ -209,9 +224,13 @@ function connect(channel) {
     chat = room.makeAction('message');
     profile = room.makeAction('profile');
     typing = room.makeAction('typing');
+    const featureOptions = { room, selfId, getName: id => id === selfId ? myName : peers.get(id)?.name || alias(id), hasPeer: id => peers.has(id) };
+    directMessages = createDirectMessages({ ...featureOptions, onChange: updateParticipants });
+    if (mode === 'ip') arena = createArena(featureOptions);
     room.onPeerJoin = (id) => {
       if (token !== generation) return;
       peers.set(id, { name: alias(id), typingUntil: 0 });
+      arena?.peerJoined(id);
       profile.send(myName, { target: id }).catch(() => {});
       notice(); updateParticipants();
       system('참여자가 연결되었습니다.');
@@ -220,6 +239,7 @@ function connect(channel) {
       if (token !== generation) return;
       const name = peers.get(id)?.name || alias(id);
       peers.delete(id); receiveRates.delete(id);
+      directMessages?.peerLeft(id); arena?.peerLeft(id);
       updateParticipants(); updateTyping();
       system(`${name} 님이 연결을 종료했습니다.`);
       if (!peers.size) notice('연결된 참여자가 없습니다.');
@@ -228,6 +248,7 @@ function connect(channel) {
       if (token !== generation || !peers.has(peerId)) return;
       const name = cleanName(value);
       if (name) peers.get(peerId).name = name;
+      directMessages?.refresh();
       updateParticipants();
     };
     chat.onMessage = (message, { peerId }) => {

@@ -90,3 +90,81 @@ input:disabled { background: #f7f7f7; color: #666; }
   .join-form label { flex-basis: calc(50% - 8px); }
   #room-tag { display: none; }
 }
+
+.participant-button { display: flex; align-items: center; justify-content: space-between; gap: 7px; width: 100%; padding: 6px; text-align: left; white-space: normal; background: #fff; border-color: #ddd; }
+.participant-button span { min-width: 0; overflow-wrap: anywhere; }
+.dm-badge { flex-shrink: 0; font-size: 10px; color: #666; }
+.participant-hint { font-size: 11px; color: #888; line-height: 1.6; }
+#dm-dialog { width: 540px; }
+#dm-status { font-size: 12px; color: #777; }
+#dm-messages { height: min(45dvh, 380px); overflow: auto; border-block: 1px solid #ddd; padding: 12px 0; }
+.dm-message { margin: 0 0 16px; overflow-wrap: anywhere; }
+.dm-message strong { font-size: 12px; }
+.dm-message p { margin: 5px 0; white-space: pre-wrap; line-height: 1.6; }
+.dm-message small { color: #888; font-size: 11px; }
+#dm-form { display: flex; gap: 8px; margin-top: 12px; }
+#dm-input { flex: 1; min-width: 0; resize: none; }
+.minigame-entry { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px; margin-top: 16px; background: #202b2b; color: #edf2e9; }
+.eyebrow { font-size: 10px; letter-spacing: 2px; font-weight: bold; color: #b5c3af; }
+.minigame-entry h2 { font-size: 22px; margin: 9px 0; letter-spacing: -1px; }
+.minigame-entry p { font-size: 12px; color: #bbc6bf; margin: 0; line-height: 1.6; }
+.minigame-entry button { background: #d9e5b3; border: 0; color: #222d22; padding: 13px 16px; font-weight: bold; }
+#arena-count { font-size: 11px; margin-left: 10px; opacity: .7; }
+#arena-dialog { width: 1120px; max-width: calc(100% - 24px); max-height: 95dvh; padding: 0; background: #172224; color: #eef3e8; border-color: #536262; }
+#arena-dialog::backdrop { background: #081113cc; }
+#arena-dialog button { color: #e4ecd9; background: #2c3a3a; border-color: #596963; }
+#arena-dialog button:hover { background: #40504b; }
+.arena-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 22px 26px; border-bottom: 1px solid #3c4b49; }
+.arena-header h2 { font-size: 30px; letter-spacing: 2px; margin: 7px 0 0; }
+.arena-header h2 span { font-size: 13px; letter-spacing: 0; font-weight: normal; color: #9cac9f; margin-left: 10px; }
+.arena-header button { font-size: 12px; }
+#arena-lobby { padding: 26px; }
+.arena-intro { margin: 0 0 24px; color: #bbc7bc; line-height: 1.7; }
+.weapon-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+#arena-dialog .weapon-options button { min-height: 158px; text-align: left; padding: 22px; display: flex; flex-direction: column; gap: 18px; white-space: normal; background: #1e2d2e; }
+#arena-dialog .weapon-options button[aria-pressed="true"] { border-color: #d9e5b3; box-shadow: inset 0 3px #d9e5b3; background: #303f38; }
+.weapon-options span { font-size: 10px; letter-spacing: 1.2px; color: #a8ba9f; }
+.weapon-options strong { font-size: 23px; letter-spacing: -1px; }
+.weapon-options small { font-size: 11px; color: #acb9ae; line-height: 1.7; }
+.arena-brief { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-top: 30px; }
+.arena-brief h3 { font-size: 15px; font-weight: normal; }
+.arena-brief p { color: #9cac9f; font-size: 12px; line-height: 1.9; }
+#arena-dialog #arena-play { background: #d9e5b3; color: #253122; padding: 16px 26px; font-weight: bold; border: 0; }
+.arena-hud { display: flex; align-items: center; gap: 16px; padding: 12px 20px; font-size: 12px; min-height: 50px; flex-wrap: wrap; }
+#arena-health { color: #c4edab; font-weight: bold; font-size: 17px; }
+#arena-weapon { flex: 1; }
+.arena-hud button { font-size: 11px; padding: 5px 8px; }
+.arena-stage { position: relative; background: #252e31; }
+#arena-canvas { display: block; width: min(100%, calc(61dvh * 1200 / 760)); height: auto; margin: auto; aspect-ratio: 1200 / 760; touch-action: none; cursor: crosshair; }
+#arena-banner { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); padding: 10px 16px; background: #132022de; color: #e5eecb; text-align: center; font-size: 13px; max-width: 90%; width: max-content; pointer-events: none; }
+#arena-banner:empty { display: none; }
+.arena-bottom { padding: 10px 20px; font-size: 11px; color: #aab9ad; }
+#arena-status { margin: 0 0 8px; }
+#arena-scoreboard { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; padding-left: 15px; }
+.touch-controls { display: none; align-items: center; justify-content: space-between; padding: 10px 20px; }
+#move-pad { width: 100px; height: 100px; border-radius: 50%; border: 1px solid #647466; background: radial-gradient(circle, #637760 0 20%, #283b37 21% 100%); display: grid; place-items: center; touch-action: none; user-select: none; font-size: 12px; }
+#touch-fire { width: 80px; height: 80px; border-radius: 50%; touch-action: none; user-select: none; }
+@media (pointer: coarse) { .touch-controls { display: flex; } }
+@media (max-width: 620px) {
+  .workspace { height: auto; grid-template-rows: minmax(330px, calc(100dvh - 370px)) auto; }
+  .info-panel { display: block; border-left: 0; border-top: 1px solid #ddd; padding: 12px; max-height: 170px; }
+  #connection-status { margin: 6px 0 10px; }
+  .participants { display: flex; flex-wrap: wrap; gap: 8px; }
+  .participants li { margin: 0; }
+  .participant-hint { margin: 9px 0 0; }
+  .minigame-entry { padding: 18px; flex-direction: column; align-items: stretch; gap: 16px; }
+  .arena-header { padding: 16px; }
+  .arena-header h2 { font-size: 24px; }
+  .arena-header h2 span { display: none; }
+  #arena-lobby { padding: 16px; }
+  .weapon-options { grid-template-columns: 1fr; gap: 8px; }
+  #arena-dialog .weapon-options button { min-height: 100px; padding: 16px; gap: 8px; }
+  .weapon-options strong { font-size: 20px; }
+  .arena-brief { flex-direction: column; align-items: stretch; gap: 8px; margin-top: 12px; }
+  .arena-hud { gap: 8px; padding: 10px; }
+  .arena-hud button { padding: 5px; }
+  .touch-controls { display: flex; }
+  #arena-canvas { width: 100%; }
+  #arena-banner { font-size: 11px; padding: 7px 10px; top: 8px; }
+  #dm-input { font-size: 16px; }
+}
