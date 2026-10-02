@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { ArenaEngine, WEAPONS, blocked, validInput } from '../src/arena-engine.js';
+import { assignSeats, validRules } from '../src/arena-lobby.js';
 
 const idle = { x: 0, y: 0, angle: 0, fire: false, reload: false, trigger: 0 };
 function arena() {
@@ -48,3 +49,47 @@ assert.equal(validInput({ ...idle, x: Infinity }), false);
 assert.equal(validInput({ ...idle, x: 3 }), false);
 assert.equal(validInput({ ...idle, trigger: -1 }), false);
 console.log('Arena checks passed: two-hit kill, semiauto, walls, movement, reload, shotgun, respawn, round reset, invalid input.');
+
+for (const size of [1, 2, 3, 4, 5, 6]) {
+  const members = new Map(Array.from({ length: size * 2 + 2 }, (_, i) => [`p${String(i).padStart(2, '0')}`, { team: 'auto' }]));
+  let seats = assignSeats(members, new Map(), size);
+  assert.equal(seats.size, size * 2, 'Seats never exceed the selected n vs n capacity');
+  for (const side of ['red', 'blue']) assert.equal([...seats.values()].filter(t => t === side).length, size);
+  const incumbent = [...seats.keys()][0];
+  const incumbentSide = seats.get(incumbent);
+  members.set('first', { team: incumbentSide });
+  seats = assignSeats(members, seats, size);
+  assert.equal(seats.get(incumbent), incumbentSide, 'New requests do not displace accepted players');
+  assert.equal(seats.has('first'), false, 'A full team rejects another request');
+  members.delete(incumbent);
+  seats = assignSeats(members, seats, size);
+  assert.equal(seats.size, size * 2, 'An empty seat can be filled');
+  const match = new ArenaEngine({ mode: 'teams', size });
+  for (const side of ['red', 'blue']) for (let i = 0; i < size; i++) match.add(`${side}${i}`, 'deagle', side);
+  assert.equal(match.waiting, false);
+  match.add('overflow', 'm4', 'red'); assert.equal(match.players.has('overflow'), false);
+  assert.ok(match.players.get('red0').x < 200 && match.players.get('blue0').x > 1000, 'Teams spawn on opposite sides');
+  match.remove('blue0'); assert.equal(match.waiting, true);
+  const before = { ...match.players.get('red0') };
+  match.step(0.05, new Map([['red0', { ...idle, x: 1, fire: true, trigger: 1 }]]));
+  assert.equal(match.players.get('red0').x, before.x); assert.equal(match.players.get('red0').ammo, before.ammo);
+  match.add('blue0', 'm4', 'blue'); assert.equal(match.waiting, false);
+}
+const teams = new ArenaEngine({ mode: 'teams', size: 2 });
+teams.add('red1', 'deagle', 'red'); teams.add('red2', 'deagle', 'red'); teams.add('blue1', 'm4', 'blue'); teams.add('blue2', 'm4', 'blue');
+Object.assign(teams.players.get('red1'), { x: 100, y: 90, angle: 0, shieldUntil: 0 });
+Object.assign(teams.players.get('red2'), { x: 200, y: 90, shieldUntil: 0 });
+Object.assign(teams.players.get('blue1'), { x: 300, y: 90, shieldUntil: 0 });
+Object.assign(teams.players.get('blue2'), { x: 700, y: 690, shieldUntil: 0 });
+teams.shoot(teams.players.get('red1'));
+assert.equal(teams.players.get('red2').hp, 100, 'Friendly fire is disabled');
+assert.equal(teams.players.get('blue1').hp, 50, 'Enemy receives Desert Eagle damage');
+teams.teamScores.red = 19;
+teams.shoot(teams.players.get('red1'));
+assert.equal(teams.winner, 'red'); assert.equal(teams.teamScores.red, 20);
+assert.equal(teams.players.get('red1').kills, 1, 'Victory uses team score, not individual score');
+teams.step(8.1, new Map()); assert.equal(teams.winner, null); assert.deepEqual(teams.teamScores, { red: 0, blue: 0 });
+assert.equal(validRules({ mode: 'teams', size: 2 }, false), false, 'IP rooms cannot enable teams');
+assert.equal(validRules({ mode: 'teams', size: 7 }, true), false);
+assert.equal(validRules({ mode: 'teams', size: 1.5 }, true), false);
+console.log('Team checks passed: 1–6 vs 1–6, capacity, seat races, spawn sides, readiness, friendly fire, team victory, round reset, IP restrictions.');

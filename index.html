@@ -34,10 +34,9 @@
       <aside class="info-panel"><h2>접속자 <span id="participant-count">0</span></h2><p id="connection-status">입장 전</p><ul id="participants" class="participants"><li class="no-participants">없음</li></ul><p class="participant-hint">참가자를 누르면 DM을 시작합니다.</p></aside>
     </div>
     <section id="minigame-entry" class="minigame-entry" hidden>
-      <div><span class="eyebrow">IP ROOM · FREE FOR ALL</span><h2>DEPOT / 창고 구역</h2><p>팀 없이, 모두가 상대. 게임방에 들어온 사람끼리 전투합니다.</p></div>
+      <div><span id="minigame-label" class="eyebrow">IP ROOM · FREE FOR ALL</span><h2>DEPOT / 창고 구역</h2><p id="minigame-description">팀 없이, 모두가 상대. 게임방에 들어온 사람끼리 전투합니다.</p></div>
       <button id="arena-enter" type="button">미니게임 방 입장 <span id="arena-count">0명</span></button>
     </section>
-    <p id="team-game-note" class="footnote" hidden>커스텀 방 팀전 · 1 vs 1 / 2 vs 2 / 3 vs 3 준비 중</p>
     <p class="footnote">나가거나 새로고침하면 내 대화 기록이 삭제됩니다.</p>
   </main>
   <dialog id="dm-dialog" aria-labelledby="dm-title">
@@ -47,9 +46,14 @@
     <p class="footnote">두 사람이 모두 DM에서 나가면 이 대화가 삭제됩니다.</p>
   </dialog>
   <dialog id="arena-dialog" aria-labelledby="arena-title">
-    <header class="arena-header"><div><span class="eyebrow">FREE FOR ALL · 20 KILLS TO WIN</span><h2 id="arena-title">DEPOT <span>창고 구역</span></h2></div><button id="arena-leave" type="button">게임방 나가기</button></header>
+    <header class="arena-header"><div><span id="arena-mode-label" class="eyebrow">FREE FOR ALL · 20 KILLS TO WIN</span><h2 id="arena-title">DEPOT <span>창고 구역</span></h2></div><button id="arena-leave" type="button">게임방 나가기</button></header>
     <div id="arena-lobby">
       <p class="arena-intro">장비를 고르고 출격하세요. <span id="arena-lobby-count">0명</span>이 게임방에 있습니다.</p>
+      <section id="arena-match-settings" class="match-settings" hidden>
+        <div class="match-options"><label>게임 방식<select id="arena-mode"><option value="ffa">Free For All</option><option value="teams">n vs n 팀전</option></select></label><label id="arena-size-field" hidden>팀당 인원<select id="arena-size"><option value="1">1 vs 1</option><option value="2">2 vs 2</option><option value="3">3 vs 3</option><option value="4">4 vs 4</option><option value="5">5 vs 5</option><option value="6">6 vs 6</option></select></label></div>
+        <p id="arena-settings-note" role="status"></p>
+        <div id="arena-teams" hidden><div class="team-choices" role="group" aria-label="팀 선택"><button data-team="auto" type="button">자동 배정</button><button data-team="red" type="button">레드 팀</button><button data-team="blue" type="button">블루 팀</button></div><div class="team-rosters"><div><h3 id="red-count">레드</h3><ul id="red-roster"></ul></div><div><h3 id="blue-count">블루</h3><ul id="blue-roster"></ul></div></div><p id="arena-team-status" role="status"></p></div>
+      </section>
       <div id="weapon-options" class="weapon-options" role="group" aria-label="무기 선택">
         <button type="button" data-weapon="m870" aria-pressed="false"><span>01 / SHOTGUN</span><strong>M870</strong><small>근거리 산탄 · 8발 · 펌프 액션</small></button>
         <button type="button" data-weapon="m4" aria-pressed="true"><span>02 / ASSAULT RIFLE</span><strong>M4 Carbin</strong><small>자동 사격 · 30발 · 균형 잡힌 연사</small></button>
@@ -58,10 +62,11 @@
       <div class="arena-brief"><div><h3>창고를 가로질러, 골목을 장악하세요.</h3><p>중앙 적재장, 양쪽 통로, 콘크리트 엄폐물. 벽 뒤로는 총알이 통과하지 않습니다.</p><p>WASD / 방향키 이동 · 마우스 조준 · 클릭 사격 · R 재장전<br>모바일: 왼쪽 패드 이동 · 맵을 터치해 조준 · 사격 버튼</p></div><button id="arena-play" type="button">출격하기 →</button></div>
     </div>
     <div id="arena-battle" hidden>
-      <div class="arena-hud"><span id="arena-health">HP 100</span><span id="arena-weapon">M4 Carbin</span><span id="arena-ammo">30 / 30</span><button id="arena-reload" type="button">재장전 R</button><button id="arena-back" type="button">장비 변경</button></div>
+      <div id="arena-team-score" class="team-score" hidden></div>
+      <div class="arena-hud"><span id="arena-health">HP 100</span><span id="arena-weapon">M4 Carbin</span><span id="arena-ammo">30 / 30</span><button id="arena-reload" type="button">재장전 R</button><button id="arena-back" type="button">장비 변경 / 준비 해제</button></div>
       <div class="arena-stage"><canvas id="arena-canvas" width="1200" height="760" tabindex="0" aria-label="FFA 전장. WASD 이동, 마우스 조준, 클릭 사격, R 재장전"></canvas><div id="arena-banner" role="status"></div></div>
       <div class="touch-controls"><div id="move-pad" aria-label="이동 패드"><span>이동</span></div><button id="touch-fire" type="button">사격</button></div>
-      <div class="arena-bottom"><p id="arena-status" role="status"></p><ol id="arena-scoreboard" aria-label="FFA 점수판"></ol></div>
+      <div class="arena-bottom"><p id="arena-status" role="status"></p><ol id="arena-scoreboard" aria-label="게임 점수판"></ol></div>
     </div>
   </dialog>
   <div class="toast" id="toast" role="status" hidden></div>

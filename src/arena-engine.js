@@ -41,26 +41,34 @@ export function validInput(input) {
   return input && ['x', 'y', 'angle'].every(key => Number.isFinite(input[key])) && Math.abs(input.x) <= 1 && Math.abs(input.y) <= 1 && Math.abs(input.angle) <= Math.PI * 2 && typeof input.fire === 'boolean' && typeof input.reload === 'boolean' && Number.isSafeInteger(input.trigger) && input.trigger >= 0;
 }
 export class ArenaEngine {
-  constructor() { this.players = new Map(); this.time = 0; this.traces = []; this.feed = []; this.winner = null; this.restartAt = 0; this.shotId = 0; }
-  add(id, weapon = 'm4') {
+  constructor(rules = { mode: 'ffa', size: 1 }) { this.rules = { ...rules }; this.teamScores = { red: 0, blue: 0 }; this.players = new Map(); this.time = 0; this.traces = []; this.feed = []; this.winner = null; this.restartAt = 0; this.shotId = 0; }
+  get waiting() { return this.rules.mode === 'teams' && ['red', 'blue'].some(team => [...this.players.values()].filter(p => p.team === team).length !== this.rules.size); }
+  add(id, weapon = 'm4', team = null) {
     if (this.players.has(id) || !WEAPONS[weapon]) return;
-    const p = { id, weapon, kills: 0, deaths: 0, angle: 0, lastTrigger: 0, cooldown: 0, reloadUntil: 0, respawnAt: 0 };
+    if (this.rules.mode === 'teams' && (!['red', 'blue'].includes(team) || [...this.players.values()].filter(p => p.team === team).length >= this.rules.size)) return;
+    const p = { id, weapon, team, kills: 0, deaths: 0, angle: 0, lastTrigger: 0, cooldown: 0, reloadUntil: 0, respawnAt: 0 };
     this.players.set(id, p); this.spawn(p);
   }
   remove(id) { this.players.delete(id); }
   spawn(p) {
     // Prefer the spawn farthest from living opponents.
     const others = [...this.players.values()].filter(other => other.id !== p.id && other.hp > 0);
-    const ranked = SPAWNS.map((point, index) => ({ point, score: others.length ? Math.min(...others.map(o => Math.hypot(o.x - point[0], o.y - point[1]))) : (index === this.players.size % SPAWNS.length ? 1 : 0) })).sort((a, b) => b.score - a.score);
+    const spawns = this.rules.mode === 'teams' ? [80, 200, 320, 440, 560, 680].map(y => [p.team === 'red' ? 90 : 1110, y]) : SPAWNS;
+    const ranked = spawns.map((point, index) => ({ point, score: others.length ? Math.min(...others.map(o => Math.hypot(o.x - point[0], o.y - point[1]))) : (index === this.players.size % spawns.length ? 1 : 0) })).sort((a, b) => b.score - a.score);
     [p.x, p.y] = ranked[0].point;
     p.hp = 100; p.ammo = WEAPONS[p.weapon].magazine; p.reloadUntil = 0; p.respawnAt = 0; p.cooldown = 0; p.shieldUntil = this.time + 1.5;
   }
   step(dt, inputs) {
+    if (this.waiting) {
+      this.traces = [];
+      for (const p of this.players.values()) if (inputs.has(p.id)) p.lastTrigger = inputs.get(p.id).trigger;
+      return;
+    }
     this.time += dt;
     this.traces = this.traces.filter(t => t.until > this.time);
     if (this.winner) {
       if (this.time >= this.restartAt) {
-        this.winner = null; this.feed = [];
+        this.winner = null; this.feed = []; this.teamScores = { red: 0, blue: 0 };
         for (const p of this.players.values()) { p.kills = p.deaths = 0; this.spawn(p); }
       }
       return;
@@ -92,6 +100,7 @@ export class ArenaEngine {
     }
   }
   shoot(p) {
+    if (this.waiting || this.winner || p.hp <= 0) return;
     const w = WEAPONS[p.weapon];
     const damage = new Map();
     for (let i = 0; i < w.pellets; i++) {
@@ -100,7 +109,7 @@ export class ArenaEngine {
       let distance = Math.min(w.range, ...WALLS.map(wall => rayWall(p.x, p.y, dx, dy, wall)));
       let target = null;
       for (const other of this.players.values()) {
-        if (other.id === p.id || other.hp <= 0 || other.shieldUntil > this.time) continue;
+        if (other.id === p.id || other.hp <= 0 || other.shieldUntil > this.time || (this.rules.mode === 'teams' && other.team === p.team)) continue;
         const hit = rayPlayer(p.x, p.y, dx, dy, other);
         if (hit < distance) { distance = hit; target = other; }
       }
@@ -114,9 +123,10 @@ export class ArenaEngine {
         target.deaths++; p.kills++; target.respawnAt = this.time + 3;
         this.feed.unshift({ killer: p.id, victim: target.id, weapon: p.weapon, at: this.time });
         this.feed = this.feed.slice(0, 4);
-        if (p.kills >= 20) { this.winner = p.id; this.restartAt = this.time + 8; }
+        if (this.rules.mode === 'teams') this.teamScores[p.team]++;
+        if (this.rules.mode === 'teams' ? this.teamScores[p.team] >= 20 : p.kills >= 20) { this.winner = this.rules.mode === 'teams' ? p.team : p.id; this.restartAt = this.time + 8; }
       }
     }
   }
-  snapshot() { return { time: this.time, players: [...this.players.values()].map(p => ({ ...p })), traces: this.traces, feed: this.feed, winner: this.winner, restartAt: this.restartAt }; }
+  snapshot() { return { time: this.time, players: [...this.players.values()].map(p => ({ ...p })), traces: this.traces, feed: this.feed, winner: this.winner, restartAt: this.restartAt, waiting: this.waiting, teamScores: { ...this.teamScores } }; }
 }

@@ -16,7 +16,7 @@ test('DM is participant-only, private, retained with one occupant, and erased wh
     await expect(a.locator('#participant-count')).toHaveText('3', { timeout: 60000 });
     await expect(b.locator('#participant-count')).toHaveText('3', { timeout: 60000 });
     await expect(c.locator('#participant-count')).toHaveText('3', { timeout: 60000 });
-    await expect(a.locator('#minigame-entry')).toBeHidden();
+    await expect(a.locator('#minigame-entry')).toBeVisible();
     await a.getByRole('button', { name: 'Bob에게 DM' }).click();
     await a.locator('#dm-input').fill('<b>비밀 메시지</b>'); await a.locator('#dm-send').click();
     await expect(b.getByRole('button', { name: 'Alice에게 DM' })).toContainText('DM 1');
@@ -70,6 +70,7 @@ test('IP arena opts in separately, synchronizes weapons, supports reload and hos
       await p.locator('[data-weapon="deagle"]').click();
     }
     await expect(a.locator('#arena-lobby-count')).toHaveText('2명');
+    await expect(a.locator('#arena-match-settings')).toBeHidden();
     await expect(b.locator('#arena-lobby-count')).toHaveText('2명');
     await a.screenshot({ path: 'test-results/arena-lobby.png', fullPage: true });
     await a.locator('#arena-play').click(); await b.locator('#arena-play').click();

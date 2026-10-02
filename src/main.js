@@ -57,8 +57,9 @@ function renderMode() {
   $('channel-field').hidden = isIp;
   $('random-button').hidden = isIp;
   $('share-button').hidden = isIp;
-  $('minigame-entry').hidden = !room || !isIp;
-  $('team-game-note').hidden = !room || isIp;
+  $('minigame-entry').hidden = !room;
+  $('minigame-label').textContent = isIp ? 'IP ROOM · FREE FOR ALL' : 'CUSTOM ROOM · FFA / TEAM MATCH';
+  $('minigame-description').textContent = isIp ? '팀 없이, 모두가 상대. 게임방에 들어온 사람끼리 전투합니다.' : '자유 전투부터 1 vs 1 ~ 6 vs 6 팀전까지. 친구들과 창고 구역에 출격하세요.';
   $('mode-description').textContent = isIp
     ? '현재 접속 IP를 기준으로 입장합니다. 같은 공인 IP를 쓰는 사람끼리 연결됩니다.'
     : '채널 ID를 정해서 입장하세요. 같은 ID를 입력한 사람끼리 연결됩니다.';
@@ -226,7 +227,7 @@ function connect(channel) {
     typing = room.makeAction('typing');
     const featureOptions = { room, selfId, getName: id => id === selfId ? myName : peers.get(id)?.name || alias(id), hasPeer: id => peers.has(id) };
     directMessages = createDirectMessages({ ...featureOptions, onChange: updateParticipants });
-    if (mode === 'ip') arena = createArena(featureOptions);
+    arena = createArena({ ...featureOptions, custom: mode === 'custom' });
     room.onPeerJoin = (id) => {
       if (token !== generation) return;
       peers.set(id, { name: alias(id), typingUntil: 0 });
