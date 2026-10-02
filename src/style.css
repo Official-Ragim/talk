@@ -153,9 +153,14 @@ input:disabled { background: #f7f7f7; color: #666; }
 .arena-stage { position: relative; background: #252e31; }
 .camera-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 9px 20px; background: #1c2b2d; font-size: 11px; color: #c6d5bf; }
 .camera-settings label { display: flex; gap: 6px; align-items: center; }
+#arena-quality { font: inherit; background: #2b3d38; color: #deebd3; border: 1px solid #647466; padding: 4px; }
 #arena-fov { width: 130px; accent-color: #d9e5b3; padding: 0; }
 #arena-look-hint { color: #9cad9f; }
 #arena-crosshair { position: absolute; color: white; text-shadow: 0 1px 2px #000; font: 26px/1 monospace; transform: translate(-50%, -50%); pointer-events: none; }
+#arena-crosshair.aiming { font-size: 16px; color: #e4ffb5; }
+#arena-dialog #arena-aim[aria-pressed="true"], #arena-dialog #touch-aim[aria-pressed="true"] { background: #d9e5b3; color: #1b2a22; border-color: #d9e5b3; }
+.touch-actions { display: flex; align-items: center; gap: 12px; }
+#touch-aim { width: 60px; height: 60px; border-radius: 50%; touch-action: manipulation; user-select: none; }
 #arena-render-error { margin: 12px 20px; padding: 12px; background: #583b32; color: #ffe4d7; font-size: 13px; }
 #arena-canvas { display: block; width: min(100%, calc(61dvh * 1200 / 760)); height: auto; margin: auto; aspect-ratio: 1200 / 760; touch-action: none; cursor: crosshair; }
 #arena-banner { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); padding: 10px 16px; background: #132022de; color: #e5eecb; text-align: center; font-size: 13px; max-width: 90%; width: max-content; pointer-events: none; }

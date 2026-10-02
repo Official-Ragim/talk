@@ -2,13 +2,17 @@ import { ArenaEngine, WORLD, WALLS, WEAPONS, validInput } from './arena-engine.j
 import { assignSeats, TEAM_NAMES, validRules, firstStarter } from './arena-lobby.js';
 import { createArenaRenderer } from './arena-renderer.js';
 import { clamp, wrapAngle, relativeMove } from './arena-camera.js';
+import { createLatestSender } from './arena-network.js';
 
 export function createArena({ room, selfId, getName, hasPeer, custom = false }) {
-  const $ = id => document.getElementById(id);
+  const elements = new Map();
+  const $ = id => { if (!elements.has(id)) elements.set(id, document.getElementById(id)); return elements.get(id); };
+  const setText = (id, text) => { if ($(id).textContent !== text) $(id).textContent = text; };
   const membership = room.makeAction('arenaMember');
   const control = room.makeAction('arenaInput');
   const state = room.makeAction('arenaState');
   const setup = room.makeAction('arenaSetup');
+  const stateSender = createLatestSender((value, target) => state.send(value, { target }));
   const members = new Map();
   const inputs = new Map();
   const inputTimes = new Map();
@@ -22,6 +26,16 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   let rules = { mode: 'ffa', size: 1, view: 'top' }, revision = -1, seats = new Map(), team = 'auto', lastSetup = 0;
   let order = 0, startedAt = 0, yaw = 0, pitch = 0, fov = 75, cameraReady = false, unlockedAt = -1000, lockUnavailable = false, lookPointer = null;
   let pointerN = { x: 0, y: 0 };
+  let aimHeld = false, aimToggle = false, ads = 0, lastDraw = 0, boardKey = '', inputKey = '', lastInputAt = 0, quality = 'auto';
+  let crosshairX = -1, crosshairY = -1;
+  const layout = { width: 0, canvasWidth: 0, height: 0 };
+  const layoutObserver = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      if (entry.target === canvas) { layout.canvasWidth = entry.contentRect.width; layout.height = entry.contentRect.height; }
+      else layout.width = entry.contentRect.width;
+    }
+  });
+  layoutObserver.observe(canvas); layoutObserver.observe(canvas.parentElement);
   let pointer = { x: 600, y: 380 }, firing = false, trigger = 0, reload = false, stick = { x: 0, y: 0 };
   const listen = (target, type, fn) => target.addEventListener(type, fn, { signal: events.signal });
   const safeSend = (action, value, target) => { action.send(value, target ? { target } : undefined).catch(() => {}); };
@@ -37,8 +51,8 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     $('arena-game-rules').hidden = !custom;
     $('arena-view').value = rules.view;
     $('arena-current-view').textContent = fps ? '3D 1인칭' : '3D 탑뷰';
-    $('arena-look-hint').textContent = fps ? '화면 클릭: 마우스 잠금 · Esc: 잠금 해제 · 모바일: 드래그 조준' : '마우스 / 터치로 조준 · 시야각을 넓히면 더 멀리 보입니다.';
-    $('arena-controls-help').textContent = fps ? 'WASD 이동 · 화면 클릭 후 마우스로 둘러보기 · 클릭 / Space 사격 · R 재장전 · Esc 마우스 해제. 모바일: 이동 패드 + 화면 드래그 조준 + 사격 버튼.' : 'WASD / 방향키 이동 · 마우스 조준 · 클릭 / Space 사격 · R 재장전. 모바일: 이동 패드 + 화면 터치 조준 + 사격 버튼.';
+    $('arena-look-hint').textContent = fps ? '우클릭 / Shift: 정밀 조준 · 화면 클릭: 마우스 잠금 · Esc: 해제' : '우클릭 / Shift: 정밀 조준 · 마우스 / 터치로 겨냥';
+    $('arena-controls-help').textContent = (fps ? 'WASD 이동 · 화면 클릭 후 마우스로 둘러보기 · Esc 마우스 해제. ' : 'WASD / 방향키 이동 · 마우스로 겨냥. ') + '우클릭 / Shift 정밀 조준 · 클릭 / Space 사격 · R 재장전. 모바일: 이동 패드 + 화면 드래그/터치 + 조준·사격 버튼.';
     $('arena-mode').value = rules.mode;
     $('arena-size').value = String(rules.size);
     const locked = [...members.values()].some(m => m.playing);
@@ -79,7 +93,16 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
       if (member.playing) engine.add(id, member.weapon, rules.mode === 'teams' ? seats.get(id) : null);
     }
   }
-  function resetInput() { keys.clear(); firing = false; reload = false; stick = { x: 0, y: 0 }; }
+  function aiming() {
+    const me = snapshot?.players.find(p => p.id === selfId);
+    return Boolean(playing && me?.hp > 0 && !snapshot.waiting && !snapshot.winner && !me.reloadUntil && !reload && (aimHeld || aimToggle || keys.has('ShiftLeft') || keys.has('ShiftRight')));
+  }
+  function renderAim() {
+    const active = aiming();
+    for (const id of ['arena-aim', 'touch-aim']) if ($(id).getAttribute('aria-pressed') !== String(active)) $(id).setAttribute('aria-pressed', String(active));
+    if (canvas.dataset.aiming !== String(active)) { canvas.dataset.aiming = String(active); $('arena-crosshair').classList.toggle('aiming', active); }
+  }
+  function resetInput() { keys.clear(); firing = false; reload = false; aimHeld = aimToggle = false; stick = { x: 0, y: 0 }; renderAim(); }
   function announce(target) { safeSend(membership, localPresence(), target); }
   function reconcile() {
     const next = firstStarter(members);
@@ -87,6 +110,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     if (nextKey !== hostKey) {
       if (host && next && joined) migrationUntil = performance.now() + 4000;
       host = next; hostKey = nextKey; inputs.clear(); inputTimes.clear(); snapshot = null;
+      stateSender.clear(); inputKey = '';
       trigger = 0; revision = host === selfId ? 0 : -1;
       if (!host) { rules = { mode: 'ffa', size: 1, view: 'top' }; seats.clear(); }
       engine = joined && host === selfId ? new ArenaEngine(rules) : null;
@@ -128,7 +152,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     return s && Number.isFinite(s.time) && Array.isArray(s.players) && s.players.length <= members.size && s.players.every(p => members.get(p.id)?.playing && Object.hasOwn(WEAPONS, p.weapon) && ['x', 'y', 'angle', 'hp', 'ammo', 'kills', 'deaths', 'shieldUntil', 'respawnAt', 'reloadUntil'].every(k => Number.isFinite(p[k])) && p.x >= 0 && p.x <= WORLD.width && p.y >= 0 && p.y <= WORLD.height && p.hp >= 0 && p.hp <= 100) && Array.isArray(s.traces) && s.traces.length <= 160 && s.traces.every(t => ['x', 'y', 'endX', 'endY'].every(k => Number.isFinite(t[k]))) && Array.isArray(s.feed) && s.feed.length <= 4 && s.feed.every(f => typeof f.killer === 'string' && typeof f.victim === 'string' && Object.hasOwn(WEAPONS, f.weapon)) && (s.winner === null || typeof s.winner === 'string') && Number.isFinite(s.restartAt);
   }
   state.onMessage = (packet, { peerId }) => {
-    if (disposed || !joined || peerId !== host || !acceptSetup(packet, peerId) || !validSnapshot(packet.snapshot) || typeof packet.snapshot.waiting !== 'boolean' || !['red', 'blue'].every(side => Number.isInteger(packet.snapshot.teamScores?.[side]) && packet.snapshot.teamScores[side] >= 0)) return;
+    if (disposed || !joined || peerId !== host || packet?.hostKey !== hostKey || packet.revision !== revision || !validSnapshot(packet.snapshot) || typeof packet.snapshot.waiting !== 'boolean' || !['red', 'blue'].every(side => Number.isInteger(packet.snapshot.teamScores?.[side]) && packet.snapshot.teamScores[side] >= 0)) return;
     if (snapshot && packet.snapshot.time < snapshot.time) return;
     snapshot = packet.snapshot; lastSnapshotAt = performance.now();
   };
@@ -143,14 +167,18 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
       x: move.x / length, y: move.y / length,
       angle: fps ? yaw : me ? Math.atan2(pointer.y - me.y, pointer.x - me.x) : 0,
       pitch: fps ? pitch : 0,
-      fire: firing, trigger, reload,
+      fire: firing, trigger, reload, aiming: aiming(),
     };
   }
   function sendInput() {
     if (!playing || !host) return;
     const value = input();
     if (host === selfId) { inputs.set(selfId, { ...value, reload: value.reload || inputs.get(selfId)?.reload || false }); inputTimes.set(selfId, performance.now()); }
-    else safeSend(control, { hostKey, revision, session, input: value }, host);
+    else {
+      for (const field of ['x', 'y', 'angle', 'pitch']) value[field] = Math.round(value[field] * 1000) / 1000;
+      const key = `${hostKey}:${revision}:` + JSON.stringify(value), now = performance.now();
+      if (key !== inputKey || now - lastInputAt >= 150) { inputKey = key; lastInputAt = now; safeSend(control, { hostKey, revision, session, input: value }, host); }
+    }
     reload = false;
   }
   const tick = setInterval(() => {
@@ -168,12 +196,13 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     if (now - lastSend > 65) {
       lastSend = now;
       const targets = [...members.keys()].filter(id => id !== selfId);
-      if (targets.length) safeSend(state, { ...setupPacket(), snapshot }, targets);
+      if (targets.length) stateSender.send({ hostKey, revision, snapshot }, targets);
     }
   }, 1000 / 30);
   function leave() {
     if (!joined) return;
     joined = playing = false; resetInput(); updatePresence(); engine = null; snapshot = null;
+    stateSender.clear(); boardKey = ''; ads = 0;
     if (document.pointerLockElement === canvas) document.exitPointerLock();
     $('arena-dialog').close(); $('arena-battle').hidden = true; $('arena-lobby').hidden = false;
     $('arena-scoreboard').replaceChildren(); $('arena-banner').textContent = ''; $('arena-status').textContent = '';
@@ -199,6 +228,8 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   listen($('arena-size'), 'change', changeRules);
   listen($('arena-view'), 'change', changeRules);
   listen($('arena-fov'), 'input', () => { fov = clamp(Number($('arena-fov').value), 55, 110); $('arena-fov-value').textContent = `${fov}°`; });
+  listen($('arena-quality'), 'change', () => { quality = $('arena-quality').value; renderer?.setQuality(quality); });
+  for (const id of ['arena-aim', 'touch-aim']) listen($(id), 'click', () => { aimToggle = !aimToggle; renderAim(); sendInput(); });
   for (const button of document.querySelectorAll('[data-team]')) listen(button, 'click', () => {
     if (!joined || playing) return;
     team = button.dataset.team; updatePresence();
@@ -210,7 +241,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   });
   listen($('arena-play'), 'click', () => {
     if (!joined || revision < 0 || (rules.mode === 'teams' && !seats.has(selfId))) return;
-    try { renderer ||= createArenaRenderer(canvas); $('arena-render-error').hidden = true; }
+    try { renderer ||= createArenaRenderer(canvas); renderer.setQuality(quality); $('arena-render-error').hidden = true; }
     catch (error) { $('arena-render-error').textContent = error.message; $('arena-render-error').hidden = false; return; }
     cameraReady = false;
     playing = true; trigger = 0; resetInput(); updatePresence();
@@ -225,11 +256,12 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     if (e.code === 'Escape' && document.pointerLockElement === canvas) {
       e.preventDefault(); unlockedAt = performance.now(); document.exitPointerLock(); resetInput(); sendInput(); return;
     }
-    if (!playing || ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName) || !['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'KeyR', 'Space'].includes(e.code)) return;
+    if (!playing || ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName) || !['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'KeyR', 'Space', 'ShiftLeft', 'ShiftRight'].includes(e.code)) return;
     e.preventDefault(); keys.add(e.code); if (e.code === 'KeyR') reload = true;
     if (e.code === 'Space' && !e.repeat) { firing = true; trigger++; sendInput(); }
+    if (e.code.startsWith('Shift')) { renderAim(); sendInput(); }
   });
-  listen(window, 'keyup', e => { keys.delete(e.code); if (e.code === 'Space') { firing = false; sendInput(); } });
+  listen(window, 'keyup', e => { keys.delete(e.code); if (e.code === 'Space') firing = false; if (e.code === 'Space' || e.code.startsWith('Shift')) { renderAim(); sendInput(); } });
   listen(window, 'blur', () => { resetInput(); sendInput(); });
   listen(document, 'visibilitychange', () => { if (document.hidden) { resetInput(); sendInput(); } });
   function aim(e) {
@@ -238,7 +270,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     const aimed = renderer?.aim(pointerN.x, pointerN.y);
     if (aimed) pointer = aimed;
   }
-  function turn(dx, dy) { yaw = wrapAngle(yaw + dx * 0.0028); pitch = clamp(pitch - dy * 0.0028, -1.15, 1.15); }
+  function turn(dx, dy) { const sensitivity = 0.0028 * (aiming() ? 0.5 : 1); yaw = wrapAngle(yaw + dx * sensitivity); pitch = clamp(pitch - dy * sensitivity, -1.15, 1.15); }
   listen(canvas, 'pointermove', e => {
     if (!playing) return;
     if (rules.view === 'top') aim(e);
@@ -253,6 +285,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     if (document.pointerLockElement !== canvas) { unlockedAt = performance.now(); resetInput(); sendInput(); }
   });
   listen(canvas, 'pointerdown', e => {
+    if (e.button === 2 && playing) { e.preventDefault(); aimHeld = true; renderAim(); sendInput(); return; }
     if (e.button !== 0 || !playing) return;
     e.preventDefault(); canvas.focus();
     if (rules.view === 'fps') {
@@ -265,8 +298,20 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     if (e.pointerType !== 'touch') { firing = true; trigger++; sendInput(); }
     if (document.pointerLockElement !== canvas) canvas.setPointerCapture(e.pointerId);
   });
-  listen(window, 'pointerup', e => { if (lookPointer?.id === e.pointerId) lookPointer = null; if (e.pointerType !== 'touch') { firing = false; sendInput(); } });
-  listen(canvas, 'pointercancel', () => { firing = false; lookPointer = null; });
+  listen(window, 'pointerup', e => { if (lookPointer?.id === e.pointerId) lookPointer = null; if (e.button === 2) { aimHeld = false; renderAim(); sendInput(); } else if (e.pointerType !== 'touch') { firing = false; sendInput(); } });
+  // Pointer events omit intermediate presses/releases when two mouse buttons are held.
+  listen(canvas, 'mousedown', e => {
+    if (!playing || e.buttons !== 3) return;
+    if (e.button === 2) aimHeld = true;
+    else if (e.button === 0) { firing = true; trigger++; }
+    renderAim(); sendInput();
+  });
+  listen(window, 'mouseup', e => {
+    if (e.button === 2) aimHeld = false;
+    if (e.button === 0) firing = false;
+    renderAim(); sendInput();
+  });
+  listen(canvas, 'pointercancel', () => { firing = false; aimHeld = false; lookPointer = null; renderAim(); sendInput(); });
   listen(canvas, 'contextmenu', e => e.preventDefault());
   listen(canvas, 'webglcontextlost', e => {
     e.preventDefault(); playing = false; resetInput(); updatePresence();
@@ -289,34 +334,45 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   function draw(now) {
     if (disposed) return;
     frame = requestAnimationFrame(draw);
-    if (!playing || !renderer) return;
+    if (!playing || !renderer || document.hidden || now - lastDraw < 15.5) return;
+    const dt = Math.min(0.05, (now - lastDraw) / 1000); lastDraw = now;
+    const aim = aiming();
+    ads += ((aim ? 1 : 0) - ads) * (1 - Math.exp(-dt * 22));
+    if (Math.abs(ads - (aim ? 1 : 0)) < 0.001) ads = aim ? 1 : 0;
+    renderAim();
     const viewPlayer = snapshot?.players.find(p => p.id === selfId);
     if (viewPlayer && !cameraReady) {
       yaw = Math.atan2(380 - viewPlayer.y, 600 - viewPlayer.x); pitch = 0; cameraReady = true;
     }
     if (rules.view === 'top' && viewPlayer) yaw = Math.atan2(pointer.y - viewPlayer.y, pointer.x - viewPlayer.x);
-    renderer.draw(snapshot, selfId, rules, { yaw, pitch, fov });
+    const zoom = rules.view === 'top' ? 0.82 : weapon === 'm870' ? 0.78 : weapon === 'deagle' ? 0.72 : 0.62;
+    const effectiveFov = fov * (1 - ads * (1 - zoom));
+    renderer.draw(snapshot, selfId, rules, { yaw, pitch, fov: effectiveFov, ads, now });
     if (rules.view === 'top') {
       const aimed = renderer.aim(pointerN.x, pointerN.y);
       if (aimed) pointer = aimed;
     }
-    const rect = canvas.getBoundingClientRect(), stage = canvas.parentElement.getBoundingClientRect();
-    $('arena-crosshair').style.left = (rect.left - stage.left + rect.width * (rules.view === 'fps' ? 0.5 : (pointerN.x + 1) / 2)) + 'px';
-    $('arena-crosshair').style.top = (rect.top - stage.top + rect.height * (rules.view === 'fps' ? 0.5 : (1 - pointerN.y) / 2)) + 'px';
+    const x = Math.round(layout.width / 2 + (rules.view === 'fps' ? 0 : layout.canvasWidth * pointerN.x / 2));
+    const y = Math.round(layout.height * (rules.view === 'fps' ? 0.5 : (1 - pointerN.y) / 2));
+    if (x !== crosshairX) { crosshairX = x; $('arena-crosshair').style.left = `${x}px`; }
+    if (y !== crosshairY) { crosshairY = y; $('arena-crosshair').style.top = `${y}px`; }
     if (now - lastHud < 120) return;
     lastHud = now;
     const me = snapshot?.players.find(p => p.id === selfId);
-    $('arena-health').textContent = `HP ${me?.hp ?? '—'}`;
-    $('arena-weapon').textContent = WEAPONS[weapon].name;
-    $('arena-ammo').textContent = me?.reloadUntil > snapshot?.time ? `재장전 ${Math.max(0, me.reloadUntil - snapshot.time).toFixed(1)}s` : `${me?.ammo ?? '—'} / ${WEAPONS[weapon].magazine}`;
+    setText('arena-health', `HP ${me?.hp ?? '—'}`);
+    setText('arena-weapon', WEAPONS[weapon].name);
+    setText('arena-ammo', me?.reloadUntil > snapshot?.time ? `재장전 ${Math.max(0, me.reloadUntil - snapshot.time).toFixed(1)}s` : `${me?.ammo ?? '—'} / ${WEAPONS[weapon].magazine}`);
     const stale = now - lastSnapshotAt > 2500;
     const teams = rules.mode === 'teams';
     const ready = side => snapshot?.players.filter(p => p.team === side).length || 0;
     const waiting = `준비 대기 · 레드 ${ready('red')}/${rules.size} · 블루 ${ready('blue')}/${rules.size}`;
     const winnerName = teams ? `${TEAM_NAMES[snapshot?.winner]} 팀` : snapshot?.winner ? getName(snapshot.winner) : '';
-    $('arena-banner').textContent = !me || stale ? '게임 연결을 기다리는 중…' : snapshot.waiting ? waiting : snapshot.winner ? `${winnerName} 승리 · ${Math.ceil(snapshot.restartAt - snapshot.time)}초 후 새 라운드` : me.hp <= 0 ? `${Math.ceil(me.respawnAt - snapshot.time)}초 후 부활` : !teams && snapshot.players.length < 2 ? '연습 중 · 다른 참가자가 출격하면 FFA 시작' : '';
-    $('arena-status').textContent = `${snapshot?.waiting ? waiting : `${snapshot?.players.length || 0}명 전투 중`} · ${teams ? '팀 합산 ' : ''}20킬 승리 · 사망 후 3초 부활${now < migrationUntil ? ' · 호스트 변경으로 라운드 재시작' : ''}`;
-    $('arena-team-score').textContent = `레드 ${snapshot?.teamScores.red ?? 0} : ${snapshot?.teamScores.blue ?? 0} 블루 · ${rules.size} vs ${rules.size} · 내 팀: ${TEAM_NAMES[me?.team] || '배정 중'}`;
+    setText('arena-banner', !me || stale ? '게임 연결을 기다리는 중…' : snapshot.waiting ? waiting : snapshot.winner ? `${winnerName} 승리 · ${Math.ceil(snapshot.restartAt - snapshot.time)}초 후 새 라운드` : me.hp <= 0 ? `${Math.ceil(me.respawnAt - snapshot.time)}초 후 부활` : !teams && snapshot.players.length < 2 ? '연습 중 · 다른 참가자가 출격하면 FFA 시작' : '');
+    setText('arena-status', `${snapshot?.waiting ? waiting : `${snapshot?.players.length || 0}명 전투 중`} · ${teams ? '팀 합산 ' : ''}20킬 승리 · 사망 후 3초 부활${now < migrationUntil ? ' · 호스트 변경으로 라운드 재시작' : ''}`);
+    setText('arena-team-score', `레드 ${snapshot?.teamScores.red ?? 0} : ${snapshot?.teamScores.blue ?? 0} 블루 · ${rules.size} vs ${rules.size} · 내 팀: ${TEAM_NAMES[me?.team] || '배정 중'}`);
+    const nextBoardKey = (snapshot?.players || []).map(p => `${p.id}:${getName(p.id)}:${p.team}:${p.kills}:${p.deaths}`).join('|');
+    if (nextBoardKey === boardKey) return;
+    boardKey = nextBoardKey;
     const board = $('arena-scoreboard'); board.replaceChildren();
     for (const p of [...(snapshot?.players || [])].sort((a, b) => b.kills - a.kills || a.deaths - b.deaths)) {
       const item = document.createElement('li'); item.textContent = `${teams ? `[${TEAM_NAMES[p.team]}] ` : ''}${getName(p.id)}${p.id === selfId ? ' (나)' : ''} · ${p.kills} K / ${p.deaths} D`; board.append(item);
@@ -327,10 +383,11 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   frame = requestAnimationFrame(draw);
   return {
     peerJoined(id) { announce(id); },
-    peerLeft(id) { members.delete(id); inputs.delete(id); inputTimes.delete(id); reconcile(); },
+    peerLeft(id) { members.delete(id); inputs.delete(id); inputTimes.delete(id); stateSender.remove(id); reconcile(); },
     destroy() {
       leave(); disposed = true; clearInterval(tick); cancelAnimationFrame(frame); events.abort(); members.clear(); inputs.clear();
       renderer?.destroy(); renderer = null;
+      stateSender.close(); layoutObserver.disconnect();
       $('arena-count').textContent = '0명'; $('arena-lobby-count').textContent = '0명';
     },
   };

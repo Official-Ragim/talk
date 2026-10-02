@@ -28,7 +28,17 @@ export function createArenaRenderer(canvas) {
   gl.deleteShader(vertex); gl.deleteShader(fragment);
   const attributes = ['position', 'normal', 'color'].map(name => gl.getAttribLocation(program, name));
   const uniforms = Object.fromEntries(['projection', 'view', 'eye', 'fog'].map(name => [name, gl.getUniformLocation(program, name)]));
-  const staticBuffer = gl.createBuffer(), dynamicBuffer = gl.createBuffer();
+  const staticBuffer = gl.createBuffer();
+  const buffers = new Set([staticBuffer]);
+  const mesh = () => { const buffer = gl.createBuffer(); buffers.add(buffer); return { buffer, data: new Float32Array(0), count: 0 }; };
+  const avatars = mesh(), tracers = mesh(), guns = new Map();
+  let lastSnapshot = null, avatarKey = '', traceKey = '', lastOwnAngle = null;
+  let quality = 'auto', scale = 1, resizeDirty = true, cssWidth = 1, cssHeight = 1, lastFrameAt = 0, frameAverage = 16.7, qualityAt = 0;
+  const resizeObserver = new ResizeObserver(entries => {
+    const rect = entries[0].contentRect;
+    if (rect.width > 0 && rect.height > 0) { cssWidth = rect.width; cssHeight = rect.height; resizeDirty = true; }
+  });
+  resizeObserver.observe(canvas);
   const faces = [
     [[1, 0, 0], [[1,-1,-1],[1,1,-1],[1,1,1],[1,-1,1]]],
     [[-1,0,0], [[-1,-1,1],[-1,1,1],[-1,1,-1],[-1,-1,-1]]],
@@ -70,24 +80,64 @@ export function createArenaRenderer(canvas) {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     attributes.forEach((location, index) => { gl.enableVertexAttribArray(location); gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 36, index * 12); });
   }
-  function drawDynamic(data, kind = gl.TRIANGLES) {
-    if (!data.length) return;
-    bind(dynamicBuffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW); gl.drawArrays(kind, 0, data.length / 9);
+  function upload(target, data) {
+    target.count = data.length / 9;
+    gl.bindBuffer(gl.ARRAY_BUFFER, target.buffer);
+    if (target.data.length < data.length) {
+      target.data = new Float32Array(2 ** Math.ceil(Math.log2(Math.max(1, data.length))));
+      gl.bufferData(gl.ARRAY_BUFFER, target.data.byteLength, gl.DYNAMIC_DRAW);
+    }
+    if (data.length) { target.data.set(data); gl.bufferSubData(gl.ARRAY_BUFFER, 0, target.data.subarray(0, data.length)); }
+  }
+  function drawMesh(target, kind = gl.TRIANGLES) {
+    if (!target.count) return;
+    bind(target.buffer); gl.drawArrays(kind, 0, target.count);
+  }
+  function weaponMesh(weapon) {
+    if (guns.has(weapon)) return guns.get(weapon);
+    const data = [], target = mesh();
+    box(data, 17,-18,-29,11,9,22,[0.63,0.50,0.35]);
+    box(data, 10,-15,-37,8,7,22,[0.63,0.50,0.35]);
+    box(data, 14,-10,-42,7,8,weapon === 'deagle' ? 22 : 40,[0.21,0.25,0.26]);
+    box(data, 14,-10,-64,3,3,weapon === 'deagle' ? 5 : 14,[0.09,0.12,0.13]);
+    box(data, 14,-15,-35,5,15,8,weapon === 'm870' ? [0.39,0.25,0.15] : [0.13,0.16,0.17]);
+    box(data, 14,-5,-47,2,3,3,[0.08,0.10,0.10]);
+    upload(target, data); guns.set(weapon, target); return target;
+  }
+  const gunView = new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+  function updateResolution(now) {
+    const elapsed = now - lastFrameAt; lastFrameAt = now;
+    if (elapsed > 0 && elapsed < 150) frameAverage += (elapsed - frameAverage) * 0.06;
+    if (quality === 'auto' && now - qualityAt > 2000) {
+      const next = Math.max(0.65, Math.min(1, scale + (frameAverage > 24 ? -0.1 : frameAverage < 18 ? 0.05 : 0)));
+      if (next !== scale) { scale = next; resizeDirty = true; }
+      qualityAt = now;
+    }
+    if (!resizeDirty) return;
+    if (cssWidth === 1) { const rect = canvas.getBoundingClientRect(); cssWidth = Math.max(1, rect.width); cssHeight = Math.max(1, rect.height); }
+    const ratio = quality === 'high' ? Math.min(devicePixelRatio || 1, 1.5) : quality === 'low' ? 0.65 : scale;
+    const budget = quality === 'high' ? 1500000 : quality === 'low' ? 350000 : 850000;
+    const limited = Math.min(ratio, Math.sqrt(budget / (cssWidth * cssHeight)));
+    const width = Math.max(1, Math.round(cssWidth * limited)), height = Math.max(1, Math.round(cssHeight * limited));
+    if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+    aspect = width / height; resizeDirty = false;
   }
   function draw(snapshot, selfId, rules, camera) {
     if (gl.isContextLost()) return;
-    const rect = canvas.getBoundingClientRect(), ratio = Math.min(devicePixelRatio || 1, 1.5);
-    const width = Math.max(1, Math.round(rect.width * ratio)), height = Math.max(1, Math.round(rect.height * ratio));
-    if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
-    aspect = width / height; fov = camera.fov;
+    updateResolution(camera.now ?? performance.now()); fov = camera.fov;
     const me = snapshot?.players.find(p => p.id === selfId);
     pose = cameraPose(me, rules.view, camera.yaw, camera.pitch);
     const fog = rules.view === 'fps' ? [0.48,0.57,0.57] : [0.13,0.19,0.20];
-    gl.viewport(0, 0, width, height); gl.clearColor(...fog, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.viewport(0, 0, canvas.width, canvas.height); gl.clearColor(...fog, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST); gl.disable(gl.CULL_FACE); gl.useProgram(program);
     gl.uniformMatrix4fv(uniforms.projection, false, perspective(fov, aspect)); gl.uniformMatrix4fv(uniforms.view, false, viewMatrix(pose));
     gl.uniform3fv(uniforms.eye, pose.eye); gl.uniform3fv(uniforms.fog, fog);
     bind(staticBuffer); gl.drawArrays(gl.TRIANGLES, 0, staticData.length / 9);
+    const ownAngle = rules.view === 'top' ? Math.round(camera.yaw * 1000) : 0;
+    if (snapshot !== lastSnapshot || ownAngle !== lastOwnAngle) {
+    const nextKey = `${selfId}:${rules.view}:${rules.mode}:${ownAngle}:` + (snapshot?.players || []).map(p => `${p.id},${p.x},${p.y},${p.angle},${p.hp > 0},${p.weapon},${p.team},${p.shieldUntil > snapshot.time}`).join(';');
+    if (nextKey !== avatarKey) {
+    avatarKey = nextKey;
     const data = [];
     for (const p of snapshot?.players || []) {
       if (p.hp <= 0 || (rules.view === 'fps' && p.id === selfId)) continue;
@@ -102,32 +152,35 @@ export function createArenaRenderer(canvas) {
       part(7,36,-16,22,9,8,color); part(7,36,16,22,9,8,color);
       part(19,42,8,p.weapon === 'deagle' ? 21 : 36,7,7,[0.12,0.15,0.16]);
     }
-    drawDynamic(data);
-    const lines = [];
+    upload(avatars, data);
+    }
+    const nextTraceKey = (snapshot?.traces || []).map(t => t.id).join(',');
+    if (nextTraceKey !== traceKey) {
+    traceKey = nextTraceKey; const lines = [];
     for (const t of snapshot?.traces || []) {
       lines.push(t.x,t.z ?? 42,t.y,0,1,0,1,0.87,0.43, t.endX,t.endZ ?? 42,t.endY,0,1,0,1,0.87,0.43);
     }
-    drawDynamic(lines, gl.LINES);
+    upload(tracers, lines);
+    }
+    lastSnapshot = snapshot; lastOwnAngle = ownAngle;
+    }
+    drawMesh(avatars); drawMesh(tracers, gl.LINES);
     if (rules.view === 'fps' && me?.hp > 0) {
       // A camera-space weapon model stays below the crosshair without clipping walls.
-      const gun = [], recoil = snapshot.traces.some(t => t.owner === selfId) ? 2 : 0;
-      box(gun, 17,-18,-29 + recoil,11,9,22,[0.63,0.50,0.35]);
-      box(gun, 10,-15,-37 + recoil,8,7,22,[0.63,0.50,0.35]);
-      box(gun, 14,-10,-42 + recoil,7,8,me.weapon === 'deagle' ? 22 : 40,[0.21,0.25,0.26]);
-      box(gun, 14,-10,-64 + recoil,3,3,me.weapon === 'deagle' ? 5 : 14,[0.09,0.12,0.13]);
-      box(gun, 14,-15,-35 + recoil,5,15,8,me.weapon === 'm870' ? [0.39,0.25,0.15] : [0.13,0.16,0.17]);
-      box(gun, 14,-5,-47 + recoil,2,3,3,[0.08,0.10,0.10]);
-      if (recoil) box(gun, 14,-10,-74,6,6,9,[1,0.75,0.22]);
+      const recoil = snapshot.traces.some(t => t.owner === selfId) ? 2 : 0;
+      gunView[12] = -14 * (camera.ads || 0); gunView[13] = 3.2 * (camera.ads || 0); gunView[14] = recoil;
       gl.clear(gl.DEPTH_BUFFER_BIT);
-      gl.uniformMatrix4fv(uniforms.view, false, new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]));
-      gl.uniform3fv(uniforms.eye, [0,0,0]); drawDynamic(gun);
+      gl.uniformMatrix4fv(uniforms.view, false, gunView);
+      gl.uniform3fv(uniforms.eye, [0,0,0]); drawMesh(weaponMesh(me.weapon));
     }
-    canvas.dataset.renderedView = rules.view;
+    if (canvas.dataset.renderedView !== rules.view) canvas.dataset.renderedView = rules.view;
   }
   return {
     draw,
+    setQuality(value) { quality = ['auto', 'low', 'high'].includes(value) ? value : 'auto'; scale = 1; frameAverage = 16.7; resizeDirty = true; },
+    stats() { return { width: canvas.width, height: canvas.height, quality, scale }; },
     aim(nx, ny) { return aimOnGround(pose, nx, ny, fov, aspect); },
-    clear() { gl.clearColor(0.1,0.15,0.16,1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); },
-    destroy() { gl.deleteBuffer(staticBuffer); gl.deleteBuffer(dynamicBuffer); gl.deleteProgram(program); },
+    clear() { lastSnapshot = null; avatarKey = traceKey = ''; avatars.count = tracers.count = 0; gl.clearColor(0.1,0.15,0.16,1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); },
+    destroy() { resizeObserver.disconnect(); for (const buffer of buffers) gl.deleteBuffer(buffer); gl.deleteProgram(program); },
   };
 }

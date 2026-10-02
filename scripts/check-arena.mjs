@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { ArenaEngine, WEAPONS, blocked, validInput } from '../src/arena-engine.js';
+import { ArenaEngine, WEAPONS, blocked, validInput, weaponSpread, AIM_SPEED } from '../src/arena-engine.js';
+import { createLatestSender } from '../src/arena-network.js';
 import { assignSeats, validRules, firstStarter } from '../src/arena-lobby.js';
 import { cameraPose, aimOnGround, relativeMove, wrapAngle } from '../src/arena-camera.js';
 
@@ -119,3 +120,28 @@ assert.equal(pitched.players.get('b').hp, 100, 'Aiming at the floor does not hit
 assert.ok(pitched.traces.every(t => t.endZ >= 0));
 assert.equal(validInput({ ...idle, pitch: 2 }), false);
 console.log('Camera checks passed: first-starter authority, succession, FOV, movement transforms, vertical hit detection, view validation.');
+
+const aimed = arena(), hip = arena();
+aimed.step(0.05, new Map([['a', { ...idle, x: 1, aiming: true }]]));
+hip.step(0.05, new Map([['a', { ...idle, x: 1 }]]));
+assert.ok(Math.abs((aimed.players.get('a').x - 100) / (hip.players.get('a').x - 100) - AIM_SPEED) < 0.00001);
+assert.equal(aimed.players.get('a').aiming, true);
+assert.ok(weaponSpread('m4', true) < weaponSpread('m4', false));
+assert.ok(weaponSpread('m870', true) < weaponSpread('m870', false));
+assert.equal(weaponSpread('deagle', true), 0);
+aimed.players.get('a').ammo = 2;
+aimed.step(0.01, new Map([['a', { ...idle, aiming: true, reload: true }]]));
+assert.equal(aimed.players.get('a').aiming, false, 'Reload interrupts precision aim');
+assert.equal(WEAPONS.deagle.damage, 50, 'Aim does not alter the two-hit damage model');
+assert.equal(validInput({ ...idle, aiming: 'yes' }), false);
+assert.equal('cooldown' in aimed.snapshot().players[0], false, 'Internal simulation fields are not sent');
+const sent = [], releases = [];
+const queue = createLatestSender((value, peer) => { sent.push([peer, value]); return new Promise(resolve => releases.push(resolve)); });
+queue.send(1, ['slow']); queue.send(2, ['slow']); queue.send(3, ['slow']); queue.send(4, ['fast']);
+assert.deepEqual(sent, [['slow', 1], ['fast', 4]], 'Slow recipients do not block other recipients');
+releases[0](); await Promise.resolve();
+assert.deepEqual(sent, [['slow', 1], ['fast', 4], ['slow', 3]], 'Only newest pending snapshot is transmitted');
+queue.send(5, ['slow']); queue.remove('slow'); releases[2](); await Promise.resolve();
+assert.equal(sent.length, 3, 'Leaving discards pending snapshots');
+queue.close(); releases[1](); queue.send(6, ['fast']); await Promise.resolve(); assert.equal(sent.length, 3);
+console.log('Aim/network checks passed: aim speed, tighter spread, reload, damage invariance, latest-only snapshots, per-peer backpressure, cleanup.');

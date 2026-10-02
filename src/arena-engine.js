@@ -4,6 +4,8 @@ export const WEAPONS = {
   m4: { name: 'M4 Carbin', damage: 25, pellets: 1, spread: 0.018, range: 880, cooldown: 0.12, magazine: 30, reload: 1.9 },
   deagle: { name: 'Desert Eagle', damage: 50, pellets: 1, spread: 0, range: 950, cooldown: 0.42, magazine: 7, reload: 1.8 },
 };
+export const AIM_SPEED = 0.65;
+export function weaponSpread(weapon, aiming) { return WEAPONS[weapon].spread * (aiming ? weapon === 'm870' ? 0.8 : 0.4 : 1); }
 export const WALLS = [
   { x: 0, y: 0, w: 1200, h: 24 }, { x: 0, y: 736, w: 1200, h: 24 },
   { x: 0, y: 0, w: 24, h: 760 }, { x: 1176, y: 0, w: 24, h: 760 },
@@ -44,7 +46,7 @@ function rayPlayer(x, y, dx, dy, p, dz = 0) {
   return far >= near ? near : Infinity;
 }
 export function validInput(input) {
-  return input && ['x', 'y', 'angle'].every(key => Number.isFinite(input[key])) && (input.pitch === undefined || (Number.isFinite(input.pitch) && Math.abs(input.pitch) <= 1.15)) && Math.abs(input.x) <= 1 && Math.abs(input.y) <= 1 && Math.abs(input.angle) <= Math.PI * 2 && typeof input.fire === 'boolean' && typeof input.reload === 'boolean' && Number.isSafeInteger(input.trigger) && input.trigger >= 0;
+  return input && ['x', 'y', 'angle'].every(key => Number.isFinite(input[key])) && (input.aiming === undefined || typeof input.aiming === 'boolean') && (input.pitch === undefined || (Number.isFinite(input.pitch) && Math.abs(input.pitch) <= 1.15)) && Math.abs(input.x) <= 1 && Math.abs(input.y) <= 1 && Math.abs(input.angle) <= Math.PI * 2 && typeof input.fire === 'boolean' && typeof input.reload === 'boolean' && Number.isSafeInteger(input.trigger) && input.trigger >= 0;
 }
 export class ArenaEngine {
   constructor(rules = { mode: 'ffa', size: 1 }) { this.rules = { ...rules }; this.teamScores = { red: 0, blue: 0 }; this.players = new Map(); this.time = 0; this.traces = []; this.feed = []; this.winner = null; this.restartAt = 0; this.shotId = 0; }
@@ -62,12 +64,12 @@ export class ArenaEngine {
     const spawns = this.rules.mode === 'teams' ? [80, 200, 320, 440, 560, 680].map(y => [p.team === 'red' ? 90 : 1110, y]) : SPAWNS;
     const ranked = spawns.map((point, index) => ({ point, score: others.length ? Math.min(...others.map(o => Math.hypot(o.x - point[0], o.y - point[1]))) : (index === this.players.size % spawns.length ? 1 : 0) })).sort((a, b) => b.score - a.score);
     [p.x, p.y] = ranked[0].point;
-    p.hp = 100; p.ammo = WEAPONS[p.weapon].magazine; p.reloadUntil = 0; p.respawnAt = 0; p.cooldown = 0; p.shieldUntil = this.time + 1.5;
+    p.hp = 100; p.ammo = WEAPONS[p.weapon].magazine; p.aiming = false; p.reloadUntil = 0; p.respawnAt = 0; p.cooldown = 0; p.shieldUntil = this.time + 1.5;
   }
   step(dt, inputs) {
     if (this.waiting) {
       this.traces = [];
-      for (const p of this.players.values()) if (inputs.has(p.id)) p.lastTrigger = inputs.get(p.id).trigger;
+      for (const p of this.players.values()) { p.aiming = false; if (inputs.has(p.id)) p.lastTrigger = inputs.get(p.id).trigger; }
       return;
     }
     this.time += dt;
@@ -82,17 +84,20 @@ export class ArenaEngine {
     for (const p of this.players.values()) {
       const input = inputs.get(p.id);
       if (p.hp <= 0) {
+        p.aiming = false;
         if (input) p.lastTrigger = input.trigger;
         if (this.time >= p.respawnAt) this.spawn(p);
         continue;
       }
       if (p.reloadUntil && this.time >= p.reloadUntil) { p.ammo = WEAPONS[p.weapon].magazine; p.reloadUntil = 0; }
-      if (!input || !validInput(input)) continue;
+      if (!input || !validInput(input)) { p.aiming = false; continue; }
       p.angle = input.angle;
       p.pitch = this.rules.view === 'fps' ? (input.pitch || 0) : 0;
+      p.aiming = Boolean(input.aiming && !p.reloadUntil && !input.reload);
       const magnitude = Math.max(1, Math.hypot(input.x, input.y));
-      const x = p.x + input.x / magnitude * 215 * dt;
-      const y = p.y + input.y / magnitude * 215 * dt;
+      const speed = 215 * (p.aiming ? AIM_SPEED : 1);
+      const x = p.x + input.x / magnitude * speed * dt;
+      const y = p.y + input.y / magnitude * speed * dt;
       if (!blocked(x, p.y)) p.x = x;
       if (!blocked(p.x, y)) p.y = y;
       const w = WEAPONS[p.weapon];
@@ -102,16 +107,17 @@ export class ArenaEngine {
       if ((p.weapon === 'deagle' ? trigger : input.fire || trigger) && this.time >= p.cooldown && !p.reloadUntil && p.ammo > 0) {
         this.shoot(p); p.ammo--; p.cooldown = this.time + w.cooldown; p.shieldUntil = 0;
       }
-      if (!p.ammo && !p.reloadUntil) p.reloadUntil = this.time + w.reload;
+      if (!p.ammo && !p.reloadUntil) { p.reloadUntil = this.time + w.reload; p.aiming = false; }
       if (this.winner) break;
     }
   }
   shoot(p) {
     if (this.waiting || this.winner || p.hp <= 0) return;
     const w = WEAPONS[p.weapon];
+    const spread = weaponSpread(p.weapon, p.aiming);
     const damage = new Map();
     for (let i = 0; i < w.pellets; i++) {
-      const angle = p.angle + (w.pellets > 1 ? (i / (w.pellets - 1) * 2 - 1) * w.spread : (Math.random() * 2 - 1) * w.spread);
+      const angle = p.angle + (w.pellets > 1 ? (i / (w.pellets - 1) * 2 - 1) * spread : (Math.random() * 2 - 1) * spread);
       const dx = Math.cos(angle), dy = Math.sin(angle);
       const dz = Math.tan(p.pitch || 0);
       let distance = Math.min(w.range, dz < 0 ? -42 / dz : Infinity, ...WALLS.map(wall => rayWall(p.x, p.y, dx, dy, wall, 42, dz)));
@@ -136,5 +142,5 @@ export class ArenaEngine {
       }
     }
   }
-  snapshot() { return { time: this.time, players: [...this.players.values()].map(p => ({ ...p })), traces: this.traces, feed: this.feed, winner: this.winner, restartAt: this.restartAt, waiting: this.waiting, teamScores: { ...this.teamScores } }; }
+  snapshot() { return { time: this.time, players: [...this.players.values()].map(({ lastTrigger, cooldown, ...p }) => p), traces: this.traces, feed: this.feed, winner: this.winner, restartAt: this.restartAt, waiting: this.waiting, teamScores: { ...this.teamScores } }; }
 }
