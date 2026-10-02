@@ -12,16 +12,16 @@ export const WALLS = [
   { x: 535, y: 315, w: 130, h: 130 },
   { x: 310, y: 350, w: 65, h: 65 }, { x: 825, y: 350, w: 65, h: 65 },
   { x: 565, y: 100, w: 70, h: 65 }, { x: 565, y: 595, w: 70, h: 65 },
-];
+].map((wall, index) => ({ ...wall, height: index < 4 ? 120 : index < 8 ? 90 : 72 }));
 const SPAWNS = [[90, 90], [1110, 670], [90, 670], [1110, 90], [90, 380], [1110, 380], [490, 70], [710, 690]];
 export const RADIUS = 16;
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 export function blocked(x, y) {
   return WALLS.some(w => Math.hypot(x - clamp(x, w.x, w.x + w.w), y - clamp(y, w.y, w.y + w.h)) < RADIUS);
 }
-export function rayWall(x, y, dx, dy, wall) {
+export function rayWall(x, y, dx, dy, wall, z = 42, dz = 0) {
   let near = 0, far = Infinity;
-  for (const [origin, direction, min, max] of [[x, dx, wall.x, wall.x + wall.w], [y, dy, wall.y, wall.y + wall.h]]) {
+  for (const [origin, direction, min, max] of [[x, dx, wall.x, wall.x + wall.w], [y, dy, wall.y, wall.y + wall.h], [z, dz, 0, wall.height ?? 90]]) {
     if (Math.abs(direction) < 1e-8) { if (origin < min || origin > max) return Infinity; }
     else {
       const a = (min - origin) / direction, b = (max - origin) / direction;
@@ -30,15 +30,21 @@ export function rayWall(x, y, dx, dy, wall) {
   }
   return far >= near ? near : Infinity;
 }
-function rayPlayer(x, y, dx, dy, p) {
+function rayPlayer(x, y, dx, dy, p, dz = 0) {
   const ox = p.x - x, oy = p.y - y;
   const along = ox * dx + oy * dy;
   const distance2 = ox * ox + oy * oy - along * along;
   if (distance2 > RADIUS * RADIUS || along < 0) return Infinity;
-  return Math.max(0, along - Math.sqrt(RADIUS * RADIUS - distance2));
+  const radius = Math.sqrt(RADIUS * RADIUS - distance2);
+  let near = Math.max(0, along - radius), far = along + radius;
+  if (Math.abs(dz) > 1e-8) {
+    const low = -42 / dz, high = (64 - 42) / dz;
+    near = Math.max(near, Math.min(low, high)); far = Math.min(far, Math.max(low, high));
+  }
+  return far >= near ? near : Infinity;
 }
 export function validInput(input) {
-  return input && ['x', 'y', 'angle'].every(key => Number.isFinite(input[key])) && Math.abs(input.x) <= 1 && Math.abs(input.y) <= 1 && Math.abs(input.angle) <= Math.PI * 2 && typeof input.fire === 'boolean' && typeof input.reload === 'boolean' && Number.isSafeInteger(input.trigger) && input.trigger >= 0;
+  return input && ['x', 'y', 'angle'].every(key => Number.isFinite(input[key])) && (input.pitch === undefined || (Number.isFinite(input.pitch) && Math.abs(input.pitch) <= 1.15)) && Math.abs(input.x) <= 1 && Math.abs(input.y) <= 1 && Math.abs(input.angle) <= Math.PI * 2 && typeof input.fire === 'boolean' && typeof input.reload === 'boolean' && Number.isSafeInteger(input.trigger) && input.trigger >= 0;
 }
 export class ArenaEngine {
   constructor(rules = { mode: 'ffa', size: 1 }) { this.rules = { ...rules }; this.teamScores = { red: 0, blue: 0 }; this.players = new Map(); this.time = 0; this.traces = []; this.feed = []; this.winner = null; this.restartAt = 0; this.shotId = 0; }
@@ -46,7 +52,7 @@ export class ArenaEngine {
   add(id, weapon = 'm4', team = null) {
     if (this.players.has(id) || !WEAPONS[weapon]) return;
     if (this.rules.mode === 'teams' && (!['red', 'blue'].includes(team) || [...this.players.values()].filter(p => p.team === team).length >= this.rules.size)) return;
-    const p = { id, weapon, team, kills: 0, deaths: 0, angle: 0, lastTrigger: 0, cooldown: 0, reloadUntil: 0, respawnAt: 0 };
+    const p = { id, weapon, team, kills: 0, deaths: 0, angle: 0, pitch: 0, lastTrigger: 0, cooldown: 0, reloadUntil: 0, respawnAt: 0 };
     this.players.set(id, p); this.spawn(p);
   }
   remove(id) { this.players.delete(id); }
@@ -83,6 +89,7 @@ export class ArenaEngine {
       if (p.reloadUntil && this.time >= p.reloadUntil) { p.ammo = WEAPONS[p.weapon].magazine; p.reloadUntil = 0; }
       if (!input || !validInput(input)) continue;
       p.angle = input.angle;
+      p.pitch = this.rules.view === 'fps' ? (input.pitch || 0) : 0;
       const magnitude = Math.max(1, Math.hypot(input.x, input.y));
       const x = p.x + input.x / magnitude * 215 * dt;
       const y = p.y + input.y / magnitude * 215 * dt;
@@ -106,15 +113,16 @@ export class ArenaEngine {
     for (let i = 0; i < w.pellets; i++) {
       const angle = p.angle + (w.pellets > 1 ? (i / (w.pellets - 1) * 2 - 1) * w.spread : (Math.random() * 2 - 1) * w.spread);
       const dx = Math.cos(angle), dy = Math.sin(angle);
-      let distance = Math.min(w.range, ...WALLS.map(wall => rayWall(p.x, p.y, dx, dy, wall)));
+      const dz = Math.tan(p.pitch || 0);
+      let distance = Math.min(w.range, dz < 0 ? -42 / dz : Infinity, ...WALLS.map(wall => rayWall(p.x, p.y, dx, dy, wall, 42, dz)));
       let target = null;
       for (const other of this.players.values()) {
         if (other.id === p.id || other.hp <= 0 || other.shieldUntil > this.time || (this.rules.mode === 'teams' && other.team === p.team)) continue;
-        const hit = rayPlayer(p.x, p.y, dx, dy, other);
+        const hit = rayPlayer(p.x, p.y, dx, dy, other, dz);
         if (hit < distance) { distance = hit; target = other; }
       }
       if (target) damage.set(target, (damage.get(target) || 0) + w.damage);
-      this.traces.push({ id: ++this.shotId, x: p.x, y: p.y, endX: p.x + dx * distance, endY: p.y + dy * distance, until: this.time + 0.14 });
+      this.traces.push({ id: ++this.shotId, owner: p.id, x: p.x, y: p.y, z: 42, endX: p.x + dx * distance, endY: p.y + dy * distance, endZ: Math.max(0, 42 + dz * distance), until: this.time + 0.14 });
     }
     this.traces = this.traces.slice(-160);
     for (const [target, amount] of damage) {

@@ -16,8 +16,7 @@ test('custom rooms offer FFA and host-controlled n vs n with shared teams and re
     for (const page of pages) await expect(page.locator('#participant-count')).toHaveText('4', { timeout: 60000 });
     for (const page of pages) await page.locator('#arena-enter').click();
     for (const page of pages) await expect(page.locator('#arena-lobby-count')).toHaveText('4명');
-    const ids = await Promise.all(pages.map(page => page.evaluate(async () => (await import('./vendor/trystero.js')).selfId)));
-    const host = pages[ids.indexOf([...ids].sort()[0])];
+    const host = pages[0];
     const client = pages.find(page => page !== host);
     await expect(host.locator('#arena-mode')).toBeEnabled();
     await expect(client.locator('#arena-mode')).toBeDisabled();
@@ -76,8 +75,9 @@ test('custom rooms offer FFA and host-controlled n vs n with shared teams and re
     await host.locator('#arena-play').click();
     for (const page of pages) await expect(page.locator('#arena-status')).toContainText('4명 전투 중');
     for (const page of pages) await page.locator('#arena-back').click();
-    await expect(host.locator('#arena-mode')).toBeEnabled();
-    await host.locator('#arena-mode').selectOption('ffa');
+    await expect(host.locator('#arena-mode')).toBeDisabled();
+    await expect(pages[1].locator('#arena-mode')).toBeEnabled();
+    await pages[1].locator('#arena-mode').selectOption('ffa');
     for (const page of pages) {
       await expect(page.locator('#arena-mode-label')).toContainText('FREE FOR ALL');
       await expect(page.locator('#arena-teams')).toBeHidden();

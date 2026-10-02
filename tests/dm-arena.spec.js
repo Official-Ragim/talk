@@ -70,7 +70,13 @@ test('IP arena opts in separately, synchronizes weapons, supports reload and hos
       await p.locator('[data-weapon="deagle"]').click();
     }
     await expect(a.locator('#arena-lobby-count')).toHaveText('2명');
-    await expect(a.locator('#arena-match-settings')).toBeHidden();
+    await expect(a.locator('#arena-game-rules')).toBeHidden();
+    await expect(a.locator('#arena-view')).toBeEnabled();
+    await expect(b.locator('#arena-view')).toBeDisabled();
+    await a.locator('#arena-view').selectOption('fps');
+    await expect(b.locator('#arena-view')).toHaveValue('fps');
+    await a.locator('#arena-view').selectOption('top');
+    await expect(b.locator('#arena-view')).toHaveValue('top');
     await expect(b.locator('#arena-lobby-count')).toHaveText('2명');
     await a.screenshot({ path: 'test-results/arena-lobby.png', fullPage: true });
     await a.locator('#arena-play').click(); await b.locator('#arena-play').click();
@@ -90,8 +96,7 @@ test('IP arena opts in separately, synchronizes weapons, supports reload and hos
     }
     await a.setViewportSize({ width: 1440, height: 1000 });
     await a.screenshot({ path: 'test-results/arena-battle.png', fullPage: true });
-    const ids = await Promise.all([a, b].map(p => p.evaluate(async () => (await import('./vendor/trystero.js')).selfId)));
-    const host = ids[0] < ids[1] ? a : b, survivor = host === a ? b : a;
+    const host = a, survivor = b;
     await host.locator('#arena-leave').click();
     await expect(survivor.locator('#arena-status')).toContainText('1명 전투 중');
     await expect(survivor.locator('#arena-banner')).toContainText('연습 중');

@@ -1,6 +1,11 @@
 export const TEAM_NAMES = { red: '레드', blue: '블루' };
 export function validRules(rules, custom) {
-  return rules && (rules.mode === 'ffa' || (custom && rules.mode === 'teams')) && Number.isInteger(rules.size) && rules.size >= 1 && rules.size <= 6;
+  return rules && (rules.mode === 'ffa' || (custom && rules.mode === 'teams')) && Number.isInteger(rules.size) && rules.size >= 1 && rules.size <= 6 && ['top', 'fps'].includes(rules.view);
+}
+// Joining an existing game receives a later logical order, even with clock skew.
+// Simultaneous starts use timestamps and peer IDs only as deterministic tie breakers.
+export function firstStarter(members) {
+  return [...members].sort(([a, x], [b, y]) => x.order - y.order || x.startedAt - y.startedAt || (a < b ? -1 : a > b ? 1 : 0))[0]?.[0] || null;
 }
 // Keep accepted seats before considering new requests, including simultaneous joins.
 export function assignSeats(members, previous, size) {

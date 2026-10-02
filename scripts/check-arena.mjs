@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { ArenaEngine, WEAPONS, blocked, validInput } from '../src/arena-engine.js';
-import { assignSeats, validRules } from '../src/arena-lobby.js';
+import { assignSeats, validRules, firstStarter } from '../src/arena-lobby.js';
+import { cameraPose, aimOnGround, relativeMove, wrapAngle } from '../src/arena-camera.js';
 
 const idle = { x: 0, y: 0, angle: 0, fire: false, reload: false, trigger: 0 };
 function arena() {
@@ -93,3 +94,28 @@ assert.equal(validRules({ mode: 'teams', size: 2 }, false), false, 'IP rooms can
 assert.equal(validRules({ mode: 'teams', size: 7 }, true), false);
 assert.equal(validRules({ mode: 'teams', size: 1.5 }, true), false);
 console.log('Team checks passed: 1–6 vs 1–6, capacity, seat races, spawn sides, readiness, friendly fire, team victory, round reset, IP restrictions.');
+
+const starters = new Map([['zzz', { order: 1, startedAt: 1000 }], ['aaa', { order: 2, startedAt: 500 }]]);
+assert.equal(firstStarter(starters), 'zzz', 'The first starter owns the game even if a later peer ID or clock sorts earlier');
+starters.delete('zzz'); assert.equal(firstStarter(starters), 'aaa');
+starters.set('zzz', { order: 3, startedAt: 1500 }); assert.equal(firstStarter(starters), 'aaa', 'Returning creator cannot take back ownership');
+assert.equal(validRules({ mode: 'ffa', size: 1, view: 'fps' }, false), true);
+assert.equal(validRules({ mode: 'ffa', size: 1, view: 'invalid' }, true), false);
+const pose = cameraPose({ x: 600, y: 380 }, 'top', 0, 0);
+const center = aimOnGround(pose, 0, 0, 75, 1.6);
+assert.ok(Math.abs(center.x - 600) < 0.001);
+const narrow = aimOnGround(pose, 0.5, 0, 55, 1.6), wide = aimOnGround(pose, 0.5, 0, 110, 1.6);
+assert.ok(wide.x > narrow.x, 'Larger FOV exposes more world space');
+assert.ok(relativeMove(0, 1, Math.PI / 2).y > 0.99, 'FPS forward follows camera yaw');
+assert.ok(relativeMove(1, 0, 0).y > 0.99, 'FPS strafe is camera relative');
+assert.ok(Math.abs(wrapAngle(100)) <= Math.PI);
+const pitched = arena();
+pitched.players.get('a').pitch = 0.6;
+pitched.shoot(pitched.players.get('a'));
+assert.equal(pitched.players.get('b').hp, 100, 'Aiming above an enemy does not hit their body');
+pitched.players.get('a').pitch = -0.6;
+pitched.shoot(pitched.players.get('a'));
+assert.equal(pitched.players.get('b').hp, 100, 'Aiming at the floor does not hit an enemy behind the impact');
+assert.ok(pitched.traces.every(t => t.endZ >= 0));
+assert.equal(validInput({ ...idle, pitch: 2 }), false);
+console.log('Camera checks passed: first-starter authority, succession, FOV, movement transforms, vertical hit detection, view validation.');

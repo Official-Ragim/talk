@@ -50,7 +50,8 @@
     <div id="arena-lobby">
       <p class="arena-intro">장비를 고르고 출격하세요. <span id="arena-lobby-count">0명</span>이 게임방에 있습니다.</p>
       <section id="arena-match-settings" class="match-settings" hidden>
-        <div class="match-options"><label>게임 방식<select id="arena-mode"><option value="ffa">Free For All</option><option value="teams">n vs n 팀전</option></select></label><label id="arena-size-field" hidden>팀당 인원<select id="arena-size"><option value="1">1 vs 1</option><option value="2">2 vs 2</option><option value="3">3 vs 3</option><option value="4">4 vs 4</option><option value="5">5 vs 5</option><option value="6">6 vs 6</option></select></label></div>
+        <div class="match-options"><label>게임 시점<select id="arena-view"><option value="top">3D 탑뷰</option><option value="fps">3D 1인칭</option></select></label></div>
+        <div id="arena-game-rules" class="match-options"><label>게임 방식<select id="arena-mode"><option value="ffa">Free For All</option><option value="teams">n vs n 팀전</option></select></label><label id="arena-size-field" hidden>팀당 인원<select id="arena-size"><option value="1">1 vs 1</option><option value="2">2 vs 2</option><option value="3">3 vs 3</option><option value="4">4 vs 4</option><option value="5">5 vs 5</option><option value="6">6 vs 6</option></select></label></div>
         <p id="arena-settings-note" role="status"></p>
         <div id="arena-teams" hidden><div class="team-choices" role="group" aria-label="팀 선택"><button data-team="auto" type="button">자동 배정</button><button data-team="red" type="button">레드 팀</button><button data-team="blue" type="button">블루 팀</button></div><div class="team-rosters"><div><h3 id="red-count">레드</h3><ul id="red-roster"></ul></div><div><h3 id="blue-count">블루</h3><ul id="blue-roster"></ul></div></div><p id="arena-team-status" role="status"></p></div>
       </section>
@@ -59,12 +60,14 @@
         <button type="button" data-weapon="m4" aria-pressed="true"><span>02 / ASSAULT RIFLE</span><strong>M4 Carbin</strong><small>자동 사격 · 30발 · 균형 잡힌 연사</small></button>
         <button type="button" data-weapon="deagle" aria-pressed="false"><span>03 / HAND CANNON</span><strong>Desert Eagle</strong><small>2발 명중 시 처치 · 7발 · 반자동</small></button>
       </div>
-      <div class="arena-brief"><div><h3>창고를 가로질러, 골목을 장악하세요.</h3><p>중앙 적재장, 양쪽 통로, 콘크리트 엄폐물. 벽 뒤로는 총알이 통과하지 않습니다.</p><p>WASD / 방향키 이동 · 마우스 조준 · 클릭 사격 · R 재장전<br>모바일: 왼쪽 패드 이동 · 맵을 터치해 조준 · 사격 버튼</p></div><button id="arena-play" type="button">출격하기 →</button></div>
+      <div class="arena-brief"><div><h3>창고를 가로질러, 골목을 장악하세요.</h3><p>중앙 적재장, 양쪽 통로, 콘크리트 엄폐물. 벽 뒤로는 총알이 통과하지 않습니다.</p><p id="arena-controls-help">WASD 이동 · 마우스 조준 · 클릭 사격 · R 재장전</p></div><button id="arena-play" type="button">출격하기 →</button></div>
     </div>
+    <p id="arena-render-error" role="alert" hidden></p>
     <div id="arena-battle" hidden>
       <div id="arena-team-score" class="team-score" hidden></div>
       <div class="arena-hud"><span id="arena-health">HP 100</span><span id="arena-weapon">M4 Carbin</span><span id="arena-ammo">30 / 30</span><button id="arena-reload" type="button">재장전 R</button><button id="arena-back" type="button">장비 변경 / 준비 해제</button></div>
-      <div class="arena-stage"><canvas id="arena-canvas" width="1200" height="760" tabindex="0" aria-label="FFA 전장. WASD 이동, 마우스 조준, 클릭 사격, R 재장전"></canvas><div id="arena-banner" role="status"></div></div>
+      <div class="camera-settings"><span id="arena-current-view">3D 탑뷰</span><label for="arena-fov">내 시야각 FOV <output id="arena-fov-value">75°</output></label><input id="arena-fov" type="range" min="55" max="110" value="75" step="1" /><span id="arena-look-hint"></span></div>
+      <div class="arena-stage"><canvas id="arena-canvas" width="1200" height="760" tabindex="0" aria-label="3D 전장"></canvas><div id="arena-crosshair" aria-hidden="true">+</div><div id="arena-banner" role="status"></div></div>
       <div class="touch-controls"><div id="move-pad" aria-label="이동 패드"><span>이동</span></div><button id="touch-fire" type="button">사격</button></div>
       <div class="arena-bottom"><p id="arena-status" role="status"></p><ol id="arena-scoreboard" aria-label="게임 점수판"></ol></div>
     </div>
