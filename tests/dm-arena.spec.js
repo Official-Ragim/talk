@@ -104,7 +104,9 @@ test('IP arena opts in separately, synchronizes weapons, supports reload and hos
     await expect(survivor.locator('#arena-ammo')).toHaveText('6 / 7');
     await survivor.setViewportSize({ width: 390, height: 844 });
     expect(await survivor.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await expect(survivor.locator('#touch-fire')).toBeVisible();
+    await survivor.locator('#arena-controls').selectOption('mobile');
+    await expect(survivor.locator('#touch-fire')).toHaveCount(0);
+    await expect(survivor.locator('#move-pad')).toBeVisible();
     await survivor.screenshot({ path: 'test-results/arena-mobile.png', fullPage: true });
     await survivor.locator('#arena-back').click();
     await survivor.locator('[data-weapon="m870"]').click(); await survivor.locator('#arena-play').click();

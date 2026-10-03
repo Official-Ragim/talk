@@ -145,3 +145,38 @@ queue.send(5, ['slow']); queue.remove('slow'); releases[2](); await Promise.reso
 assert.equal(sent.length, 3, 'Leaving discards pending snapshots');
 queue.close(); releases[1](); queue.send(6, ['fast']); await Promise.resolve(); assert.equal(sent.length, 3);
 console.log('Aim/network checks passed: aim speed, tighter spread, reload, damage invariance, latest-only snapshots, per-peer backpressure, cleanup.');
+
+const automatic = arena();
+automatic.rules.view = 'fps';
+const automaticInput = { ...idle, autoFire: true };
+automatic.step(0.01, new Map([['a', automaticInput]]));
+assert.equal(automatic.players.get('b').hp, 50, 'Centered enemy triggers mobile fire');
+automatic.step(0.1, new Map([['a', automaticInput]]));
+assert.equal(automatic.players.get('a').ammo, 6, 'Auto fire respects weapon cooldown');
+automatic.step(0.43, new Map([['a', automaticInput]]));
+assert.equal(automatic.players.get('b').hp, 0, 'Semi-auto repeats only at its allowed rate');
+for (const condition of ['wall', 'shield', 'ally', 'pitch', 'off-center', 'range', 'waiting', 'reload', 'dead']) {
+  const match = arena(); match.rules.view = 'fps';
+  const a = match.players.get('a'), b = match.players.get('b');
+  const command = { ...automaticInput };
+  if (condition === 'wall') { a.x = 100; a.y = 200; b.x = 500; b.y = 200; }
+  if (condition === 'shield') b.shieldUntil = 100;
+  if (condition === 'ally') { match.rules.mode = 'teams'; match.rules.size = 1; a.team = b.team = 'red'; match.add('c', 'm4', 'blue'); }
+  if (condition === 'pitch') command.pitch = 0.7;
+  if (condition === 'off-center') command.angle = Math.PI / 2;
+  if (condition === 'range') b.x = 1150;
+  if (condition === 'waiting') { match.rules.mode = 'teams'; match.rules.size = 3; }
+  if (condition === 'reload') { a.ammo = 5; a.reloadUntil = 100; }
+  if (condition === 'dead') { a.hp = 0; a.respawnAt = 100; }
+  const ammo = a.ammo;
+  match.step(0.01, new Map([['a', command]]));
+  assert.equal(a.ammo, ammo, `No auto shot: ${condition}`);
+}
+const topAuto = arena(); topAuto.rules.view = 'top';
+topAuto.step(0.01, new Map([['a', { ...automaticInput, aimX: 900, aimY: 90 }]]));
+assert.equal(topAuto.players.get('a').ammo, 7, 'Top view requires the cursor on the enemy, not just the firing direction');
+topAuto.step(0.01, new Map([['a', { ...automaticInput, aimX: topAuto.players.get('b').x, aimY: topAuto.players.get('b').y }]]));
+assert.equal(topAuto.players.get('b').hp, 50);
+assert.equal(validInput({ ...idle, autoFire: 'true' }), false);
+assert.equal(validInput({ ...idle, aimX: NaN }), false);
+console.log('Mobile auto-fire checks passed: crosshair, cooldown, walls, shields, teams, pitch, range, reload, death, top-view cursor.');

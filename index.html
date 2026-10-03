@@ -47,6 +47,7 @@
   </dialog>
   <dialog id="arena-dialog" aria-labelledby="arena-title">
     <header class="arena-header"><div><span id="arena-mode-label" class="eyebrow">FREE FOR ALL · 20 KILLS TO WIN</span><h2 id="arena-title">DEPOT <span>창고 구역</span></h2></div><button id="arena-leave" type="button">게임방 나가기</button></header>
+    <div class="control-settings"><label for="arena-controls">내 조작 모드<select id="arena-controls"><option value="computer">컴퓨터 모드</option><option value="mobile">모바일 모드</option></select></label><span id="arena-control-note"></span></div>
     <div id="arena-lobby">
       <p class="arena-intro">장비를 고르고 출격하세요. <span id="arena-lobby-count">0명</span>이 게임방에 있습니다.</p>
       <section id="arena-match-settings" class="match-settings" hidden>
@@ -68,7 +69,7 @@
       <div class="arena-hud"><span id="arena-health">HP 100</span><span id="arena-weapon">M4 Carbin</span><span id="arena-ammo">30 / 30</span><button id="arena-aim" type="button" aria-pressed="false">정밀 조준</button><button id="arena-reload" type="button">재장전 R</button><button id="arena-back" type="button">장비 변경 / 준비 해제</button></div>
       <div class="camera-settings"><span id="arena-current-view">3D 탑뷰</span><label for="arena-fov">내 시야각 FOV <output id="arena-fov-value">75°</output></label><input id="arena-fov" type="range" min="55" max="110" value="75" step="1" /><label for="arena-quality">화질<select id="arena-quality"><option value="auto">자동</option><option value="low">성능 우선</option><option value="high">선명하게</option></select></label><span id="arena-look-hint"></span></div>
       <div class="arena-stage"><canvas id="arena-canvas" width="1200" height="760" tabindex="0" aria-label="3D 전장"></canvas><div id="arena-crosshair" aria-hidden="true">+</div><div id="arena-banner" role="status"></div></div>
-      <div class="touch-controls"><div id="move-pad" aria-label="이동 패드"><span>이동</span></div><div class="touch-actions"><button id="touch-aim" type="button" aria-pressed="false">조준</button><button id="touch-fire" type="button">사격</button></div></div>
+      <div id="arena-touch-controls" class="touch-controls" hidden><div id="move-pad" aria-label="이동 패드"><span>이동</span></div><div class="touch-actions"><span class="auto-fire-hint">적을 겨냥하면 자동 사격</span><button id="touch-aim" type="button" aria-pressed="false">조준</button></div></div>
       <div class="arena-bottom"><p id="arena-status" role="status"></p><ol id="arena-scoreboard" aria-label="게임 점수판"></ol></div>
     </div>
   </dialog>

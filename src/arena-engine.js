@@ -46,7 +46,21 @@ function rayPlayer(x, y, dx, dy, p, dz = 0) {
   return far >= near ? near : Infinity;
 }
 export function validInput(input) {
-  return input && ['x', 'y', 'angle'].every(key => Number.isFinite(input[key])) && (input.aiming === undefined || typeof input.aiming === 'boolean') && (input.pitch === undefined || (Number.isFinite(input.pitch) && Math.abs(input.pitch) <= 1.15)) && Math.abs(input.x) <= 1 && Math.abs(input.y) <= 1 && Math.abs(input.angle) <= Math.PI * 2 && typeof input.fire === 'boolean' && typeof input.reload === 'boolean' && Number.isSafeInteger(input.trigger) && input.trigger >= 0;
+  return input && ['x', 'y', 'angle'].every(key => Number.isFinite(input[key])) && (input.autoFire === undefined || typeof input.autoFire === 'boolean') && ['aimX', 'aimY'].every(key => input[key] === undefined || (Number.isFinite(input[key]) && Math.abs(input[key]) <= 10000)) && (input.aiming === undefined || typeof input.aiming === 'boolean') && (input.pitch === undefined || (Number.isFinite(input.pitch) && Math.abs(input.pitch) <= 1.15)) && Math.abs(input.x) <= 1 && Math.abs(input.y) <= 1 && Math.abs(input.angle) <= Math.PI * 2 && typeof input.fire === 'boolean' && typeof input.reload === 'boolean' && Number.isSafeInteger(input.trigger) && input.trigger >= 0;
+}
+export function autoFireTarget(players, player, rules, input, time) {
+  if (!input.autoFire || player.hp <= 0 || player.reloadUntil || !player.ammo) return null;
+  const dx = Math.cos(player.angle), dy = Math.sin(player.angle), dz = Math.tan(player.pitch || 0);
+  let distance = Math.min(WEAPONS[player.weapon].range, dz < 0 ? -42 / dz : Infinity, ...WALLS.map(w => rayWall(player.x, player.y, dx, dy, w, 42, dz)));
+  let target = null;
+  for (const other of players) {
+    if (other.id === player.id || other.hp <= 0) continue;
+    const hit = rayPlayer(player.x, player.y, dx, dy, other, dz);
+    if (hit < distance) { target = other; distance = hit; }
+  }
+  if (!target || target.shieldUntil > time || (rules.mode === 'teams' && target.team === player.team)) return null;
+  if (rules.view !== 'fps' && (!Number.isFinite(input.aimX) || !Number.isFinite(input.aimY) || Math.hypot(input.aimX - target.x, input.aimY - target.y) > RADIUS)) return null;
+  return target;
 }
 export class ArenaEngine {
   constructor(rules = { mode: 'ffa', size: 1 }) { this.rules = { ...rules }; this.teamScores = { red: 0, blue: 0 }; this.players = new Map(); this.time = 0; this.traces = []; this.feed = []; this.winner = null; this.restartAt = 0; this.shotId = 0; }
@@ -104,7 +118,8 @@ export class ArenaEngine {
       if (input.reload && p.ammo < w.magazine && !p.reloadUntil) p.reloadUntil = this.time + w.reload;
       const trigger = input.trigger > p.lastTrigger;
       p.lastTrigger = input.trigger;
-      if ((p.weapon === 'deagle' ? trigger : input.fire || trigger) && this.time >= p.cooldown && !p.reloadUntil && p.ammo > 0) {
+      const automatic = autoFireTarget(this.players.values(), p, this.rules, input, this.time);
+      if ((automatic || (p.weapon === 'deagle' ? trigger : input.fire || trigger)) && this.time >= p.cooldown && !p.reloadUntil && p.ammo > 0) {
         this.shoot(p); p.ammo--; p.cooldown = this.time + w.cooldown; p.shieldUntil = 0;
       }
       if (!p.ammo && !p.reloadUntil) { p.reloadUntil = this.time + w.reload; p.aiming = false; }

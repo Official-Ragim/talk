@@ -2,6 +2,7 @@ import { joinRoom, selfId } from '../vendor/trystero.js';
 import { resolveIpRoom, validChannel } from './rooms.js';
 import { createDirectMessages } from './dm.js';
 import { createArena } from './arena.js';
+import { createRoomMesh } from './room-mesh.js';
 
 const $ = (id) => document.getElementById(id);
 const peers = new Map();
@@ -19,6 +20,7 @@ let generation = 0;
 let connectionTimer;
 let toastTimer;
 let typingTimer;
+let presenceTimer;
 let lastTypingAt = 0;
 let sending = false;
 let lastSendAt = 0;
@@ -159,6 +161,7 @@ function leave({ resetUrl = true, announce = true } = {}) {
   // Clear references and DOM immediately, even if the network is unavailable.
   clearTimeout(connectionTimer);
   clearInterval(typingTimer);
+  clearInterval(presenceTimer);
   peers.clear(); receiveRates.clear(); seen.clear();
   $('messages').replaceChildren();
   $('message-input').value = '';
@@ -219,9 +222,9 @@ function connect(channel) {
   myName = cleanName($('nickname-input').value) || `익명-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
   currentChannel = channel;
   try {
-    room = joinRoom({ appId: `talk-ephemeral-v1:${location.host}${location.pathname.replace(/index\.html$/, '')}` }, channel, {
+    room = createRoomMesh(joinRoom({ appId: `talk-ephemeral-v2:${location.host}${location.pathname.replace(/index\.html$/, '')}` }, channel, {
       onJoinError: () => { if (token === generation) notice('친구와 연결하지 못했습니다. 채널명과 네트워크를 확인해 주세요.'); },
-    });
+    }), selfId);
     chat = room.makeAction('message');
     profile = room.makeAction('profile');
     typing = room.makeAction('typing');
@@ -248,7 +251,8 @@ function connect(channel) {
     profile.onMessage = (value, { peerId }) => {
       if (token !== generation || !peers.has(peerId)) return;
       const name = cleanName(value);
-      if (name) peers.get(peerId).name = name;
+      if (!name || peers.get(peerId).name === name) return;
+      peers.get(peerId).name = name;
       directMessages?.refresh();
       updateParticipants();
     };
@@ -289,6 +293,8 @@ function connect(channel) {
   document.body.classList.add('in-room');
   updateParticipants(); renderMode();
   typingTimer = setInterval(updateTyping, 1000);
+  // A profile sent during simultaneous joins may precede the reverse route.
+  presenceTimer = setInterval(() => profile?.send(myName).catch(() => {}), 2000);
   connectionTimer = setTimeout(() => {
     if (token === generation && !peers.size) notice('아직 연결된 친구가 없습니다. 둘 다 입장했다면 잠시 기다리거나 다른 네트워크에서 다시 시도해 주세요.');
   }, 20000);

@@ -76,9 +76,17 @@ test('same-IP tabs and a separate browser session exchange text without history 
     await join(c, '늦은 친구');
     await expect(c.locator('#participant-count')).toHaveText('3', { timeout: 60000 });
     await expect(c.locator('.message-text')).toHaveCount(0);
+    for (const p of [a, b, c]) {
+      await expect(p.locator('#participant-count')).toHaveText('3');
+      for (const name of ['친구 A', '친구 B', '늦은 친구']) await expect(p.locator('#participants')).toContainText(name);
+    }
     await b.locator('#message-input').fill('반가워\n줄바꿈도 됩니다');
     await b.locator('#send-button').click();
     await expect(c.locator('.message-text')).toHaveText('반가워\n줄바꿈도 됩니다');
+    await expect(a.locator('.message-text').last()).toHaveText('반가워\n줄바꿈도 됩니다');
+    await c.locator('#message-input').fill('C도 모두에게 보여요');
+    await c.locator('#send-button').click();
+    for (const p of [a, b]) await expect(p.locator('.message-text').last()).toHaveText('C도 모두에게 보여요');
     await a.emulateMedia({ reducedMotion: 'reduce' });
     await a.screenshot({ path: 'test-results/chat.png', fullPage: true });
     await a.locator('#leave-button').click();

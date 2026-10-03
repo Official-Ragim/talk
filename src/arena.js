@@ -22,10 +22,11 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   let renderer = null;
   let joined = false, playing = false, weapon = 'm4', session = '', host = null, hostKey = '', engine = null, disposed = false;
   let snapshot = null, lastSnapshotAt = 0, lastTick = performance.now(), lastSend = 0, frame = 0, lastHud = 0;
-  let migrationUntil = 0;
+  let migrationUntil = 0, lastPresence = 0;
   let rules = { mode: 'ffa', size: 1, view: 'top' }, revision = -1, seats = new Map(), team = 'auto', lastSetup = 0;
   let order = 0, startedAt = 0, yaw = 0, pitch = 0, fov = 75, cameraReady = false, unlockedAt = -1000, lockUnavailable = false, lookPointer = null;
   let pointerN = { x: 0, y: 0 };
+  let controlMode = matchMedia('(pointer: coarse)').matches ? 'mobile' : 'computer';
   let aimHeld = false, aimToggle = false, ads = 0, lastDraw = 0, boardKey = '', inputKey = '', lastInputAt = 0, quality = 'auto';
   let crosshairX = -1, crosshairY = -1;
   const layout = { width: 0, canvasWidth: 0, height: 0 };
@@ -42,6 +43,15 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   const localPresence = () => ({ joined, playing, weapon, session, team, order, startedAt });
   const setupPacket = () => ({ hostKey, rules, revision, seats: [...seats] });
   function publishSetup() { if (joined && host === selfId) safeSend(setup, setupPacket()); }
+  function renderControls() {
+    const mobile = controlMode === 'mobile', fps = rules.view === 'fps';
+    $('arena-dialog').dataset.controls = controlMode;
+    $('arena-controls').value = controlMode;
+    $('arena-touch-controls').hidden = !mobile;
+    $('arena-control-note').textContent = mobile ? '컴퓨터에서도 화면 패드·드래그 사용 가능 · 적을 겨냥하면 자동 사격' : 'WASD 이동 · 클릭 / Space 사격 · 우클릭 / Shift 정밀 조준';
+    $('arena-look-hint').textContent = mobile ? (fps ? '화면 드래그로 시점 회전 · 적을 겨냥하면 자동 사격' : '화면 터치 / 마우스로 적을 겨냥하면 자동 사격') : fps ? '우클릭 / Shift: 정밀 조준 · 화면 클릭: 마우스 잠금 · Esc: 해제' : '우클릭 / Shift: 정밀 조준 · 마우스 / 터치로 겨냥';
+    $('arena-controls-help').textContent = mobile ? '화면 이동 패드로 이동 · 전장 드래그/터치로 겨냥 · 적이 조준점에 들어오면 자동 사격 · 조준 버튼으로 확대 · 재장전 버튼 사용. 컴퓨터에서도 모바일 모드를 고를 수 있습니다.' : 'WASD 이동 · 마우스로 겨냥 · 클릭 / Space 사격 · R 재장전 · 우클릭 / Shift 정밀 조준. 화면 조작은 모바일 모드를 선택하세요.';
+  }
   function renderLobby() {
     const teams = rules.mode === 'teams';
     for (const button of document.querySelectorAll('[data-weapon]')) button.setAttribute('aria-pressed', String(button.dataset.weapon === weapon));
@@ -51,8 +61,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     $('arena-game-rules').hidden = !custom;
     $('arena-view').value = rules.view;
     $('arena-current-view').textContent = fps ? '3D 1인칭' : '3D 탑뷰';
-    $('arena-look-hint').textContent = fps ? '우클릭 / Shift: 정밀 조준 · 화면 클릭: 마우스 잠금 · Esc: 해제' : '우클릭 / Shift: 정밀 조준 · 마우스 / 터치로 겨냥';
-    $('arena-controls-help').textContent = (fps ? 'WASD 이동 · 화면 클릭 후 마우스로 둘러보기 · Esc 마우스 해제. ' : 'WASD / 방향키 이동 · 마우스로 겨냥. ') + '우클릭 / Shift 정밀 조준 · 클릭 / Space 사격 · R 재장전. 모바일: 이동 패드 + 화면 드래그/터치 + 조준·사격 버튼.';
+    renderControls();
     $('arena-mode').value = rules.mode;
     $('arena-size').value = String(rules.size);
     const locked = [...members.values()].some(m => m.playing);
@@ -128,6 +137,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   membership.onMessage = (packet, { peerId }) => {
     if (disposed || !hasPeer(peerId) || !packet || typeof packet.joined !== 'boolean' || typeof packet.playing !== 'boolean' || !Object.hasOwn(WEAPONS, packet.weapon) || typeof packet.session !== 'string' || packet.session.length > 64 || !['auto', 'red', 'blue'].includes(packet.team) || !Number.isSafeInteger(packet.order) || packet.order < 0 || !Number.isSafeInteger(packet.startedAt) || packet.startedAt < 0) return;
     const previous = members.get(peerId);
+    if (previous && ['joined', 'playing', 'weapon', 'session', 'team', 'order', 'startedAt'].every(key => previous[key] === packet[key])) return;
     if (packet.joined) members.set(peerId, packet); else members.delete(peerId);
     if (!packet.joined || previous?.session !== packet.session || previous?.playing !== packet.playing) {
       inputs.delete(peerId); inputTimes.delete(peerId); engine?.remove(peerId);
@@ -167,7 +177,9 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
       x: move.x / length, y: move.y / length,
       angle: fps ? yaw : me ? Math.atan2(pointer.y - me.y, pointer.x - me.x) : 0,
       pitch: fps ? pitch : 0,
-      fire: firing, trigger, reload, aiming: aiming(),
+      fire: controlMode === 'computer' && firing, trigger, reload, aiming: aiming(),
+      autoFire: controlMode === 'mobile' && !document.hidden && document.hasFocus(),
+      aimX: pointer.x, aimY: pointer.y,
     };
   }
   function sendInput() {
@@ -175,7 +187,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     const value = input();
     if (host === selfId) { inputs.set(selfId, { ...value, reload: value.reload || inputs.get(selfId)?.reload || false }); inputTimes.set(selfId, performance.now()); }
     else {
-      for (const field of ['x', 'y', 'angle', 'pitch']) value[field] = Math.round(value[field] * 1000) / 1000;
+      for (const field of ['x', 'y', 'angle', 'pitch', 'aimX', 'aimY']) value[field] = Math.round(value[field] * 1000) / 1000;
       const key = `${hostKey}:${revision}:` + JSON.stringify(value), now = performance.now();
       if (key !== inputKey || now - lastInputAt >= 150) { inputKey = key; lastInputAt = now; safeSend(control, { hostKey, revision, session, input: value }, host); }
     }
@@ -185,6 +197,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     const now = performance.now();
     const dt = Math.min(0.05, (now - lastTick) / 1000); lastTick = now;
     if (!joined) return;
+    if (now - lastPresence > 2000) { lastPresence = now; announce(); }
     if (playing && rules.view === 'fps') yaw = wrapAngle(yaw + (Number(keys.has('ArrowRight')) - Number(keys.has('ArrowLeft'))) * dt * 1.8);
     sendInput();
     if (!engine) return;
@@ -229,6 +242,11 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   listen($('arena-view'), 'change', changeRules);
   listen($('arena-fov'), 'input', () => { fov = clamp(Number($('arena-fov').value), 55, 110); $('arena-fov-value').textContent = `${fov}°`; });
   listen($('arena-quality'), 'change', () => { quality = $('arena-quality').value; renderer?.setQuality(quality); });
+  listen($('arena-controls'), 'change', () => {
+    controlMode = $('arena-controls').value === 'mobile' ? 'mobile' : 'computer';
+    if (document.pointerLockElement === canvas) document.exitPointerLock();
+    resetInput(); lookPointer = null; renderControls(); canvas.focus(); sendInput();
+  });
   for (const id of ['arena-aim', 'touch-aim']) listen($(id), 'click', () => { aimToggle = !aimToggle; renderAim(); sendInput(); });
   for (const button of document.querySelectorAll('[data-team]')) listen(button, 'click', () => {
     if (!joined || playing) return;
@@ -258,7 +276,7 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     }
     if (!playing || ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName) || !['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'KeyR', 'Space', 'ShiftLeft', 'ShiftRight'].includes(e.code)) return;
     e.preventDefault(); keys.add(e.code); if (e.code === 'KeyR') reload = true;
-    if (e.code === 'Space' && !e.repeat) { firing = true; trigger++; sendInput(); }
+    if (e.code === 'Space' && !e.repeat && controlMode === 'computer') { firing = true; trigger++; sendInput(); }
     if (e.code.startsWith('Shift')) { renderAim(); sendInput(); }
   });
   listen(window, 'keyup', e => { keys.delete(e.code); if (e.code === 'Space') firing = false; if (e.code === 'Space' || e.code.startsWith('Shift')) { renderAim(); sendInput(); } });
@@ -290,18 +308,18 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
     e.preventDefault(); canvas.focus();
     if (rules.view === 'fps') {
       lookPointer = { id: e.pointerId, x: e.clientX, y: e.clientY };
-      if (e.pointerType !== 'touch' && document.pointerLockElement !== canvas && !lockUnavailable) {
+      if (controlMode === 'computer' && e.pointerType !== 'touch' && document.pointerLockElement !== canvas && !lockUnavailable) {
         try { if (canvas.requestPointerLock) canvas.requestPointerLock()?.catch(lockFailed); else lockFailed(); } catch { lockFailed(); }
         return;
       }
     } else aim(e);
-    if (e.pointerType !== 'touch') { firing = true; trigger++; sendInput(); }
+    if (controlMode === 'computer' && e.pointerType !== 'touch') { firing = true; trigger++; sendInput(); }
     if (document.pointerLockElement !== canvas) canvas.setPointerCapture(e.pointerId);
   });
   listen(window, 'pointerup', e => { if (lookPointer?.id === e.pointerId) lookPointer = null; if (e.button === 2) { aimHeld = false; renderAim(); sendInput(); } else if (e.pointerType !== 'touch') { firing = false; sendInput(); } });
   // Pointer events omit intermediate presses/releases when two mouse buttons are held.
   listen(canvas, 'mousedown', e => {
-    if (!playing || e.buttons !== 3) return;
+    if (!playing || controlMode !== 'computer' || e.buttons !== 3) return;
     if (e.button === 2) aimHeld = true;
     else if (e.button === 0) { firing = true; trigger++; }
     renderAim(); sendInput();
@@ -329,8 +347,6 @@ export function createArena({ room, selfId, getName, hasPeer, custom = false }) 
   listen(pad, 'pointerdown', e => { padPointer = e.pointerId; pad.setPointerCapture(e.pointerId); moveStick(e); });
   listen(pad, 'pointermove', e => { if (padPointer === e.pointerId) moveStick(e); });
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) listen(pad, event, () => { padPointer = null; stick = { x: 0, y: 0 }; });
-  listen($('touch-fire'), 'pointerdown', e => { e.preventDefault(); $('touch-fire').setPointerCapture(e.pointerId); firing = true; trigger++; sendInput(); });
-  for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) listen($('touch-fire'), event, () => { firing = false; sendInput(); });
   function draw(now) {
     if (disposed) return;
     frame = requestAnimationFrame(draw);

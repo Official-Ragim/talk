@@ -168,10 +168,15 @@ input:disabled { background: #f7f7f7; color: #666; }
 .arena-bottom { padding: 10px 20px; font-size: 11px; color: #aab9ad; }
 #arena-status { margin: 0 0 8px; }
 #arena-scoreboard { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; padding-left: 15px; }
-.touch-controls { display: none; align-items: center; justify-content: space-between; padding: 10px 20px; }
+.touch-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; }
+.touch-controls[hidden] { display: none; }
+.control-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 20px; background: #1c2b2d; color: #c6d5bf; font-size: 12px; }
+.control-settings label { display: flex; align-items: center; gap: 8px; }
+#arena-controls { font: inherit; padding: 6px; background: #2b3d38; color: #deebd3; border: 1px solid #647466; }
+.auto-fire-hint { max-width: 110px; font-size: 11px; color: #c6d5bf; word-break: keep-all; }
+#arena-control-note { word-break: keep-all; }
+#arena-dialog[data-controls="mobile"] #arena-canvas { width: min(100%, calc(max(160px, 100dvh - 500px) * 1200 / 760)); }
 #move-pad { width: 100px; height: 100px; border-radius: 50%; border: 1px solid #647466; background: radial-gradient(circle, #637760 0 20%, #283b37 21% 100%); display: grid; place-items: center; touch-action: none; user-select: none; font-size: 12px; }
-#touch-fire { width: 80px; height: 80px; border-radius: 50%; touch-action: none; user-select: none; }
-@media (pointer: coarse) { .touch-controls { display: flex; } }
 @media (max-width: 620px) {
   .workspace { height: auto; grid-template-rows: minmax(330px, calc(100dvh - 370px)) auto; }
   .info-panel { display: block; border-left: 0; border-top: 1px solid #ddd; padding: 12px; max-height: 170px; }

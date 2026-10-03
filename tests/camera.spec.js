@@ -83,9 +83,11 @@ test('first starter chooses shared 3D view; FOV and first-person controls work i
     await expect(a.locator('#arena-view')).toBeDisabled();
     await b.setViewportSize({ width: 390, height: 844 });
     await b.bringToFront();
+    await b.locator('#arena-controls').selectOption('mobile');
     await b.locator('#arena-play').click();
     await expect(b.locator('#arena-canvas')).toHaveAttribute('data-rendered-view', 'fps');
-    await expect(b.locator('#touch-fire')).toBeVisible();
+    await expect(b.locator('#touch-fire')).toHaveCount(0);
+    await expect(b.locator('#move-pad')).toBeVisible();
     await expect(b.locator('#arena-health')).toHaveText('HP 100');
     await b.locator('#touch-aim').click();
     await expect(b.locator('#touch-aim')).toHaveAttribute('aria-pressed', 'true');
@@ -102,8 +104,9 @@ test('first starter chooses shared 3D view; FOV and first-person controls work i
     await mobile.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     // Read the composited frame: WebGL may discard its drawing buffer after presentation.
     await expect.poll(async () => !(await b.locator('#arena-canvas').screenshot()).equals(beforeLook)).toBe(true);
-    await b.locator('#touch-fire').click();
-    await expect(b.locator('#arena-ammo')).toHaveText('6 / 7');
+    await b.locator('#arena-canvas').focus();
+    await b.keyboard.press('Space');
+    await expect(b.locator('#arena-ammo')).toHaveText('7 / 7');
     await b.locator('#touch-aim').click();
     await expect(b.locator('#arena-canvas')).toHaveAttribute('data-aiming', 'false');
     expect(await b.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
