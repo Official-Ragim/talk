@@ -1,4 +1,4 @@
-import { joinRoom, selfId } from '../vendor/trystero.js';
+import { joinRoom, selfId } from '../vendor/trystero.js?v=20261003-discovery2';
 import { resolveIpRoom, validChannel } from './rooms.js';
 import { createDirectMessages } from './dm.js';
 import { createArena } from './arena.js';
@@ -17,6 +17,8 @@ let currentChannel = '';
 let mode = 'custom';
 let lookupController = null;
 let generation = 0;
+let connecting = false;
+let pendingLeave = Promise.resolve();
 let connectionTimer;
 let toastTimer;
 let typingTimer;
@@ -53,7 +55,7 @@ function normalizeChannel(value) {
 
 function renderMode() {
   const isIp = mode === 'ip';
-  const busy = Boolean(room || lookupController);
+  const busy = Boolean(room || lookupController || connecting);
   $('custom-mode').setAttribute('aria-pressed', String(!isIp));
   $('ip-mode').setAttribute('aria-pressed', String(isIp));
   $('channel-field').hidden = isIp;
@@ -65,7 +67,7 @@ function renderMode() {
   $('mode-description').textContent = isIp
     ? '현재 접속 IP를 기준으로 입장합니다. 같은 공인 IP를 쓰는 사람끼리 연결됩니다.'
     : '채널 ID를 정해서 입장하세요. 같은 ID를 입력한 사람끼리 연결됩니다.';
-  $('join-button').textContent = room ? '참여 중' : lookupController ? 'IP 확인 중…' : isIp ? 'IP방 입장' : '입장 / 만들기';
+  $('join-button').textContent = room ? '참여 중' : lookupController ? 'IP 확인 중…' : connecting ? '연결 준비 중…' : isIp ? 'IP방 입장' : '입장 / 만들기';
   $('channel-input').disabled = $('nickname-input').disabled = $('join-button').disabled = $('random-button').disabled = busy;
   $('leave-button').disabled = !busy;
   if (!room) {
@@ -152,6 +154,7 @@ function updateTyping() {
 
 function leave({ resetUrl = true, announce = true } = {}) {
   generation++;
+  connecting = false;
   lookupController?.abort();
   lookupController = null;
   const oldRoom = room;
@@ -177,23 +180,25 @@ function leave({ resetUrl = true, announce = true } = {}) {
   lastSendAt = lastTypingAt = 0;
   notice(); updateParticipants(); renderMode();
   if (resetUrl) history.replaceState(null, '', location.pathname + location.search + (mode === 'ip' ? '#mode=ip' : ''));
-  try { Promise.resolve(oldRoom?.leave()).catch(() => {}); } catch { /* Local data is already cleared. */ }
+  try {
+    if (oldRoom) pendingLeave = Promise.all([pendingLeave, Promise.resolve(oldRoom.leave()).catch(() => {})]).then(() => {});
+  } catch { /* Local data is already cleared. */ }
   if (oldRoom && announce) toast('퇴장했습니다.');
 }
 
 function enter(value) {
-  if (mode !== 'custom' || room || lookupController) return;
+  if (mode !== 'custom' || room || lookupController || connecting) return;
   $('form-error').textContent = '';
   if (!validChannel(value)) {
     $('form-error').textContent = '채널 ID는 영문·숫자만 1~32자 입력하세요.';
     return;
   }
   const channel = normalizeChannel(value);
-  connect(channel);
+  void connect(channel);
 }
 
 async function enterIp() {
-  if (mode !== 'ip' || room || lookupController) return;
+  if (mode !== 'ip' || room || lookupController || connecting) return;
   $('form-error').textContent = '';
   if (!navigator.onLine) { $('form-error').textContent = '인터넷 연결을 확인해 주세요.'; return; }
   const token = ++generation;
@@ -205,7 +210,7 @@ async function enterIp() {
     const channel = await resolveIpRoom(controller.signal);
     if (token !== generation || mode !== 'ip') return;
     lookupController = null;
-    connect(channel);
+    await connect(channel);
   } catch {
     if (token === generation) $('form-error').textContent = 'IP를 확인하지 못했습니다. 다시 입장하거나 커스텀 방을 이용하세요.';
   } finally {
@@ -215,11 +220,18 @@ async function enterIp() {
   }
 }
 
-function connect(channel) {
+async function connect(channel) {
   if (!navigator.onLine) { $('form-error').textContent = '인터넷 연결을 확인해 주세요.'; return; }
-  if (room) return;
+  if (room || connecting) return;
   const token = ++generation;
-  myName = cleanName($('nickname-input').value) || `익명-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+  const name = cleanName($('nickname-input').value) || `익명-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+  connecting = true; renderMode();
+  // Trystero caches a room until its asynchronous leave completes. Reusing it
+  // earlier lets the old leave destroy the newly joined room and its handlers.
+  await pendingLeave;
+  if (token !== generation) return;
+  if (!navigator.onLine) { connecting = false; renderMode(); $('form-error').textContent = '인터넷 연결을 확인해 주세요.'; return; }
+  myName = name;
   currentChannel = channel;
   try {
     room = createRoomMesh(joinRoom({ appId: `talk-ephemeral-v2:${location.host}${location.pathname.replace(/index\.html$/, '')}` }, channel, {
@@ -282,6 +294,7 @@ function connect(channel) {
     $('form-error').textContent = '이 브라우저에서 연결을 시작하지 못했습니다. 최신 Chrome, Edge 또는 Safari로 열어 주세요.';
     return;
   }
+  connecting = false;
   history.replaceState(null, '', mode === 'ip' ? '#mode=ip' : `#channel=${encodeURIComponent(channel)}`);
   if (mode === 'custom') $('channel-input').value = channel;
   $('room-title').textContent = mode === 'ip' ? 'IP방' : channel;
@@ -361,7 +374,7 @@ window.addEventListener('pagehide', () => leave({ announce: false }));
 // A restored back/forward-cache page must never restore a previous conversation.
 window.addEventListener('pageshow', event => { if (event.persisted) leave({ announce: false }); });
 function readInvite() {
-  if (room || lookupController) return;
+  if (room || lookupController || connecting) return;
   const params = new URLSearchParams(location.hash.slice(1));
   if (params.get('mode') === 'ip') { setMode('ip', { updateUrl: false }); return; }
   const value = params.get('channel');

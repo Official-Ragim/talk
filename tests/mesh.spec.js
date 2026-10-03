@@ -6,7 +6,7 @@ test('three real clients exchange messages and private DM with an A–C transpor
   const pages = await Promise.all([context.newPage(), context.newPage(), context.newPage()]);
   const [a, b, c] = pages, channel = `partial${Date.now()}`, errors = [];
   try {
-    await context.route(url => url.pathname.endsWith('/vendor/trystero.js') && !url.search, route => route.fulfill({ contentType: 'text/javascript', body: `
+    await context.route(url => url.pathname.endsWith('/vendor/trystero.js') && !url.searchParams.has('original'), route => route.fulfill({ contentType: 'text/javascript', body: `
       import { joinRoom as original, selfId } from './trystero.js?original=1';
       export { selfId };
       export function joinRoom(...args) {
@@ -32,7 +32,7 @@ test('three real clients exchange messages and private DM with an A–C transpor
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(`./#channel=${channel}`);
     }
-    const ids = await Promise.all(pages.map(p => p.evaluate(async () => (await import('./vendor/trystero.js')).selfId)));
+    const ids = await Promise.all(pages.map(p => p.evaluate(async () => (await import('./vendor/trystero.js?v=20261003-discovery2')).selfId)));
     await a.evaluate(id => { window.missingPeer = id; }, ids[2]);
     await c.evaluate(id => { window.missingPeer = id; }, ids[0]);
     for (let i = 0; i < pages.length; i++) {

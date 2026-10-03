@@ -54,18 +54,18 @@ var e = Object.freeze, t = 11579208923731619542357098500868790785326998466564056
 	if (r !== 1n) throw Error("invert: does not exist");
 	return y(i, t);
 }, S = (e) => {
-	let t = ae[e];
+	let t = te[e];
 	if (typeof t != "function") throw Error("hashes." + e + " not set");
 	return t;
 }, C = (e, t, n) => c(S(e)(t, n), o, "digest"), w = async (e, t, n) => c(await S(e)(t, n), o, "digest"), T = (e) => {
-	if (e instanceof M) return e;
+	if (e instanceof P) return e;
 	throw TypeError("Point expected");
-}, E = "bad point: not on curve", D = (e) => y(y(e * e) * e + 7n), O = (e) => v(e, 0n, t), k = (e) => v(e, 1n, t), ee = (e) => v(e, 1n, n), A = (e) => !(e & 1n), j = (e) => Uint8Array.of(A(e) ? 2 : 3), te = (e) => {
+}, E = "bad point: not on curve", D = (e) => y(y(e * e) * e + 7n), O = (e) => v(e, 0n, t), k = (e) => v(e, 1n, t), A = (e) => v(e, 1n, n), j = (e) => !(e & 1n), M = (e) => Uint8Array.of(j(e) ? 2 : 3), N = (e) => {
 	let n = D(k(e)), r = 1n;
 	for (let e = n, i = 115792089237316195423570985008687907853269984665640564039457584007908834671664n / 4n; i > 0n; i >>= 1n) i & 1n && (r = r * e % t), e = e * e % t;
 	if (y(r * r) !== n) throw Error("sqrt invalid");
-	return new M(e, A(r) ? r : y(-r), 1n);
-}, M = class n {
+	return new P(e, j(r) ? r : y(-r), 1n);
+}, P = class n {
 	static BASE;
 	static ZERO;
 	X;
@@ -79,17 +79,17 @@ var e = Object.freeze, t = 11579208923731619542357098500868790785326998466564056
 	}
 	static fromAffine(e) {
 		let { x: t, y: r } = e;
-		return t === 0n && r === 0n ? P : new n(t, r, 1n);
+		return t === 0n && r === 0n ? I : new n(t, r, 1n);
 	}
 	static fromBytes(e) {
 		c(e);
-		let t = e.length, r = e[0], i = I(e, 1, 33);
+		let t = e.length, r = e[0], i = z(e, 1, 33);
 		try {
 			if (t === 33 && (r === 2 || r === 3)) {
-				let e = te(i);
+				let e = N(i);
 				return r === 3 ? e.negate() : e;
 			}
-			if (t === 65 && r === 4) return new n(i, I(e, 33, 65), 1n).assertValidity();
+			if (t === 65 && r === 4) return new n(i, z(e, 33, 65), 1n).assertValidity();
 		} catch {
 			throw Error(E);
 		}
@@ -127,10 +127,10 @@ var e = Object.freeze, t = 11579208923731619542357098500868790785326998466564056
 		return this.add(T(e).negate());
 	}
 	multiply(e, t = !0) {
-		if (!t && e === 0n) return P;
-		if (ee(e), e === 1n) return this;
-		if (this.equals(N)) return Ee(e).p;
-		let n = P, r = N, i = this;
+		if (!t && e === 0n) return I;
+		if (A(e), e === 1n) return this;
+		if (this.equals(F)) return Ce(e).p;
+		let n = I, r = F, i = this;
 		for (let a = 0; t ? a < 256 : e > 0n; a++) e & 1n ? n = n.add(i) : t && (r = r.add(i)), i = i.double(), e >>= 1n;
 		return n;
 	}
@@ -160,139 +160,139 @@ var e = Object.freeze, t = 11579208923731619542357098500868790785326998466564056
 		return this;
 	}
 	toBytes(e = !0) {
-		let { x: t, y: n } = this.assertValidity().toAffine(), r = L(t);
-		return e ? h(j(n), r) : h(Uint8Array.of(4), r, L(n));
+		let { x: t, y: n } = this.assertValidity().toAffine(), r = ee(t);
+		return e ? h(M(n), r) : h(Uint8Array.of(4), r, ee(n));
 	}
 	toHex(e) {
 		return f(this.toBytes(e));
 	}
-}, N = new M(r, i, 1n), P = new M(0n, 1n, 0n);
-M.BASE = N, M.ZERO = P;
-var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(), F = (e) => _("0x" + (f(e) || "0")), I = (e, t, n) => F(e.subarray(t, n)), L = (e) => p(d(v(e, 0n, 2n ** 256n), 64)), re = (e) => v(F(c(e, o, "secret key")), 1n, n, "invalid secret key: outside of range"), ie = "SHA-256", ae = {
+}, F = new P(r, i, 1n), I = new P(0n, 1n, 0n);
+P.BASE = F, P.ZERO = I;
+var L = (e, t, n) => F.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(), R = (e) => _("0x" + (f(e) || "0")), z = (e, t, n) => R(e.subarray(t, n)), ee = (e) => p(d(v(e, 0n, 2n ** 256n), 64)), B = (e) => v(R(c(e, o, "secret key")), 1n, n, "invalid secret key: outside of range"), V = "SHA-256", te = {
 	hmacSha256Async: async (e, t) => {
 		let n = m(), r = await n.importKey("raw", e, {
 			name: "HMAC",
-			hash: ie
+			hash: V
 		}, !1, ["sign"]);
 		return new Uint8Array(await n.sign("HMAC", r, t));
 	},
 	hmacSha256: void 0,
-	sha256Async: async (e) => new Uint8Array(await m().digest(ie, e)),
+	sha256Async: async (e) => new Uint8Array(await m().digest(V, e)),
 	sha256: void 0
-}, R = (e) => {
+}, H = (e) => {
 	if (e = e === void 0 ? g(48) : e, c(e), e.length < 48 || e.length > 1024) throw RangeError("expected 48-1024b");
-	return L(y(F(e), n - 1n) + 1n);
-}, z = (e) => (t) => {
-	let n = R(t);
+	return ee(y(R(e), n - 1n) + 1n);
+}, ne = (e) => (t) => {
+	let n = H(t);
 	return {
 		secretKey: n,
 		publicKey: e(n)
 	};
-}, B = (e) => Uint8Array.from("BIP0340/" + e, (e) => e.charCodeAt(0)), oe = (e, ...t) => {
-	let n = C("sha256", B(e));
+}, re = (e) => Uint8Array.from("BIP0340/" + e, (e) => e.charCodeAt(0)), ie = (e, ...t) => {
+	let n = C("sha256", re(e));
 	return C("sha256", h(n, n, ...t));
-}, se = (e, ...t) => w("sha256Async", B(e)).then((e) => w("sha256Async", h(e, e, ...t))), V = (e) => {
-	let t = re(e), { x: n, y: r } = N.multiply(t).assertValidity().toAffine();
+}, ae = (e, ...t) => w("sha256Async", re(e)).then((e) => w("sha256Async", h(e, e, ...t))), U = (e) => {
+	let t = B(e), { x: n, y: r } = F.multiply(t).assertValidity().toAffine();
 	return {
-		d: A(r) ? t : b(-t),
-		px: L(n)
+		d: j(r) ? t : b(-t),
+		px: ee(n)
 	};
-}, ce = (e) => b(F(e)), le = (...e) => ce(oe("challenge", ...e)), ue = async (...e) => ce(await se("challenge", ...e)), de = (e) => V(e).px, fe = /* @__PURE__ */ z(de), H = (e, t, n) => {
-	let r = u(e, "message"), { px: i, d: a } = V(t);
+}, oe = (e) => b(R(e)), se = (...e) => oe(ie("challenge", ...e)), ce = async (...e) => oe(await ae("challenge", ...e)), le = (e) => U(e).px, ue = /* @__PURE__ */ ne(le), de = (e, t, n) => {
+	let r = u(e, "message"), { px: i, d: a } = U(t);
 	return {
 		m: r,
 		px: i,
 		d: a,
 		a: c(n, o)
 	};
-}, pe = (e) => {
-	let t = ce(e);
+}, fe = (e) => {
+	let t = oe(e);
 	if (t === 0n) throw Error("sign failed: k is zero");
-	let { px: n, d: r } = V(L(t));
+	let { px: n, d: r } = U(ee(t));
 	return {
 		rx: n,
 		k: r
 	};
-}, me = (e, t, n, r) => h(t, L(b(e + n * r))), he = "invalid signature produced", ge = (e, t, n = g(o)) => {
-	let { m: r, px: i, d: a, a: s } = H(e, t, n), { rx: c, k: l } = pe(oe("nonce", L(a ^ F(oe("aux", s))), i, r)), u = me(l, c, le(c, i, r), a);
-	if (!be(u, r, i)) throw Error(he);
+}, pe = (e, t, n, r) => h(t, ee(b(e + n * r))), W = "invalid signature produced", me = (e, t, n = g(o)) => {
+	let { m: r, px: i, d: a, a: s } = de(e, t, n), { rx: c, k: l } = fe(ie("nonce", ee(a ^ R(ie("aux", s))), i, r)), u = pe(l, c, se(c, i, r), a);
+	if (!_e(u, r, i)) throw Error(W);
 	return u;
-}, _e = async (e, t, n = g(o)) => {
-	let { m: r, px: i, d: a, a: s } = H(e, t, n), { rx: c, k: l } = pe(await se("nonce", L(a ^ F(await se("aux", s))), i, r)), u = me(l, c, await ue(c, i, r), a);
-	if (!await xe(u, r, i)) throw Error(he);
+}, G = async (e, t, n = g(o)) => {
+	let { m: r, px: i, d: a, a: s } = de(e, t, n), { rx: c, k: l } = fe(await ae("nonce", ee(a ^ R(await ae("aux", s))), i, r)), u = pe(l, c, await ce(c, i, r), a);
+	if (!await ve(u, r, i)) throw Error(W);
 	return u;
-}, ve = (e, t) => e instanceof Promise ? e.then(t) : t(e), ye = (e, t, n, r) => {
+}, he = (e, t) => e instanceof Promise ? e.then(t) : t(e), ge = (e, t, n, r) => {
 	let i = c(e, 64, "signature"), a = c(t, void 0, "message"), s = c(n, o, "publicKey"), l, u, d, f;
 	try {
-		l = te(F(s)), u = k(I(i, 0, o)), d = ee(I(i, o, 64)), f = h(L(u), s, a);
+		l = N(R(s)), u = k(z(i, 0, o)), d = A(z(i, o, 64)), f = h(ee(u), s, a);
 	} catch {
 		return !1;
 	}
-	return ve(r(f), (e) => {
+	return he(r(f), (e) => {
 		try {
-			let { x: t, y: n } = ne(l, d, b(-e)).toAffine();
-			return !(!A(n) || t !== u);
+			let { x: t, y: n } = L(l, d, b(-e)).toAffine();
+			return !(!j(n) || t !== u);
 		} catch {
 			return !1;
 		}
 	});
-}, be = (e, t, n) => ye(e, t, n, le), xe = async (e, t, n) => ye(e, t, n, ue), Se = /* @__PURE__ */ e({
-	keygen: fe,
-	getPublicKey: de,
-	sign: ge,
-	verify: be,
-	signAsync: _e,
-	verifyAsync: xe
-}), Ce = () => {
-	let e = [], t = N, n = t;
+}, _e = (e, t, n) => ge(e, t, n, se), ve = async (e, t, n) => ge(e, t, n, ce), ye = /* @__PURE__ */ e({
+	keygen: ue,
+	getPublicKey: le,
+	sign: me,
+	verify: _e,
+	signAsync: G,
+	verifyAsync: ve
+}), be = () => {
+	let e = [], t = F, n = t;
 	for (let r = 0; r < 33; r++) {
 		n = t, e.push(n);
 		for (let r = 1; r < 128; r++) n = n.add(t), e.push(n);
 		t = n.double();
 	}
 	return e;
-}, we = void 0, Te = (e, t) => {
+}, xe = void 0, Se = (e, t) => {
 	let n = t.negate();
 	return e ? n : t;
-}, Ee = (e) => {
-	let t = we ||= Ce(), n = P, r = N;
+}, Ce = (e) => {
+	let t = xe ||= be(), n = I, r = F;
 	for (let i = 0; i < 33; i++) {
 		let a = Number(e & 255n);
 		e >>= 8n, a > 128 && (a -= 256, e += 1n);
 		let o = i * 128, s = o + Math.abs(a) - 1, c = i % 2 != 0, l = a < 0;
-		a === 0 ? r = r.add(Te(c, t[o])) : n = n.add(Te(l, t[s]));
+		a === 0 ? r = r.add(Se(c, t[o])) : n = n.add(Se(l, t[s]));
 	}
 	if (e !== 0n) throw Error("invalid wnaf");
 	return {
 		p: n,
 		f: r
 	};
-}, { floor: De, min: Oe, sin: ke } = Math, U = "Trystero", Ae = (e, t) => Array(e).fill(void 0).map(t), je = "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz", Me = (e) => Ae(e, () => je[De(Math.random() * 62)] ?? "").join(""), W = Me(20), Ne = Promise.all.bind(Promise), Pe = typeof window < "u", { entries: Fe, fromEntries: Ie, keys: G, values: Le } = Object, K = () => {}, Re = "candidate", q = (e) => (e !== null && clearTimeout(e), null), J = (e) => /* @__PURE__ */ Error(`${U}: ${e}`), ze = (e, t) => e instanceof Error && e.message ? e.message : typeof e == "string" && e ? e : Z(e ?? t), Y = (e, t) => e instanceof Error ? e : J(ze(e, t)), Be = new TextEncoder(), Ve = new TextDecoder(), X = (e) => Be.encode(e), He = (e) => Ve.decode(e), Ue = (e) => e.reduce((e, t) => e + t.toString(16).padStart(2, "0"), ""), We = (...e) => e.join("@"), Ge = (e, t) => {
+}, { floor: we, min: Te, sin: Ee } = Math, De = "Trystero", Oe = (e, t) => Array(e).fill(void 0).map(t), ke = "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz", Ae = (e) => Oe(e, () => ke[we(Math.random() * 62)] ?? "").join(""), je = Ae(20), Me = Promise.all.bind(Promise), Ne = typeof window < "u", { entries: Pe, fromEntries: Fe, keys: Ie, values: Le } = Object, Re = () => {}, ze = "candidate", K = (e) => (e !== null && clearTimeout(e), null), q = (e) => /* @__PURE__ */ Error(`${De}: ${e}`), Be = (e, t) => e instanceof Error && e.message ? e.message : typeof e == "string" && e ? e : Xe(e ?? t), Ve = (e, t) => e instanceof Error ? e : q(Be(e, t)), He = new TextEncoder(), Ue = new TextDecoder(), We = (e) => He.encode(e), Ge = (e) => Ue.decode(e), Ke = (e) => e.reduce((e, t) => e + t.toString(16).padStart(2, "0"), ""), qe = (...e) => e.join("@"), Je = (e, t) => {
 	let n = [...e], r = () => {
-		let e = ke(t++) * 1e4;
-		return e - De(e);
+		let e = Ee(t++) * 1e4;
+		return e - we(e);
 	}, i = n.length;
 	for (; i;) {
-		let e = De(r() * i--), t = n[i];
+		let e = we(r() * i--), t = n[i];
 		n[i] = n[e], n[e] = t;
 	}
 	return n;
-}, Ke = (e, t, n, r = !1) => e.relayConfig?.urls || (r ? Ge(t, Je(e.appId)) : t).slice(0, e.relayConfig?.redundancy ?? n), Z = JSON.stringify, qe = (e) => {
+}, Ye = (e, t, n, r = !1) => e.relayConfig?.urls || (r ? Je(t, Qe(e.appId)) : t).slice(0, e.relayConfig?.redundancy ?? n), Xe = JSON.stringify, Ze = (e) => {
 	try {
 		return JSON.parse(e);
 	} catch {
-		throw J(`failed to parse JSON: ${e}`);
+		throw q(`failed to parse JSON: ${e}`);
 	}
-}, Je = (e, t = 2 ** 53 - 1) => e.split("").reduce((e, t) => e + t.charCodeAt(0), 0) % t, Ye = 3333, Xe = 6e4, Ze = {}, Qe = null, $e = null, et = () => {
-	Qe ||= new Promise((e) => {
-		$e = e;
+}, Qe = (e, t = 2 ** 53 - 1) => e.split("").reduce((e, t) => e + t.charCodeAt(0), 0) % t, $e = 3333, et = 6e4, tt = {}, nt = null, rt = null, it = () => {
+	nt ||= new Promise((e) => {
+		rt = e;
 	}).finally(() => {
-		$e = null, Qe = null;
+		rt = null, nt = null;
 	});
-}, tt = () => {
-	$e?.();
-}, nt = (e, t, n) => {
-	let r = {}, i = !1, a = !1, o, s = K;
+}, at = () => {
+	rt?.();
+}, ot = (e, t, n) => {
+	let r = {}, i = !1, a = !1, o, s = Re;
 	r.isClosed = !1, r.ready = new Promise((e) => s = e);
 	let c = () => {
 		if (r.isClosed) return;
@@ -300,19 +300,19 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		let l = new WebSocket(e);
 		l.onclose = () => {
 			if (r.isClosed || a) return;
-			if (a = !0, Qe) {
-				Qe.then(c);
+			if (a = !0, nt) {
+				nt.then(c);
 				return;
 			}
-			let t = Ze[e] ??= Ye;
-			if (t >= Xe) {
+			let t = tt[e] ??= $e;
+			if (t >= et) {
 				r.isClosed = !0;
 				return;
 			}
-			o = setTimeout(c, Math.random() * t), Ze[e] = Oe(t * 2, Xe);
+			o = setTimeout(c, Math.random() * t), tt[e] = Te(t * 2, et);
 		}, l.onmessage = (e) => t(String(e.data)), r.socket = l, r.url = l.url, l.onopen = () => {
 			let t = i;
-			i = !0, s(r), Ze[e] = Ye, t && n?.();
+			i = !0, s(r), tt[e] = $e, t && n?.();
 		}, r.send = (e) => {
 			l.readyState === 1 && l.send(e);
 		};
@@ -320,10 +320,10 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 	return r.close = () => {
 		r.isClosed = !0, o !== void 0 && (clearTimeout(o), o = void 0), r.socket.close();
 	}, c(), r;
-}, rt = (e) => {
+}, st = (e) => {
 	let t = {}, n = /* @__PURE__ */ new WeakMap(), r = (e) => {
 		let t = n.get(e);
-		if (!t) throw J("relay bookkeeping missing registration for relay client");
+		if (!t) throw q("relay bookkeeping missing registration for relay client");
 		return t;
 	}, i = () => {
 		let e = {}, t = (t) => e[t] ??= {};
@@ -336,33 +336,33 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		register: (e, n) => t[e] || a(e, n()),
 		keyOf: r,
 		scoped: i,
-		getSockets: () => Ie(Fe(t).flatMap(([t, n]) => {
+		getSockets: () => Fe(Pe(t).flatMap(([t, n]) => {
 			let r = e(n);
 			return r ? [[t, r]] : [];
 		}))
 	};
-}, it = () => {
-	if (Pe) {
+}, ct = () => {
+	if (Ne) {
 		let e = new AbortController();
-		return addEventListener("online", tt, { signal: e.signal }), addEventListener("offline", et, { signal: e.signal }), () => e.abort();
+		return addEventListener("online", at, { signal: e.signal }), addEventListener("offline", it, { signal: e.signal }), () => e.abort();
 	}
-	return K;
-}, at = "AES-GCM", ot = {}, st = (e) => btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(e)))), ct = (e) => {
+	return Re;
+}, lt = "AES-GCM", ut = {}, dt = (e) => btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(e)))), ft = (e) => {
 	let t = atob(e);
 	return new Uint8Array(t.length).map((e, n) => t.charCodeAt(n)).buffer;
-}, lt = async (e, t) => new Uint8Array(await crypto.subtle.digest(e, X(t))), ut = async (e) => ot[e] ??= Array.from(await lt("SHA-1", e)).map((e) => e.toString(36)).join(""), dt = async (e, t, n) => crypto.subtle.importKey("raw", await crypto.subtle.digest({ name: "SHA-256" }, X(`${e}:${t}:${n}`)), { name: at }, !1, ["encrypt", "decrypt"]), ft = async (e, t) => Ue(await lt("SHA-256", `${U}:${e}:${t}`)), pt = "$", mt = ",", ht = async (e, t) => {
+}, pt = async (e, t) => new Uint8Array(await crypto.subtle.digest(e, We(t))), mt = async (e) => ut[e] ??= Array.from(await pt("SHA-1", e)).map((e) => e.toString(36)).join(""), ht = async (e, t, n) => crypto.subtle.importKey("raw", await crypto.subtle.digest({ name: "SHA-256" }, We(`${e}:${t}:${n}`)), { name: lt }, !1, ["encrypt", "decrypt"]), gt = async (e, t) => Ke(await pt("SHA-256", `${De}:${e}:${t}`)), _t = "$", vt = ",", yt = async (e, t) => {
 	let n = crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(16));
-	return n.join(mt) + pt + st(await crypto.subtle.encrypt({
-		name: at,
+	return n.join(vt) + _t + dt(await crypto.subtle.encrypt({
+		name: lt,
 		iv: n
-	}, await e, X(t)));
-}, gt = async (e, t) => {
-	let [n, r] = t.split(pt);
-	return He(await crypto.subtle.decrypt({
-		name: at,
-		iv: new Uint8Array(n?.split(mt).map(Number) ?? [])
-	}, await e, ct(r ?? "")));
-}, _t = 57333, vt = 18e4, yt = 20, bt = class {
+	}, await e, We(t)));
+}, bt = async (e, t) => {
+	let [n, r] = t.split(_t);
+	return Ge(await crypto.subtle.decrypt({
+		name: lt,
+		iv: new Uint8Array(n?.split(vt).map(Number) ?? [])
+	}, await e, ft(r ?? "")));
+}, xt = 57333, St = 18e4, Ct = 20, wt = class {
 	makeOffer;
 	pool = [];
 	pooled = /* @__PURE__ */ new Set();
@@ -377,9 +377,9 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		return this.active;
 	}
 	warmup() {
-		this.pool = [], this.pooled.clear(), Ae(yt, this.makeOffer).forEach((e) => this.push(e)), this.active = !0, this.cleanupTimer = setInterval(() => {
+		this.pool = [], this.pooled.clear(), Oe(Ct, this.makeOffer).forEach((e) => this.push(e)), this.active = !0, this.cleanupTimer = setInterval(() => {
 			this.pool = this.pool.filter((e) => !e.isDead || (this.pooled.delete(e), !1));
-		}, _t);
+		}, xt);
 	}
 	push(e) {
 		e.isDead || this.pooled.has(e) || this.leased.has(e) || (this.pool.push(e), this.pooled.add(e));
@@ -395,7 +395,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 	}
 	claimLeased(e) {
 		let t = this.leased.get(e);
-		t && (q(t), this.leased.delete(e));
+		t && (K(t), this.leased.delete(e));
 	}
 	recycle(e) {
 		if (!(e.isDead || this.recycling.has(e))) {
@@ -408,9 +408,9 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 				return;
 			}
 			this.recycling.add(e), e.setHandlers({
-				connect: K,
-				close: K,
-				error: K
+				connect: Re,
+				close: Re,
+				error: Re
 			}), e.getOffer(!0).then((t) => {
 				if (!t || t.type !== "offer" || e.isDead || !this.active) {
 					e.destroy();
@@ -422,16 +422,16 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 	}
 	reclaimLeased(e) {
 		let t = this.leased.get(e);
-		t && (q(t), this.leased.delete(e), this.recycle(e));
+		t && (K(t), this.leased.delete(e), this.recycle(e));
 	}
 	lease(e) {
 		this.claimLeased(e), this.leased.set(e, setTimeout(() => {
 			this.leased.delete(e), this.recycle(e);
-		}, vt));
+		}, St));
 	}
 	checkout(e, t, n) {
 		let r = this.shift(e), i = Math.max(0, e - r.length);
-		i > 0 && r.push(...Ae(i, this.makeOffer));
+		i > 0 && r.push(...Oe(i, this.makeOffer));
 		let a = async (e, r = !1) => {
 			try {
 				let r = await n(e);
@@ -449,33 +449,33 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 				throw t;
 			}
 		};
-		return Ne(r.map((e) => a(e)));
+		return Me(r.map((e) => a(e)));
 	}
 	getOffers(e, t) {
 		return this.checkout(e, !0, t);
 	}
 	destroy() {
 		this.active = !1, this.cleanupTimer &&= (clearInterval(this.cleanupTimer), null), this.pool.forEach((e) => e.destroy()), this.pool = [], this.pooled.clear(), this.leased.forEach((e, t) => {
-			q(e), t.destroy();
+			K(e), t.destroy();
 		}), this.leased.clear(), this.recycling.forEach((e) => e.destroy()), this.recycling.clear();
 	}
-}, xt = J("incorrect password for overlapping room"), St = (e, t, n) => {
-	let r = (r) => lt("SHA-256", `${r}:${e}:${t}:${n}`).then(Ue), i = async (t, n, i) => {
+}, Tt = q("incorrect password for overlapping room"), Et = (e, t, n) => {
+	let r = (r) => pt("SHA-256", `${r}:${e}:${t}:${n}`).then(Ke), i = async (t, n, i) => {
 		if (!e) return;
 		if (i) {
-			let e = Me(36);
+			let e = Ae(36);
 			await t({
 				__trystero_pw: "challenge",
 				c: e
 			});
 			let { data: i } = await n();
-			if (!i || typeof i != "object" || i.__trystero_pw !== "response" || typeof i.h != "string") throw xt;
+			if (!i || typeof i != "object" || i.__trystero_pw !== "response" || typeof i.h != "string") throw Tt;
 			let a = await r(e);
-			if (i.h !== a) throw xt;
+			if (i.h !== a) throw Tt;
 			return;
 		}
 		let { data: a } = await n();
-		if (!a || typeof a != "object" || a.__trystero_pw !== "challenge" || typeof a.c != "string") throw xt;
+		if (!a || typeof a != "object" || a.__trystero_pw !== "challenge" || typeof a.c != "string") throw Tt;
 		await t({
 			__trystero_pw: "response",
 			h: await r(a.c)
@@ -487,21 +487,21 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			await i(n, r, a), await t?.(e, n, r, a);
 		} : void 0
 	};
-}, Ct = (e) => {
-	let t = ze(e, "unknown error");
+}, Dt = (e) => {
+	let t = Be(e, "unknown error");
 	return t.startsWith("handshake ") ? t : `handshake failed: ${t}`;
-}, wt = ({ onPeerHandshake: e, onHandshakeError: t, handshakeTimeoutMs: n, sendHandshakeData: r, sendHandshakeReady: i, onActivate: a, onFailure: o }) => {
+}, Ot = ({ onPeerHandshake: e, onHandshakeError: t, handshakeTimeoutMs: n, sendHandshakeData: r, sendHandshakeReady: i, onActivate: a, onFailure: o }) => {
 	let s = {}, c = (e, t) => {
 		let n = s[e];
-		!n || t && n.peer !== t || n.isActive || n.didLocalHandshakePass && n.didReceiveRemoteReady && (n.isActive = !0, n.handshakeTimer = q(n.handshakeTimer), a(e, n.peer));
+		!n || t && n.peer !== t || n.isActive || n.didLocalHandshakePass && n.didReceiveRemoteReady && (n.isActive = !0, n.handshakeTimer = K(n.handshakeTimer), a(e, n.peer));
 	}, l = (e, n, r) => {
 		let i = s[e];
 		if (!i || i.peer !== n) return;
-		let a = Ct(r);
-		t?.(e, a), o(e, n, J(a));
+		let a = Dt(r);
+		t?.(e, a), o(e, n, q(a));
 	}, u = (e, t) => {
 		let n = s[e];
-		n && n.peer === t && !n.isActive && (n.didLocalHandshakePass = !0, i("", e).catch((n) => l(e, t, J(`failed sending handshake readiness: ${ze(n, "unknown send failure")}`))), c(e, t));
+		n && n.peer === t && !n.isActive && (n.didLocalHandshakePass = !0, i("", e).catch((n) => l(e, t, q(`failed sending handshake readiness: ${Be(n, "unknown send failure")}`))), c(e, t));
 	};
 	return {
 		addPeer: (e, t) => {
@@ -517,7 +517,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		},
 		clearPeer: (e, t) => {
 			let n = s[e];
-			n && (n.handshakeTimer = q(n.handshakeTimer), n.pendingHandshakePayloads.length = 0, n.handshakeWaiters.splice(0).forEach((e) => e.reject(t)), delete s[e]);
+			n && (n.handshakeTimer = K(n.handshakeTimer), n.pendingHandshakePayloads.length = 0, n.handshakeWaiters.splice(0).forEach((e) => e.reject(t)), delete s[e]);
 		},
 		canReceiveFromPeer: (e, t) => {
 			let n = s[e];
@@ -526,13 +526,13 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		start: (t, i) => {
 			let a = s[t];
 			if (!a || a.peer !== i) return;
-			a.handshakeTimer = setTimeout(() => l(t, i, J(`handshake timed out after ${n}ms`)), n);
+			a.handshakeTimer = setTimeout(() => l(t, i, q(`handshake timed out after ${n}ms`)), n);
 			let o = async (e, n) => {
 				await r(e, t, n);
 			}, c = () => new Promise((e, n) => {
 				let r = s[t];
 				if (!r || r.peer !== i) {
-					n(J("peer disconnected during handshake"));
+					n(q("peer disconnected during handshake"));
 					return;
 				}
 				let a = r.pendingHandshakePayloads.shift();
@@ -544,8 +544,8 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 					resolve: e,
 					reject: (e) => n(e)
 				});
-			}), d = W < t;
-			Promise.resolve(e?.(t, o, c, d)).then(() => u(t, i)).catch((e) => l(t, i, Y(e, "handshake failed")));
+			}), d = je < t;
+			Promise.resolve(e?.(t, o, c, d)).then(() => u(t, i)).catch((e) => l(t, i, Ve(e, "handshake failed")));
 		},
 		receiveHandshakeData: (e, t, n) => {
 			let r = s[t];
@@ -565,11 +565,11 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			t && !t.isActive && (t.didReceiveRemoteReady = !0, c(e));
 		}
 	};
-}, Tt = 15e3, Et = 5e3, Dt = "icegatheringstatechange", Ot = "iceconnectionstatechange", kt = "offer", At = "answer", jt = /out of range/i, Mt = (e) => e.replace(/ (\S+\.local) (\d+) typ host/g, " 127.0.0.1 $2 typ host"), Nt = (e, { trickleIce: t, rtcConfig: n, rtcPolyfill: r, turnConfig: i, _test_only_mdnsHostFallbackToLoopback: a }) => {
+}, kt = 15e3, At = 5e3, jt = "icegatheringstatechange", Mt = "iceconnectionstatechange", Nt = "offer", Pt = "answer", Ft = /out of range/i, It = (e) => e.replace(/ (\S+\.local) (\d+) typ host/g, " 127.0.0.1 $2 typ host"), Lt = (e, { trickleIce: t, rtcConfig: n, rtcPolyfill: r, turnConfig: i, _test_only_mdnsHostFallbackToLoopback: a }) => {
 	let o = new (r ?? RTCPeerConnection)({
-		iceServers: Pt.concat(i ?? []),
+		iceServers: Rt.concat(i ?? []),
 		...n
-	}), s = {}, c = [], l = [], u = t !== !1, d = [], f = [], p = !1, m = !1, h = null, g = null, _ = !1, v = () => g = q(g), y = () => {
+	}), s = {}, c = [], l = [], u = t !== !1, d = [], f = [], p = !1, m = !1, h = null, g = null, _ = !1, v = () => g = K(g), y = () => {
 		_ || (_ = !0, v(), s.close?.());
 	}, b = (e) => {
 		s.signal ? s.signal(e) : c.push(e);
@@ -578,15 +578,15 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		s.signal = (n) => {
 			t?.(n), e(n);
 		}, c.length > 0 && c.splice(0).forEach((e) => s.signal?.(e));
-	}, S = (e) => a ? Mt(e) : e, C = (e) => {
+	}, S = (e) => a ? It(e) : e, C = (e) => {
 		if (!a || typeof e.candidate != "string") return e;
-		let t = Mt(e.candidate);
+		let t = It(e.candidate);
 		return t === e.candidate ? e : {
 			...e,
 			candidate: t
 		};
 	}, w = (e) => ({
-		type: e.localDescription?.type ?? kt,
+		type: e.localDescription?.type ?? Nt,
 		sdp: S(e.localDescription?.sdp ?? "")
 	}), T = () => {
 		let e = o.remoteDescription?.sdp;
@@ -601,7 +601,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		try {
 			return await o.addIceCandidate(e), !0;
 		} catch (t) {
-			if (t instanceof Error && jt.test(t.message) && typeof e.sdpMLineIndex == "number") return !1;
+			if (t instanceof Error && Ft.test(t.message) && typeof e.sdpMLineIndex == "number") return !1;
 			throw t;
 		}
 	}, k = async () => {
@@ -615,49 +615,49 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			await O(n) || t.push(n);
 		}
 		t.length > 0 && d.push(...t);
-	}, ee = async (e) => {
+	}, A = async (e) => {
 		if (D(e)) {
 			await O(e) || d.push(e);
 			return;
 		}
 		d.push(e);
-	}, A = (e) => {
+	}, j = (e) => {
 		e.binaryType = "arraybuffer", e.bufferedAmountLowThreshold = 65535, e.onmessage = (e) => {
 			let t = e.data;
 			s.data ? s.data(t) : l.push(t);
-		}, e.onopen = () => s.connect?.(), e.onclose = y, e.onerror = ({ error: e }) => s.error?.(Y(e, "data channel error"));
-	}, j = async (e) => {
+		}, e.onopen = () => s.connect?.(), e.onclose = y, e.onerror = ({ error: e }) => s.error?.(Ve(e, "data channel error"));
+	}, M = async (e) => {
 		let t = null;
 		try {
 			await Promise.race([new Promise((t) => {
 				let n = () => {
-					e.iceGatheringState === "complete" && (e.removeEventListener(Dt, n), t());
+					e.iceGatheringState === "complete" && (e.removeEventListener(jt, n), t());
 				};
-				e.addEventListener(Dt, n), n();
+				e.addEventListener(jt, n), n();
 			}), new Promise((e) => {
-				t = setTimeout(e, Tt);
+				t = setTimeout(e, kt);
 			})]);
 		} finally {
-			q(t);
+			K(t);
 		}
 		return w(e);
-	}, te = async () => {
-		let e = u ? w(o) : await j(o);
+	}, N = async () => {
+		let e = u ? w(o) : await M(o);
 		return b(e), e;
 	};
-	e ? (h = o.createDataChannel("data"), A(h)) : o.ondatachannel = ({ channel: e }) => {
-		h = e, A(e);
+	e ? (h = o.createDataChannel("data"), j(h)) : o.ondatachannel = ({ channel: e }) => {
+		h = e, j(e);
 	};
-	let M = async (e = !1) => {
+	let P = async (e = !1) => {
 		if (o.connectionState !== "closed") try {
-			return p = !0, e && (o.signalingState !== "stable" && o.signalingState !== "closed" && o.localDescription?.type === kt && await o.setLocalDescription({ type: "rollback" }), typeof o.restartIce == "function" && o.restartIce()), await o.setLocalDescription(e ? await o.createOffer({ iceRestart: !0 }) : void 0), await te();
+			return p = !0, e && (o.signalingState !== "stable" && o.signalingState !== "closed" && o.localDescription?.type === Nt && await o.setLocalDescription({ type: "rollback" }), typeof o.restartIce == "function" && o.restartIce()), await o.setLocalDescription(e ? await o.createOffer({ iceRestart: !0 }) : void 0), await N();
 		} catch (e) {
-			s.error?.(Y(e, "failed to create local offer"));
+			s.error?.(Ve(e, "failed to create local offer"));
 		} finally {
 			p = !1;
 		}
 	};
-	o.onnegotiationneeded = async () => M(!1), o.onicecandidate = ({ candidate: e }) => {
+	o.onnegotiationneeded = async () => P(!1), o.onicecandidate = ({ candidate: e }) => {
 		if (!u || !e) return;
 		let t = C(typeof e.toJSON == "function" ? e.toJSON() : {
 			candidate: e.candidate,
@@ -666,11 +666,11 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			usernameFragment: e.usernameFragment
 		});
 		b({
-			type: Re,
+			type: ze,
 			sdp: JSON.stringify(t)
 		});
 	};
-	let N = () => {
+	let F = () => {
 		if (o.connectionState === "failed" || o.connectionState === "closed" || o.iceConnectionState === "failed" || o.iceConnectionState === "closed") {
 			y();
 			return;
@@ -682,11 +682,11 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		if (o.connectionState === "disconnected" || o.iceConnectionState === "disconnected") {
 			g ||= setTimeout(() => {
 				g = null, (o.connectionState === "disconnected" || o.iceConnectionState === "disconnected") && y();
-			}, Et);
+			}, At);
 			return;
 		}
 	};
-	o.onconnectionstatechange = N, o.addEventListener(Ot, N), o.ontrack = (e) => {
+	o.onconnectionstatechange = F, o.addEventListener(Mt, F), o.ontrack = (e) => {
 		let t = e.streams[0];
 		if (t) {
 			if (!s.track && !s.stream) {
@@ -699,8 +699,8 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			s.track?.(e.track, t), s.stream?.(t);
 		}
 	}, o.onremovestream = (e) => s.stream?.(e.stream);
-	let P = e ? new Promise((e) => x((t) => {
-		t.type === kt && e(t);
+	let I = e ? new Promise((e) => x((t) => {
+		t.type === Nt && e(t);
 	})) : Promise.resolve();
 	return e && queueMicrotask(() => {
 		!p && o.signalingState === "stable" && !o.localDescription && o.connectionState !== "closed" && o.onnegotiationneeded?.(new Event("negotiationneeded"));
@@ -714,15 +714,15 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			return o.connectionState === "closed";
 		},
 		getOffer: async (t = !1) => {
-			if (e) return t ? M(!0) : o.localDescription?.type === kt ? u ? w(o) : j(o) : P;
+			if (e) return t ? P(!0) : o.localDescription?.type === Nt ? u ? w(o) : M(o) : I;
 		},
 		async signal(t) {
 			if (t.type === "candidate") {
 				try {
 					let e = JSON.parse(t.sdp);
-					e && typeof e == "object" && await ee(C(e));
+					e && typeof e == "object" && await A(C(e));
 				} catch (e) {
-					s.error?.(Y(e, "failed to parse remote candidate"));
+					s.error?.(Ve(e, "failed to parse remote candidate"));
 				}
 				return;
 			}
@@ -731,14 +731,14 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 					...t,
 					sdp: S(t.sdp)
 				};
-				if (t.type === kt) {
+				if (t.type === Nt) {
 					if (p || o.signalingState !== "stable" && !m) {
 						if (e) return;
-						await Ne([o.setLocalDescription({ type: "rollback" }), o.setRemoteDescription(n)]);
+						await Me([o.setLocalDescription({ type: "rollback" }), o.setRemoteDescription(n)]);
 					} else await o.setRemoteDescription(n);
-					return await k(), await o.setLocalDescription(), await te();
+					return await k(), await o.setLocalDescription(), await N();
 				}
-				if (t.type === At) {
+				if (t.type === Pt) {
 					m = !0;
 					try {
 						await o.setRemoteDescription(n), await k();
@@ -747,7 +747,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 					}
 				}
 			} catch (e) {
-				s.error?.(Y(e, "failed to apply remote signal"));
+				s.error?.(Ve(e, "failed to apply remote signal"));
 			}
 		},
 		sendData: (e) => h?.send(e),
@@ -760,7 +760,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 				s.track?.(e, t), s.stream?.(t);
 			});
 		},
-		offerPromise: P,
+		offerPromise: I,
 		addStream: (e) => e.getTracks().forEach((t) => o.addTrack(t, e)),
 		removeStream: (e) => o.getSenders().filter((t) => t.track && e.getTracks().includes(t.track)).forEach((e) => o.removeTrack(e)),
 		addTrack: (e, t) => o.addTrack(e, t),
@@ -773,40 +773,40 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			if (n) return n.replaceTrack(t);
 		}
 	};
-}, Pt = [...Ae(3, (e, t) => `stun:stun${t || ""}.l.google.com:19302`), "stun:stun.cloudflare.com:3478"].map((e) => ({ urls: e })), Ft = Object.getPrototypeOf(Uint8Array), It = 32, Lt = 0, Rt = 32, zt = 34, Bt = 35, Vt = 36, Ht = 16348, Ut = 255, Wt = 65535, Gt = "bufferedamountlow", Kt = "close", qt = "error", Jt = 1e4, Yt = (e) => e instanceof ArrayBuffer ? new Uint8Array(e) : new Uint8Array(e.buffer, e.byteOffset, e.byteLength), Xt = (e, t = Jt) => e.readyState !== "open" || e.bufferedAmount <= e.bufferedAmountLowThreshold ? Promise.resolve(e.readyState === "open") : new Promise((n) => {
+}, Rt = [...Oe(3, (e, t) => `stun:stun${t || ""}.l.google.com:19302`), "stun:stun.cloudflare.com:3478"].map((e) => ({ urls: e })), zt = Object.getPrototypeOf(Uint8Array), Bt = 32, Vt = 0, Ht = 32, Ut = 34, Wt = 35, Gt = 36, Kt = 16348, qt = 255, Jt = 65535, Yt = "bufferedamountlow", Xt = "close", Zt = "error", Qt = 1e4, $t = (e) => e instanceof ArrayBuffer ? new Uint8Array(e) : new Uint8Array(e.buffer, e.byteOffset, e.byteLength), en = (e, t = Qt) => e.readyState !== "open" || e.bufferedAmount <= e.bufferedAmountLowThreshold ? Promise.resolve(e.readyState === "open") : new Promise((n) => {
 	let r = !1, i = null, a = (t) => {
-		r || (r = !0, e.removeEventListener(Gt, o), e.removeEventListener(Kt, s), e.removeEventListener(qt, s), q(i), n(t));
+		r || (r = !0, e.removeEventListener(Yt, o), e.removeEventListener(Xt, s), e.removeEventListener(Zt, s), K(i), n(t));
 	}, o = () => a(!0), s = () => a(!1);
-	if (e.addEventListener(Gt, o), e.addEventListener(Kt, s), e.addEventListener(qt, s), i = setTimeout(() => a(!1), t), e.readyState !== "open") {
+	if (e.addEventListener(Yt, o), e.addEventListener(Xt, s), e.addEventListener(Zt, s), i = setTimeout(() => a(!1), t), e.readyState !== "open") {
 		a(!1);
 		return;
 	}
 	e.bufferedAmount <= e.bufferedAmountLowThreshold && a(!0);
-}), Zt = ({ getPeer: e, getPeerIds: t, canReceiveFromPeer: n, throwIfAborted: r }) => {
+}), tn = ({ getPeer: e, getPeerIds: t, canReceiveFromPeer: n, throwIfAborted: r }) => {
 	let i = {}, a = {}, o = {}, s = {}, c = (n, r, { includePending: i = !1 } = {}) => (n ? Array.isArray(n) ? n : [n] : t(i)).flatMap((t) => {
 		let n = e(t, i);
-		return n ? [Promise.resolve(r(t, n))] : (console.warn(`${U}: no peer with id ${t} found`), []);
+		return n ? [Promise.resolve(r(t, n))] : (console.warn(`${De}: no peer with id ${t} found`), []);
 	});
 	return {
 		makeInternalAction: (t, n = {}) => {
 			let o = a[t];
 			if (i[t] && o) {
 				let e = i[t].options;
-				if (e.sendToPending !== !!n.sendToPending || e.receiveWhilePending !== !!n.receiveWhilePending) throw J(`action type "${t}" cannot be redefined`);
+				if (e.sendToPending !== !!n.sendToPending || e.receiveWhilePending !== !!n.receiveWhilePending) throw q(`action type "${t}" cannot be redefined`);
 				return o;
 			}
-			if (!t) throw J("action type argument is required");
-			let l = X(t);
-			if (l.byteLength > It) throw J(`action type string "${t}" (${l.byteLength}b) exceeds byte limit (${It}). Hint: choose a shorter name.`);
+			if (!t) throw q("action type argument is required");
+			let l = We(t);
+			if (l.byteLength > Bt) throw q(`action type string "${t}" (${l.byteLength}b) exceeds byte limit (${Bt}). Hint: choose a shorter name.`);
 			let u = {
 				sendToPending: !!n.sendToPending,
 				receiveWhilePending: !!n.receiveWhilePending
-			}, d = new Uint8Array(It);
+			}, d = new Uint8Array(Bt);
 			d.set(l);
 			let f = 0;
 			return i[t] = {
-				onComplete: K,
-				onProgress: K,
+				onComplete: Re,
+				onProgress: Re,
 				setOnComplete: (e) => {
 					i[t].onComplete = e;
 					let n = s[t];
@@ -818,26 +818,26 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 				send: async (t, n, i, a, o) => {
 					r(o);
 					let s = typeof t;
-					if (s === "undefined") throw J("action data cannot be undefined");
-					let l = s !== "string", p = t instanceof Blob, m = p || t instanceof ArrayBuffer || t instanceof Ft, h = i !== void 0, g = m ? Yt(p ? await t.arrayBuffer() : t) : X(l ? Z(t) : t), _ = h ? X(Z(i)) : null, v = Math.ceil(g.byteLength / Ht) + +!!h || 1, y = Ae(v, (e, t) => {
-						let n = t === v - 1, r = !!(h && t === 0), i = new Uint8Array(Vt + (r ? _?.byteLength ?? 0 : n ? g.byteLength - Ht * (v - (h ? 2 : 1)) : Ht));
-						return i.set(d), i.set([f >> 8, f & Ut], Rt), i.set([Number(n) | Number(r) << 1 | Number(m) << 2 | Number(l) << 3], zt), i.set([Math.round((t + 1) / v * Ut)], Bt), i.set(h ? r ? _ ?? /* @__PURE__ */ new Uint8Array() : g.subarray((t - 1) * Ht, t * Ht) : g.subarray(t * Ht, (t + 1) * Ht), Vt), i;
+					if (s === "undefined") throw q("action data cannot be undefined");
+					let l = s !== "string", p = t instanceof Blob, m = p || t instanceof ArrayBuffer || t instanceof zt, h = i !== void 0, g = m ? $t(p ? await t.arrayBuffer() : t) : We(l ? Xe(t) : t), _ = h ? We(Xe(i)) : null, v = Math.ceil(g.byteLength / Kt) + +!!h || 1, y = Oe(v, (e, t) => {
+						let n = t === v - 1, r = !!(h && t === 0), i = new Uint8Array(Gt + (r ? _?.byteLength ?? 0 : n ? g.byteLength - Kt * (v - (h ? 2 : 1)) : Kt));
+						return i.set(d), i.set([f >> 8, f & qt], Ht), i.set([Number(n) | Number(r) << 1 | Number(m) << 2 | Number(l) << 3], Ut), i.set([Math.round((t + 1) / v * qt)], Wt), i.set(h ? r ? _ ?? /* @__PURE__ */ new Uint8Array() : g.subarray((t - 1) * Kt, t * Kt) : g.subarray(t * Kt, (t + 1) * Kt), Gt), i;
 					});
-					return f = f + 1 & Wt, await Ne(c(n, async (t, n) => {
+					return f = f + 1 & Jt, await Me(c(n, async (t, n) => {
 						let { channel: s } = n, c = 0;
 						for (; c < v;) {
 							r(o);
 							let l = y[c];
 							if (!l) break;
 							if (s && s.bufferedAmount > s.bufferedAmountLowThreshold) {
-								let e = await Xt(s);
+								let e = await en(s);
 								if (r(o), !e) break;
 							}
 							let d = e(t, u.sendToPending);
 							if (!d || d !== n) break;
 							n.sendData(l), c++;
-							let f = l[Bt] ?? Ut;
-							a?.(f / Ut, t, i);
+							let f = l[Wt] ?? qt;
+							a?.(f / qt, t, i);
 						}
 					}, { includePending: u.sendToPending })), [];
 				},
@@ -849,15 +849,15 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			};
 		},
 		handleData: (e, t) => {
-			let r = new Uint8Array(t), a = He(r.subarray(Lt, Rt)).replaceAll("\0", ""), c = i[a];
+			let r = new Uint8Array(t), a = Ge(r.subarray(Vt, Ht)).replaceAll("\0", ""), c = i[a];
 			if (!n(e, !!c?.options.receiveWhilePending)) return;
-			let l = (r[Rt] ?? 0) << 8 | (r[33] ?? 0), u = r[zt] ?? 0, d = r[Bt] ?? 0, f = r.subarray(Vt), p = !!(u & 1), m = !!(u & 2), h = !!(u & 4), g = !!(u & 8);
+			let l = (r[Ht] ?? 0) << 8 | (r[33] ?? 0), u = r[Ut] ?? 0, d = r[Wt] ?? 0, f = r.subarray(Gt), p = !!(u & 1), m = !!(u & 2), h = !!(u & 4), g = !!(u & 8);
 			o[e] ??= {}, o[e][a] ??= {};
 			let _ = o[e][a][l] ??= { chunks: [] };
-			if (m ? _.meta = qe(He(f)) : _.chunks.push(f), c?.onProgress(d / Ut, e, _.meta), !p) return;
+			if (m ? _.meta = Ze(Ge(f)) : _.chunks.push(f), c?.onProgress(d / qt, e, _.meta), !p) return;
 			let v = new Uint8Array(_.chunks.reduce((e, t) => e + t.byteLength, 0));
 			_.chunks.reduce((e, t) => (v.set(t, e), e + t.byteLength), 0), delete o[e][a][l];
-			let y = h ? v : g ? qe(He(v)) : He(v);
+			let y = h ? v : g ? Ze(Ge(v)) : Ge(v);
 			if (c) {
 				c.onComplete(y, e, _.meta);
 				return;
@@ -872,53 +872,53 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			delete o[e];
 		}
 	};
-}, Qt = 500, $t = (e, t) => {
-	let n = J(t);
+}, nn = 500, rn = (e, t) => {
+	let n = q(t);
 	return n.kind = e, n.name = e === "aborted" ? "AbortError" : n.name, n;
-}, en = (e) => {
-	if (e?.aborted) throw $t("aborted", "operation aborted");
-}, tn = (e) => e && typeof e == "object" && !Array.isArray(e) && typeof e.r == "string" ? {
+}, an = (e) => {
+	if (e?.aborted) throw rn("aborted", "operation aborted");
+}, on = (e) => e && typeof e == "object" && !Array.isArray(e) && typeof e.r == "string" ? {
 	r: e.r,
 	...Object.hasOwn(e, "m") ? { m: e.m } : {}
-} : null, nn = (e) => e && typeof e == "object" && !Array.isArray(e) && typeof e.r == "string" ? {
+} : null, sn = (e) => e && typeof e == "object" && !Array.isArray(e) && typeof e.r == "string" ? {
 	r: e.r,
 	...typeof e.e == "string" ? { e: e.e } : {}
-} : null, rn = (e, t) => t === void 0 ? e : {
+} : null, cn = (e, t) => t === void 0 ? e : {
 	...e,
 	metadata: t
-}, an = ({ getPeer: e, getPeerIds: t, canReceiveFromPeer: n }) => {
-	let r = {}, i = {}, a = Zt({
+}, ln = ({ getPeer: e, getPeerIds: t, canReceiveFromPeer: n }) => {
+	let r = {}, i = {}, a = tn({
 		getPeer: e,
 		getPeerIds: t,
 		canReceiveFromPeer: n,
-		throwIfAborted: en
+		throwIfAborted: an
 	}), o = a.makeInternalAction, s = a.handleData, c = (e) => {
 		let t = i[e];
-		t && (q(t.timer), t.signal && t.abortHandler && t.signal.removeEventListener("abort", t.abortHandler), delete i[e]);
+		t && (K(t.timer), t.signal && t.abortHandler && t.signal.removeEventListener("abort", t.abortHandler), delete i[e]);
 	}, l = (e, t) => {
-		Fe(i).forEach(([n, r]) => {
+		Pe(i).forEach(([n, r]) => {
 			r.peerId === e && (c(n), r.reject(t));
 		});
 	}, u = (e, t) => {
-		a.clearPeer(e), l(e, $t("disconnected", ze(t, "peer disconnected")));
+		a.clearPeer(e), l(e, rn("disconnected", Be(t, "peer disconnected")));
 	}, d = o("@_response");
 	return d.onMessage((e, t, n) => {
-		let r = nn(n);
+		let r = sn(n);
 		if (!r) return;
 		let a = i[r.r];
 		if (a && a.peerId === t) {
 			if (c(r.r), r.e !== void 0) {
-				a.reject($t("rejected", r.e));
+				a.reject(rn("rejected", r.e));
 				return;
 			}
 			a.resolve(e);
 		}
 	}), {
 		makeAction: (t, n) => {
-			if (n && "onRequest" in n && n.kind !== "request") throw J("request actions must use kind: \"request\"");
+			if (n && "onRequest" in n && n.kind !== "request") throw q("request actions must use kind: \"request\"");
 			let a = n?.kind ?? "message", s = o(t), l = r[t];
 			if (l) {
-				if (l.kind !== a) throw J(`action type "${t}" cannot be redefined`);
+				if (l.kind !== a) throw q(`action type "${t}" cannot be redefined`);
 				return l.action;
 			}
 			let u = {
@@ -927,18 +927,18 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 				pendingMessages: [],
 				pendingRequests: [],
 				onReceiveProgress: n?.onReceiveProgress ?? null
-			}, f = (e, t) => e ? (n, r) => e(n, rn({ peerId: r }, t)) : void 0, p = (e) => {
+			}, f = (e, t) => e ? (n, r) => e(n, cn({ peerId: r }, t)) : void 0, p = (e) => {
 				u.onReceiveProgress = e;
 			};
 			if (s.onProgress((e, t, n) => {
-				let r = u.kind === "request" ? tn(n) : null;
-				u.onReceiveProgress?.(e, rn({ peerId: t }, r ? r.m : n));
+				let r = u.kind === "request" ? on(n) : null;
+				u.onReceiveProgress?.(e, cn({ peerId: t }, r ? r.m : n));
 			}), a === "message") {
 				let e = n?.onMessage ?? null, i = () => {
 					if (!e) return;
 					let t = e;
 					u.pendingMessages.splice(0).forEach(({ payload: e, peerId: n, metadata: r }) => {
-						Promise.resolve().then(() => t(e, rn({ peerId: n }, r))).catch((e) => console.error(`${U} action handler error:`, e));
+						Promise.resolve().then(() => t(e, cn({ peerId: n }, r))).catch((e) => console.error(`${De} action handler error:`, e));
 					});
 				}, a = {
 					send: async (e, t = {}) => {
@@ -970,17 +970,17 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 						return;
 					}
 					let i = e;
-					Promise.resolve().then(() => i(t, rn({ peerId: n }, r))).catch((e) => console.error(`${U} action handler error:`, e));
+					Promise.resolve().then(() => i(t, cn({ peerId: n }, r))).catch((e) => console.error(`${De} action handler error:`, e));
 				}), u.action = a, r[t] = u, i(), a;
 			}
 			let m = n?.onRequest ?? null, h = (e) => {
-				q(e.timer);
+				K(e.timer);
 				let t = u.pendingRequests.indexOf(e);
 				t > -1 && u.pendingRequests.splice(t, 1);
 			}, g = (e, t, n) => {
 				d.send(null, e, {
 					r: t,
-					e: ze(n, "request failed")
+					e: Be(n, "request failed")
 				});
 			}, _ = (e, t) => {
 				h(e), Promise.resolve().then(() => t(e.payload, {
@@ -988,7 +988,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 					...e.metadata === void 0 ? {} : { metadata: e.metadata },
 					signal: e.controller.signal
 				})).then(async (t) => {
-					if (t === void 0) throw J("request handler returned undefined");
+					if (t === void 0) throw q("request handler returned undefined");
 					await d.send(t, e.peerId, { r: e.requestId });
 				}).catch((t) => g(e.peerId, e.requestId, t)).finally(() => e.controller.abort());
 			}, v = () => {
@@ -1014,13 +1014,13 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 					controller: new AbortController(),
 					timer: setTimeout(() => {
 						h(i), i.controller.abort(), g(t, r, "request handler unavailable");
-					}, Qt)
+					}, nn)
 				};
 				u.pendingRequests.push(i);
 			}, b = async (t, n) => {
 				let { target: r, metadata: a, onProgress: o, signal: l, timeoutMs: u } = n;
-				if (en(l), !e(r, !1)) throw $t("disconnected", `no active peer with id ${r}`);
-				let d = Me(20), p = new Promise((e, t) => {
+				if (an(l), !e(r, !1)) throw rn("disconnected", `no active peer with id ${r}`);
+				let d = Ae(20), p = new Promise((e, t) => {
 					let n = {
 						peerId: r,
 						resolve: e,
@@ -1028,7 +1028,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 						timer: null,
 						...l === void 0 ? {} : { signal: l }
 					}, a = () => {
-						c(d), t($t("aborted", "operation aborted"));
+						c(d), t(rn("aborted", "operation aborted"));
 					};
 					l && (n.abortHandler = a, l.addEventListener("abort", a, { once: !0 })), i[d] = n;
 				}).catch((e) => {
@@ -1041,14 +1041,14 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 					}, f(o, a), l);
 					let e = i[d];
 					return e && u !== void 0 && (e.timer = setTimeout(() => {
-						c(d), e.reject($t("timeout", "request timed out"));
+						c(d), e.reject(rn("timeout", "request timed out"));
 					}, u)), await p;
 				} catch (e) {
 					throw c(d), e;
 				}
 			}, x = {
 				request: b,
-				requestMany: async (e, t) => (en(t.signal), await Ne(t.targets.map(async (n) => {
+				requestMany: async (e, t) => (an(t.signal), await Me(t.targets.map(async (n) => {
 					try {
 						let r = {
 							peerId: n,
@@ -1063,7 +1063,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 						};
 						return t.onResult?.(r), r;
 					} catch (e) {
-						let r = Y(e, "request failed");
+						let r = Ve(e, "request failed");
 						if (r.kind === "aborted" || !r.kind) throw r;
 						let i = r.kind === "timeout" ? {
 							peerId: n,
@@ -1093,7 +1093,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 				}
 			};
 			return s.onMessage((e, t, n) => {
-				let r = tn(n);
+				let r = on(n);
 				r && y(e, t, r.m, r.r);
 			}), u.action = x, r[t] = u, v(), x;
 		},
@@ -1101,19 +1101,19 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		handleData: s,
 		clearPeer: u
 	};
-}, on = (e) => e && typeof e == "object" && !Array.isArray(e) && typeof e.k == "string" ? {
+}, un = (e) => e && typeof e == "object" && !Array.isArray(e) && typeof e.k == "string" ? {
 	key: e.k,
 	...typeof e.s == "string" ? { streamId: e.s } : {},
 	...typeof e.t == "string" ? { trackId: e.t } : {},
 	...Object.hasOwn(e, "m") ? { metadata: e.m } : {}
-} : null, sn = (e) => (t) => {
+} : null, dn = (e) => (t) => {
 	let n = e.get(t);
-	return n || (n = Me(20), e.set(t, n)), n;
-}, cn = () => {
+	return n || (n = Ae(20), e.set(t, n)), n;
+}, fn = () => {
 	let e = /* @__PURE__ */ new WeakMap(), t = /* @__PURE__ */ new WeakMap(), n = /* @__PURE__ */ new Map(), r = /* @__PURE__ */ new Map(), i = /* @__PURE__ */ new Map(), a = /* @__PURE__ */ new Map();
 	return {
-		getStreamKey: sn(e),
-		getTrackKey: sn(t),
+		getStreamKey: dn(e),
+		getTrackKey: dn(t),
 		rememberRemoteStream: (e, t, i) => {
 			n.set(e, t), i && r.set(i, t);
 		},
@@ -1130,8 +1130,8 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			n.clear(), r.clear(), i.clear(), a.clear();
 		}
 	};
-}, ln = ({ iterate: e, isActive: t, getSharedMediaPeer: n }) => {
-	let r = {}, i = {}, a = cn(), o = {
+}, pn = ({ iterate: e, isActive: t, getSharedMediaPeer: n }) => {
+	let r = {}, i = {}, a = fn(), o = {
 		onPeerStream: null,
 		onPeerTrack: null
 	}, s = (e, r, i, a) => {
@@ -1163,7 +1163,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		replaceTrack: (e, t, n, r) => l(n.target, a.getTrackKey(t), n.metadata, r, (n) => n.replaceTrack(e, t), { t: e.id }),
 		receiveStreamMeta: (e, i) => {
 			if (!t(i)) return;
-			let a = on(e);
+			let a = un(e);
 			if (!a) return;
 			let o = n(i)?.__trysteroMedia?.getRemoteStream(a.key, a.streamId);
 			if (o) {
@@ -1174,7 +1174,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		},
 		receiveTrackMeta: (e, r) => {
 			if (!t(r)) return;
-			let a = on(e);
+			let a = un(e);
 			if (!a) return;
 			let o = n(r)?.__trysteroMedia?.getRemoteTrack(a.key, a.trackId);
 			if (o) {
@@ -1209,25 +1209,25 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			o.onPeerTrack = e;
 		}
 	};
-}, un = "beforeunload", dn = 1e4, Q = (e) => "@_" + e, fn = /* @__PURE__ */ new Set(), pn = () => fn.forEach((e) => e()), mn = (e) => (fn.add(e), fn.size === 1 && addEventListener(un, pn), () => {
-	fn.delete(e), fn.size || removeEventListener(un, pn);
-}), hn = (e, t, n, { onPeerHandshake: r, onHandshakeError: i, handshakeTimeoutMs: a = dn, isPassive: o = !1 } = {}) => {
+}, mn = "beforeunload", hn = 1e4, gn = (e) => "@_" + e, _n = /* @__PURE__ */ new Set(), vn = () => _n.forEach((e) => e()), yn = (e) => (_n.add(e), _n.size === 1 && addEventListener(mn, vn), () => {
+	_n.delete(e), _n.size || removeEventListener(mn, vn);
+}), bn = (e, t, n, { onPeerHandshake: r, onHandshakeError: i, handshakeTimeoutMs: a = hn, isPassive: o = !1 } = {}) => {
 	let s = {}, c = {}, l = {}, u = {
 		onPeerJoin: null,
 		onPeerLeave: null
-	}, d = K, f = null, p = (e, t, { includePending: n = !1 } = {}) => (e ? Array.isArray(e) ? e : [e] : G(n ? s : c)).flatMap((e) => {
+	}, d = Re, f = null, p = (e, t, { includePending: n = !1 } = {}) => (e ? Array.isArray(e) ? e : [e] : Ie(n ? s : c)).flatMap((e) => {
 		let r = n ? s[e] : c[e];
-		return r ? [Promise.resolve(t(e, r))] : (console.warn(`${U}: no peer with id ${e} found`), []);
-	}), m = ln({
+		return r ? [Promise.resolve(t(e, r))] : (console.warn(`${De}: no peer with id ${e} found`), []);
+	}), m = pn({
 		iterate: (e, t) => p(e, (e, n) => t(e, n)),
 		isActive: (e) => !!c[e],
 		getSharedMediaPeer: (e) => s[e] ?? null
-	}), h = an({
+	}), h = ln({
 		getPeer: (e, t) => (t ? s : c)[e],
-		getPeerIds: (e) => G(e ? s : c),
+		getPeerIds: (e) => Ie(e ? s : c),
 		canReceiveFromPeer: (e, t) => !!f?.canReceiveFromPeer(e, t)
-	}), g = h.makeInternalAction, _ = h.handleData, v = h.makeAction, y = (e, t = J("peer disconnected")) => {
-		let n = Y(t, "peer disconnected");
+	}), g = h.makeInternalAction, _ = h.handleData, v = h.makeAction, y = (e, t = q("peer disconnected")) => {
+		let n = Ve(t, "peer disconnected");
 		f?.clearPeer(e, n), delete s[e], delete c[e], h.clearPeer(e, n), l[e]?.splice(0).forEach((e) => e.reject(n)), delete l[e], m.clearPeer(e);
 	}, b = (e, n, r) => {
 		let i = s[e];
@@ -1235,20 +1235,20 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		let a = !!c[e];
 		y(e, r), i.destroy(), a && u.onPeerLeave?.(e), t(e);
 	}, x = async () => {
-		await D.send(""), await new Promise((e) => setTimeout(e, 99)), Fe(s).forEach(([e, t]) => {
-			t.destroy(), y(e, J("room left"));
+		await D.send(""), await new Promise((e) => setTimeout(e, 99)), Pe(s).forEach(([e, t]) => {
+			t.destroy(), y(e, q("room left"));
 		}), d(), n();
-	}, S = g(Q("ping")), C = g(Q("pong")), w = g(Q("signal")), T = g(Q("stream")), E = g(Q("track")), D = g(Q("leave"), {
+	}, S = g(gn("ping")), C = g(gn("pong")), w = g(gn("signal")), T = g(gn("stream")), E = g(gn("track")), D = g(gn("leave"), {
 		sendToPending: !0,
 		receiveWhilePending: !0
-	}), O = g(Q("hsdata"), {
+	}), O = g(gn("hsdata"), {
 		sendToPending: !0,
 		receiveWhilePending: !0
-	}), k = g(Q("hsready"), {
+	}), k = g(gn("hsready"), {
 		sendToPending: !0,
 		receiveWhilePending: !0
 	});
-	return f = wt({
+	return f = Ot({
 		...r === void 0 ? {} : { onPeerHandshake: r },
 		...i === void 0 ? {} : { onHandshakeError: i },
 		handshakeTimeoutMs: a,
@@ -1263,11 +1263,11 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		(n?.shift())?.resolve(), n && !n.length && delete l[t];
 	}), w.onMessage((e, t) => {
 		c[t] && s[t]?.signal(e);
-	}), T.onMessage((e, t) => m.receiveStreamMeta(e, t)), E.onMessage((e, t) => m.receiveTrackMeta(e, t)), D.onMessage((e, t) => b(t, void 0, J("peer left room"))), O.onMessage((e, t, n) => f?.receiveHandshakeData(e, t, n)), k.onMessage((e, t) => f?.receiveHandshakeReady(t)), e((e, t) => {
+	}), T.onMessage((e, t) => m.receiveStreamMeta(e, t)), E.onMessage((e, t) => m.receiveTrackMeta(e, t)), D.onMessage((e, t) => b(t, void 0, q("peer left room"))), O.onMessage((e, t, n) => f?.receiveHandshakeData(e, t, n)), k.onMessage((e, t) => f?.receiveHandshakeReady(t)), e((e, t) => {
 		let n = s[t];
 		if (n) {
 			if (n === e) return;
-			n.destroy(), y(t, J("peer replaced"));
+			n.destroy(), y(t, q("peer replaced"));
 		}
 		s[t] = e, f?.addPeer(t, e), e.setHandlers({
 			data: (e) => _(t, e),
@@ -1276,16 +1276,16 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			signal: (e) => {
 				c[t] && w.send(e, t);
 			},
-			close: () => b(t, e, J("peer disconnected")),
+			close: () => b(t, e, q("peer disconnected")),
 			error: (n) => {
-				console.error(`${U} peer error:`, n), b(t, e, n);
+				console.error(`${De} peer error:`, n), b(t, e, n);
 			}
 		}), f?.start(t, e);
-	}), Pe && (d = mn(() => x().catch(K))), {
+	}), Ne && (d = yn(() => x().catch(Re))), {
 		makeAction: v,
 		leave: x,
 		ping: async (e) => {
-			if (!c[e]) throw J(`no active peer with id ${e}`);
+			if (!c[e]) throw q(`no active peer with id ${e}`);
 			let t = Date.now();
 			return await new Promise((t, n) => {
 				let r = l[e] ??= [], i = () => {
@@ -1301,11 +1301,11 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 						i(), n(e);
 					}
 				};
-				r.push(a), S.send("", e).catch((e) => a.reject(Y(e, "peer disconnected")));
+				r.push(a), S.send("", e).catch((e) => a.reject(Ve(e, "peer disconnected")));
 			}), Date.now() - t;
 		},
 		isPassive: () => o,
-		getPeers: () => Ie(Fe(c).map(([e, t]) => [e, t.connection])),
+		getPeers: () => Fe(Pe(c).map(([e, t]) => [e, t.connection])),
 		addStream: (e, t = {}) => m.addStream(e, t, T.send),
 		removeStream: (e, t = {}) => {
 			m.removeStream(e, t.target);
@@ -1319,7 +1319,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			return u.onPeerJoin;
 		},
 		set onPeerJoin(e) {
-			u.onPeerJoin = e, e && G(c).forEach((t) => e(t));
+			u.onPeerJoin = e, e && Ie(c).forEach((t) => e(t));
 		},
 		get onPeerLeave() {
 			return u.onPeerLeave;
@@ -1340,38 +1340,38 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			m.onPeerTrack = e;
 		}
 	};
-}, gn = 1, _n = 2, vn = (e, t) => {
-	let n = X(e), r = new Uint8Array(3 + n.byteLength + t.byteLength);
-	return r[0] = gn, r[1] = n.byteLength >>> 8 & 255, r[2] = n.byteLength & 255, r.set(n, 3), r.set(t, 3 + n.byteLength), r;
-}, yn = (e, t) => {
-	let n = X(e), r = new Uint8Array(4 + n.byteLength);
-	return r[0] = _n, r[1] = Number(t), r[2] = n.byteLength >>> 8 & 255, r[3] = n.byteLength & 255, r.set(n, 4), r;
-}, bn = (e) => {
+}, xn = 1, Sn = 2, Cn = (e, t) => {
+	let n = We(e), r = new Uint8Array(3 + n.byteLength + t.byteLength);
+	return r[0] = xn, r[1] = n.byteLength >>> 8 & 255, r[2] = n.byteLength & 255, r.set(n, 3), r.set(t, 3 + n.byteLength), r;
+}, wn = (e, t) => {
+	let n = We(e), r = new Uint8Array(4 + n.byteLength);
+	return r[0] = Sn, r[1] = Number(t), r[2] = n.byteLength >>> 8 & 255, r[3] = n.byteLength & 255, r.set(n, 4), r;
+}, Tn = (e) => {
 	let t = new Uint8Array(e);
 	if (t.byteLength < 3) return null;
-	if (t[0] === gn) {
+	if (t[0] === xn) {
 		let e = (t[1] ?? 0) << 8 | (t[2] ?? 0), n = 3 + e;
 		return e <= 0 || t.byteLength < n ? null : {
 			type: "room",
-			roomToken: He(t.subarray(3, n)),
+			roomToken: Ge(t.subarray(3, n)),
 			payload: t.subarray(n).slice().buffer
 		};
 	}
-	if (t[0] !== _n || t.byteLength < 4) return null;
+	if (t[0] !== Sn || t.byteLength < 4) return null;
 	let n = (t[2] ?? 0) << 8 | (t[3] ?? 0), r = 4 + n;
 	return n <= 0 || t.byteLength < r ? null : {
 		type: "presence",
-		roomToken: He(t.subarray(4, r)),
+		roomToken: Ge(t.subarray(4, r)),
 		isPresent: t[1] === 1
 	};
-}, xn = (e) => {
+}, En = (e) => {
 	let { connection: t, channel: n } = e;
 	return e.isDead || t.connectionState === "closed" || t.connectionState === "failed" || t.iceConnectionState === "closed" || t.iceConnectionState === "failed" || n?.readyState === "closing" || n?.readyState === "closed";
-}, Sn = (e) => {
-	if (xn(e)) return "stale";
+}, Dn = (e) => {
+	if (En(e)) return "stale";
 	let { channel: t } = e;
 	return !t || t.readyState !== "open" ? "transient" : "live";
-}, Cn = class {
+}, On = class {
 	byApp = {};
 	roomPresenceHandlers = {};
 	getMap(e) {
@@ -1381,7 +1381,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		return this.byApp[e]?.[t];
 	}
 	isPeerStale(e) {
-		return xn(e);
+		return En(e);
 	}
 	getHealth(e) {
 		return this.isPeerStale(e) ? "stale" : "live";
@@ -1392,21 +1392,21 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		};
 	}
 	sendRoomPresence(e, t, n) {
-		e.isClosing || e.peer.isDead || e.peer.sendData(yn(t, n));
+		e.isClosing || e.peer.isDead || e.peer.sendData(wn(t, n));
 	}
 	clear(e, t, { destroyPeer: n }) {
 		let r = this.byApp[e], i = r?.[t];
 		if (!i || i.isClosing) return;
-		i.idleTimer = q(i.idleTimer), i.isClosing = !0, n && !i.peer.isDead && i.peer.destroy();
+		i.idleTimer = K(i.idleTimer), i.isClosing = !0, n && !i.peer.isDead && i.peer.destroy();
 		let a = Le(i.bindings);
 		i.bindings = {}, i.bindingsByToken = {}, i.controlRoomId = null, delete r[t], a.forEach((e) => {
 			e.handlers.close?.(), e.pendingData.length = 0, e.pendingSendData.length = 0, e.pendingTracks.length = 0;
-		}), i.media.clearRemote(), i.pendingDataByToken.clear(), i.remoteRoomTokens.clear(), G(r).length === 0 && delete this.byApp[e];
+		}), i.media.clearRemote(), i.pendingDataByToken.clear(), i.remoteRoomTokens.clear(), Ie(r).length === 0 && delete this.byApp[e];
 	}
 	register(e, t, n, r) {
 		let i = this.getMap(e), a = i[t];
 		if (a) {
-			if (a.idleTimer = q(a.idleTimer), a.peer === n) return a;
+			if (a.idleTimer = K(a.idleTimer), a.peer === n) return a;
 			this.clear(e, t, { destroyPeer: !0 });
 		}
 		let o = {
@@ -1421,7 +1421,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			controlRoomId: null,
 			streamOwners: /* @__PURE__ */ new Map(),
 			trackOwners: /* @__PURE__ */ new Map(),
-			media: cn(),
+			media: fn(),
 			idleMs: r,
 			isClosing: !1
 		};
@@ -1430,14 +1430,14 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			signal: (e) => this.dispatchSignal(o, e),
 			close: () => this.clear(e, t, { destroyPeer: !1 }),
 			error: (n) => {
-				console.error(`${U} peer error:`, n), this.clear(e, t, { destroyPeer: !1 });
+				console.error(`${De} peer error:`, n), this.clear(e, t, { destroyPeer: !1 });
 			},
 			track: (e, t) => this.dispatchTrack(o, e, t)
 		}), i[t] = o, o;
 	}
 	bind(e, t, n, { onDetach: r }) {
 		let i = n.bindings[e];
-		if (i) return n.idleTimer = q(n.idleTimer), {
+		if (i) return n.idleTimer = K(n.idleTimer), {
 			proxy: i.proxy,
 			isNew: !1
 		};
@@ -1449,10 +1449,10 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			pendingData: [],
 			pendingSendData: [],
 			pendingTracks: [],
-			detach: K,
+			detach: Re,
 			proxy: {}
 		}, o = () => {
-			n.bindings[e] && (this.pruneRoomOwnership(n, e), delete n.bindings[e], a.roomToken && n.bindingsByToken[a.roomToken] === a && delete n.bindingsByToken[a.roomToken], n.controlRoomId === e && (n.controlRoomId = G(n.bindings)[0] ?? null), r(), this.scheduleIdleTimer(n));
+			n.bindings[e] && (this.pruneRoomOwnership(n, e), delete n.bindings[e], a.roomToken && n.bindingsByToken[a.roomToken] === a && delete n.bindingsByToken[a.roomToken], n.controlRoomId === e && (n.controlRoomId = Ie(n.bindings)[0] ?? null), r(), this.scheduleIdleTimer(n));
 		}, s = {
 			created: n.peer.created,
 			get connection() {
@@ -1471,7 +1471,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 					a.pendingSendData.push(e);
 					return;
 				}
-				n.peer.sendData(vn(a.roomToken, e));
+				n.peer.sendData(Cn(a.roomToken, e));
 			},
 			destroy: () => o(),
 			setHandlers: (e) => {
@@ -1512,11 +1512,11 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			},
 			__trysteroMedia: n.media
 		};
-		return a.proxy = s, a.detach = o, n.bindings[e] = a, n.controlRoomId ??= e, n.idleTimer = q(n.idleTimer), t.then((t) => {
+		return a.proxy = s, a.detach = o, n.bindings[e] = a, n.controlRoomId ??= e, n.idleTimer = K(n.idleTimer), t.then((t) => {
 			if (n.isClosing || n.bindings[e] !== a) return;
 			a.roomToken = t, n.bindingsByToken[t] = a;
 			let r = n.pendingDataByToken.get(t);
-			r?.length && (a.pendingData.push(...r), n.pendingDataByToken.delete(t)), a.pendingSendData.splice(0).forEach((e) => n.peer.sendData(vn(t, e))), this.flushBindingQueues(a);
+			r?.length && (a.pendingData.push(...r), n.pendingDataByToken.delete(t)), a.pendingSendData.splice(0).forEach((e) => n.peer.sendData(Cn(t, e))), this.flushBindingQueues(a);
 		}), {
 			proxy: s,
 			isNew: !0
@@ -1530,9 +1530,9 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		});
 	}
 	scheduleIdleTimer(e) {
-		e.isClosing || G(e.bindings).length > 0 || (e.idleTimer = q(e.idleTimer), e.idleTimer = setTimeout(() => {
+		e.isClosing || Ie(e.bindings).length > 0 || (e.idleTimer = K(e.idleTimer), e.idleTimer = setTimeout(() => {
 			let t = this.byApp[e.appId]?.[e.peerId];
-			!t || G(t.bindings).length > 0 || this.clear(e.appId, e.peerId, { destroyPeer: !0 });
+			!t || Ie(t.bindings).length > 0 || this.clear(e.appId, e.peerId, { destroyPeer: !0 });
 		}, e.idleMs));
 	}
 	getSignalBinding(e) {
@@ -1550,7 +1550,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		});
 	}
 	dispatchData(e, t) {
-		let n = bn(t);
+		let n = Tn(t);
 		if (!n) return;
 		if (n.type === "presence") {
 			n.isPresent ? e.remoteRoomTokens.add(n.roomToken) : e.remoteRoomTokens.delete(n.roomToken), this.roomPresenceHandlers[e.appId]?.(e.peerId, n.roomToken, n.isPresent);
@@ -1579,23 +1579,23 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			});
 		});
 	}
-}, wn = 23333, Tn = 12, En = 7533, Dn = 23333, On = "__legacy__", kn = "offer-placeholder", An = [
+}, kn = 23333, An = 12, jn = 7533, Mn = 23333, Nn = "__legacy__", Pn = "offer-placeholder", Fn = [
 	"offer",
 	"answer",
 	"candidate"
-], jn = (e) => {
+], In = (e) => {
 	if (typeof e == "string") try {
-		let t = qe(e);
+		let t = Ze(e);
 		return t && typeof t == "object" ? t : null;
 	} catch {
 		return null;
 	}
 	return e && typeof e == "object" ? e : null;
-}, Mn = (e, t) => typeof e[t] == "string" && e[t] ? e[t] : void 0, Nn = (e) => An.some((t) => t in e && (typeof e[t] != "string" || e[t] === "")), Pn = (e, t, n, r, i, a) => {
+}, Ln = (e, t) => typeof e[t] == "string" && e[t] ? e[t] : void 0, Rn = (e) => Fn.some((t) => t in e && (typeof e[t] != "string" || e[t] === "")), zn = (e, t, n, r, i, a) => {
 	e.toCipher(t).then((t) => {
-		!e.isLeaving() && a() && r(n, Z(i(t.sdp)));
+		!e.isLeaving() && a() && r(n, Xe(i(t.sdp)));
 	});
-}, Fn = () => ({
+}, Bn = () => ({
 	status: "idle",
 	offerPeer: null,
 	offerId: null,
@@ -1614,40 +1614,40 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 	answerSent: !1,
 	connectionErrorReported: !1,
 	pendingCandidates: {}
-}), In = (e) => [...e.turnConfig ?? [], ...e.rtcConfig?.iceServers ?? []].some(({ urls: e }) => (Array.isArray(e) ? e : [e]).some((e) => /^turns?:/i.test(e))), Ln = (e, t) => `could not connect to peer ${e} after exchanging SDP; ${In(t) ? "check that your TURN server URLs and credentials are reachable by both peers" : "configure TURN servers with turnConfig or rtcConfig.iceServers"}`, Rn = (e, t, n) => {
+}), Vn = (e) => [...e.turnConfig ?? [], ...e.rtcConfig?.iceServers ?? []].some(({ urls: e }) => (Array.isArray(e) ? e : [e]).some((e) => /^turns?:/i.test(e))), Hn = (e, t) => `could not connect to peer ${e} after exchanging SDP; ${Vn(t) ? "check that your TURN server URLs and credentials are reachable by both peers" : "configure TURN servers with turnConfig or rtcConfig.iceServers"}`, Un = (e, t, n) => {
 	e.isLeaving() || t.connectedPeer || t.connectionErrorReported || (t.connectionErrorReported = !0, e.onJoinError?.({
-		error: Ln(n, e.config),
+		error: Hn(n, e.config),
 		appId: e.appId,
 		peerId: n,
 		roomId: e.roomId
 	}));
-}, zn = (e, t) => e[t] ??= Fn(), $ = (e) => {
+}, Wn = (e, t) => e[t] ??= Bn(), Gn = (e) => {
 	e.status = e.connectedPeer ? "connected" : e.answeringPeer ? "answering" : e.offerPeer || e.offerRelays.some(Boolean) ? "offering" : "idle";
-}, Bn = (e, t) => {
-	e.answeringPeer === t && (e.answeringExpiryTimer = q(e.answeringExpiryTimer), e.answeringPeer = null, e.answerSent = !1, $(e));
-}, Vn = (e, t, n) => {
-	e.connectedPeer && (e.connectedPeer.isDead || e.connectedPeer.destroy(), e.connectedPeer = null, e.connectedPeerUnhealthySinceMs = null, $(e));
-}, Hn = (e, t) => {
-	e.offerRelayTimers[t] = q(e.offerRelayTimers[t]), e.offerRelays[t] && (e.offerRelays[t] = void 0, $(e));
-}, Un = (e, t) => {
-	e?.offerRelays[t] === kn && Hn(e, t);
-}, Wn = (e) => {
+}, Kn = (e, t) => {
+	e.answeringPeer === t && (e.answeringExpiryTimer = K(e.answeringExpiryTimer), e.answeringPeer = null, e.answerSent = !1, Gn(e));
+}, qn = (e, t, n) => {
+	e.connectedPeer && (e.connectedPeer.isDead || e.connectedPeer.destroy(), e.connectedPeer = null, e.connectedPeerUnhealthySinceMs = null, Gn(e));
+}, Jn = (e, t) => {
+	e.offerRelayTimers[t] = K(e.offerRelayTimers[t]), e.offerRelays[t] && (e.offerRelays[t] = void 0, Gn(e));
+}, Yn = (e, t) => {
+	e?.offerRelays[t] === Pn && Jn(e, t);
+}, Xn = (e) => {
 	if (e.isDead || e.connection.connectionState === "closed") return !0;
 	try {
 		return !!e.connection.remoteDescription;
 	} catch {
 		return !0;
 	}
-}, Gn = (e, t) => {
+}, Zn = (e, t) => {
 	let n = e.offerAnswered;
-	e.offerExpiryTimer = q(e.offerExpiryTimer), e.offerInitPromise = null, e.offerRelays.forEach((t, n) => Hn(e, n)), e.offerRelays = [], e.offerSignalRelays = [], e.offerRelayTimers = [], e.offerSignalBacklog = [], e.offerPeer && e.offerPeer !== e.connectedPeer && (n || Wn(e.offerPeer) ? e.offerPeer.isDead || e.offerPeer.destroy() : t.recycle(e.offerPeer)), e.offerPeer = null, e.offerId = null, e.offerSdp = null, e.offerAnswered = !1, e.connectionErrorReported = !1, $(e);
-}, Kn = (e, t, n, r) => {
-	q(t.answeringExpiryTimer), t.answeringExpiryTimer = setTimeout(() => {
+	e.offerExpiryTimer = K(e.offerExpiryTimer), e.offerInitPromise = null, e.offerRelays.forEach((t, n) => Jn(e, n)), e.offerRelays = [], e.offerSignalRelays = [], e.offerRelayTimers = [], e.offerSignalBacklog = [], e.offerPeer && e.offerPeer !== e.connectedPeer && (n || Xn(e.offerPeer) ? e.offerPeer.isDead || e.offerPeer.destroy() : t.recycle(e.offerPeer)), e.offerPeer = null, e.offerId = null, e.offerSdp = null, e.offerAnswered = !1, e.connectionErrorReported = !1, Gn(e);
+}, Qn = (e, t, n, r) => {
+	K(t.answeringExpiryTimer), t.answeringExpiryTimer = setTimeout(() => {
 		let t = e.peerStates[n];
-		t && !t.connectedPeer && t.answeringPeer === r && (t.answerSent && Rn(e, t, n), r.destroy(), Bn(t, r), e.checkDeactivate());
-	}, Dn);
-}, qn = async (e, t, n) => {
-	let r = n ? [n, On] : [On];
+		t && !t.connectedPeer && t.answeringPeer === r && (t.answerSent && Un(e, t, n), r.destroy(), Kn(t, r), e.checkDeactivate());
+	}, Mn);
+}, $n = async (e, t, n) => {
+	let r = n ? [n, Nn] : [Nn];
 	for (let n of r) {
 		let r = e.pendingCandidates[n];
 		if (r?.length) {
@@ -1655,24 +1655,24 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			for (let e of r) await t.signal(e);
 		}
 	}
-}, Jn = (e, t, n, r = _t) => {
-	q(t.offerExpiryTimer);
+}, er = (e, t, n, r = xt) => {
+	K(t.offerExpiryTimer);
 	let i = t.offerId;
 	t.offerExpiryTimer = setTimeout(() => {
 		let t = e.peerStates[n];
-		t && !t.connectedPeer && t.offerId === i && (t.offerAnswered && Rn(e, t, n), Gn(t, e.offerPool), e.checkDeactivate());
+		t && !t.connectedPeer && t.offerId === i && (t.offerAnswered && Un(e, t, n), Zn(t, e.offerPool), e.checkDeactivate());
 	}, r);
-}, Yn = (e, t, n, r) => t.offerPeer && t.offerId && t.offerSdp ? Promise.resolve({
+}, tr = (e, t, n, r) => t.offerPeer && t.offerId && t.offerSdp ? Promise.resolve({
 	peer: t.offerPeer,
 	offer: t.offerSdp,
 	offerId: t.offerId
 }) : (t.offerInitPromise ||= (async () => {
 	let i = (await e.offerPool.checkout(1, !1, e.encryptOffer))[0];
-	if (!i) throw J("failed to allocate offer peer");
+	if (!i) throw q("failed to allocate offer peer");
 	let { peer: a, offer: o } = i;
-	t.offerPeer = a, t.offerId = Me(Tn), t.offerSdp = o, t.offerAnswered = !1, t.connectionErrorReported = !1, t.offerSignalBacklog = [], $(t);
+	t.offerPeer = a, t.offerId = Ae(An), t.offerSdp = o, t.offerAnswered = !1, t.connectionErrorReported = !1, t.offerSignalBacklog = [], Gn(t);
 	let s = () => {
-		t.offerPeer === a && !t.connectedPeer && (t.offerAnswered && Rn(e, t, n), Gn(t, e.offerPool)), e.disconnectPeer(a, n), e.checkDeactivate();
+		t.offerPeer === a && !t.connectedPeer && (t.offerAnswered && Un(e, t, n), Zn(t, e.offerPool)), e.disconnectPeer(a, n), e.checkDeactivate();
 	};
 	return a.setHandlers({
 		connect: () => e.connectPeer(a, n, r),
@@ -1681,53 +1681,53 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		},
 		close: s,
 		error: s
-	}), Jn(e, t, n), {
+	}), er(e, t, n), {
 		peer: a,
 		offer: o,
 		offerId: t.offerId
 	};
-})().finally(() => t.offerInitPromise = null), t.offerInitPromise), Xn = async (e, t, n, r, i) => {
+})().finally(() => t.offerInitPromise = null), t.offerInitPromise), nr = async (e, t, n, r, i) => {
 	if (r) {
 		e.attachSharedPeerToRoom(n, r);
 		return;
 	}
 	let a = e.peerStates[n];
 	if (!a || a.connectedPeer || a.answeringPeer || a.offerAnswered) {
-		Un(a, t);
+		Yn(a, t);
 		return;
 	}
-	if (a.offerRelays[t] !== kn) return;
-	let [o, s] = await Ne([ut(We(e.rootTopicPlaintext, n)), Yn(e, a, n, t)]);
+	if (a.offerRelays[t] !== Pn) return;
+	let [o, s] = await Me([mt(qe(e.rootTopicPlaintext, n)), tr(e, a, n, t)]);
 	if (e.isLeaving()) return;
-	if (a.connectedPeer || a.answeringPeer || a.offerAnswered || a.offerRelays[t] !== kn) {
-		Un(a, t);
+	if (a.connectedPeer || a.answeringPeer || a.offerAnswered || a.offerRelays[t] !== Pn) {
+		Yn(a, t);
 		return;
 	}
-	a.offerRelayTimers[t] = q(a.offerRelayTimers[t]), a.offerRelays[t] = !0, $(a), a.offerRelayTimers[t] = setTimeout(() => er(e, n, t), (e.announceIntervals[t] ?? e.announceIntervalMs) * .9);
+	a.offerRelayTimers[t] = K(a.offerRelayTimers[t]), a.offerRelays[t] = !0, Gn(a), a.offerRelayTimers[t] = setTimeout(() => or(e, n, t), (e.announceIntervals[t] ?? e.announceIntervalMs) * .9);
 	let c = !1;
 	a.offerSignalRelays[t] = (t) => {
-		c && (e.isLeaving() || a.connectedPeer || a.offerPeer !== s.peer || a.offerId !== s.offerId || t.type !== "candidate" || Pn(e, t, o, i, (t) => ({
-			peerId: W,
+		c && (e.isLeaving() || a.connectedPeer || a.offerPeer !== s.peer || a.offerId !== s.offerId || t.type !== "candidate" || zn(e, t, o, i, (t) => ({
+			peerId: je,
 			offerId: s.offerId,
 			candidate: t,
 			...e.isPassive ? { passive: !0 } : {}
 		}), () => !a.connectedPeer && a.offerPeer === s.peer && a.offerId === s.offerId));
-	}, i(o, Z({
-		peerId: W,
+	}, i(o, Xe({
+		peerId: je,
 		offerId: s.offerId,
 		offer: s.offer,
 		...e.isPassive ? { passive: !0 } : {}
 	})), c = !0, a.offerSignalBacklog.forEach((e) => a.offerSignalRelays[t]?.(e));
-}, Zn = async (e, t, n, r, i, a, o) => {
-	let s = zn(e.peerStates, n);
+}, rr = async (e, t, n, r, i, a, o) => {
+	let s = Wn(e.peerStates, n);
 	if (s.answeringPeer || s.offerAnswered) return;
 	let c = !!(s.offerPeer || s.offerRelays.some(Boolean));
-	if ((c || a) && W < n) return;
-	c && Gn(s, e.offerPool);
+	if ((c || a) && je < n) return;
+	c && Zn(s, e.offerPool);
 	let l = e.initPeer(!1, e.config);
-	s.answeringPeer = l, s.answerSent = !1, s.connectionErrorReported = !1, Kn(e, s, n, l), $(s);
+	s.answeringPeer = l, s.answerSent = !1, s.connectionErrorReported = !1, Qn(e, s, n, l), Gn(s);
 	let u = () => {
-		s.answeringPeer === l && !s.connectedPeer && s.answerSent && Rn(e, s, n), Bn(s, l), e.disconnectPeer(l, n), e.checkDeactivate();
+		s.answeringPeer === l && !s.connectedPeer && s.answerSent && Un(e, s, n), Kn(s, l), e.disconnectPeer(l, n), e.checkDeactivate();
 	};
 	l.setHandlers({
 		connect: () => e.connectPeer(l, n, t),
@@ -1741,7 +1741,7 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			sdp: r
 		});
 	} catch {
-		Bn(s, l), e.onJoinError?.({
+		Kn(s, l), e.onJoinError?.({
 			error: "incorrect room password when decrypting offer",
 			appId: e.appId,
 			peerId: n,
@@ -1750,34 +1750,34 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		return;
 	}
 	if (l.isDead) {
-		Bn(s, l);
+		Kn(s, l);
 		return;
 	}
-	let f = await ut(We(e.rootTopicPlaintext, n));
+	let f = await mt(qe(e.rootTopicPlaintext, n));
 	e.isLeaving() || (l.setHandlers({ signal: (t) => {
-		e.isLeaving() || s.answeringPeer !== l || l.isDead || (t.type === "answer" || t.type === "candidate") && Pn(e, t, f, o, (n) => {
-			let r = { peerId: W };
+		e.isLeaving() || s.answeringPeer !== l || l.isDead || (t.type === "answer" || t.type === "candidate") && zn(e, t, f, o, (n) => {
+			let r = { peerId: je };
 			return t.type === "answer" ? (s.answerSent = !0, r.answer = n) : r.candidate = n, i && (r.offerId = i), e.isPassive && (r.passive = !0), r;
 		}, () => s.answeringPeer === l && !l.isDead);
-	} }), await l.signal(d), await qn(s, l, i));
-}, Qn = async (e, t, n, r, i) => {
+	} }), await l.signal(d), await $n(s, l, i));
+}, ir = async (e, t, n, r, i) => {
 	let a;
 	try {
 		a = await e.toPlain({
-			type: Re,
+			type: ze,
 			sdp: n
 		});
 	} catch {
 		return;
 	}
-	let o = zn(e.peerStates, t), s = r && o?.offerPeer && o.offerId === r ? o.offerPeer : null, c = o?.answeringPeer ?? null, l = !r && o?.offerPeer ? o.offerPeer : null, u = i && !i.isDead ? i : s ?? c ?? l;
+	let o = Wn(e.peerStates, t), s = r && o?.offerPeer && o.offerId === r ? o.offerPeer : null, c = o?.answeringPeer ?? null, l = !r && o?.offerPeer ? o.offerPeer : null, u = i && !i.isDead ? i : s ?? c ?? l;
 	if (!u || u.isDead) {
-		let e = r ?? On;
+		let e = r ?? Nn;
 		(o.pendingCandidates[e] ??= []).push(a);
 		return;
 	}
 	u.signal(a);
-}, $n = async (e, t, n, r, i, a) => {
+}, ar = async (e, t, n, r, i, a) => {
 	let o;
 	try {
 		o = await e.toPlain({
@@ -1800,65 +1800,65 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 	else {
 		let t = e.peerStates[n];
 		if (!t || !t.offerPeer || t.offerAnswered || i && t.offerId && i !== t.offerId || t.offerPeer.isDead) return;
-		t.offerAnswered = !0, Jn(e, t, n, wn), t.offerPeer.signal(o);
+		t.offerAnswered = !0, er(e, t, n, kn), t.offerPeer.signal(o);
 	}
-}, er = (e, t, n) => {
+}, or = (e, t, n) => {
 	let r = e.peerStates[t];
-	r && !r.connectedPeer && r.offerRelays[n] && (Hn(r, n), e.checkDeactivate());
-}, tr = (e) => (t) => async (n, r, i) => {
+	r && !r.connectedPeer && r.offerRelays[n] && (Jn(r, n), e.checkDeactivate());
+}, sr = (e) => (t) => async (n, r, i) => {
 	if (e.isLeaving()) return;
-	let a = jn(r);
-	if (!a || Nn(a)) return;
-	let o = Mn(a, "peerId") ?? "", s = Mn(a, "offer"), c = Mn(a, "answer"), l = Mn(a, "candidate"), u = Mn(a, "offerId"), d = a.peer, f = a.hasOutgoingOffer === !0, p = a.passive === !0;
-	if (!o || o === W) return;
-	let [m, h] = await Ne([e.rootTopicP, e.selfTopicP]);
+	let a = In(r);
+	if (!a || Rn(a)) return;
+	let o = Ln(a, "peerId") ?? "", s = Ln(a, "offer"), c = Ln(a, "answer"), l = Ln(a, "candidate"), u = Ln(a, "offerId"), d = a.peer, f = a.hasOutgoingOffer === !0, p = a.passive === !0;
+	if (!o || o === je) return;
+	let [m, h] = await Me([e.rootTopicP, e.selfTopicP]);
 	if (e.isLeaving() || n !== m && n !== h || e.isPassive && p || (e.isPassive && !e.isActive && !c && !l && (e.isActive = !0, e.requeueAnnounce?.()), e.isPassive && !e.isActive)) return;
 	let g = e.peerStates[o], _ = g?.connectedPeer;
 	if (_ && g) {
-		let e = Sn(_);
+		let e = Dn(_);
 		if (e === "live") {
 			g.connectedPeerUnhealthySinceMs = null;
 			return;
 		}
-		if (e === "stale") Vn(g, o, "message-from-stale-peer");
+		if (e === "stale") qn(g, o, "message-from-stale-peer");
 		else {
 			let e = Date.now(), t = g.connectedPeerUnhealthySinceMs ?? e;
-			if (g.connectedPeerUnhealthySinceMs = t, e - t < En) return;
-			Vn(g, o, "message-from-prolonged-disconnect");
+			if (g.connectedPeerUnhealthySinceMs = t, e - t < jn) return;
+			qn(g, o, "message-from-prolonged-disconnect");
 		}
 	}
 	let v = e.sharedPeers.get(e.appId, o);
 	v && e.sharedPeers.getHealth(v.peer) === "stale" && (e.sharedPeers.clear(e.appId, o, { destroyPeer: !0 }), v = void 0);
 	let y = !(!o || s || c || l);
 	if (y && !v) {
-		let n = zn(e.peerStates, o), r = W < o;
+		let n = Wn(e.peerStates, o), r = je < o;
 		if (n.answeringPeer || n.connectedPeer || n.offerAnswered) return;
 		if (!r && !n.offerPeer) {
-			let t = await ut(We(e.rootTopicPlaintext, o));
-			!e.isLeaving() && !n.connectedPeer && i(t, Z({ peerId: W }));
+			let t = await mt(qe(e.rootTopicPlaintext, o));
+			!e.isLeaving() && !n.connectedPeer && i(t, Xe({ peerId: je }));
 			return;
 		}
 		if (n.offerRelays[t]) return;
-		n.offerRelays[t] = kn, $(n);
+		n.offerRelays[t] = Pn, Gn(n);
 	}
 	if (v && (s || c || l)) {
 		if (v.bindings[e.roomId]) return;
 		e.attachSharedPeerToRoom(o, v);
 		return;
 	}
-	if (y) return Xn(e, t, o, v, i);
-	if (s) return Zn(e, t, o, s, u, f, i);
-	if (l) return Qn(e, o, l, u, d);
-	if (c) return $n(e, t, o, c, u, d);
-}, nr = 5333, rr = [
+	if (y) return nr(e, t, o, v, i);
+	if (s) return rr(e, t, o, s, u, f, i);
+	if (l) return ir(e, o, l, u, d);
+	if (c) return ar(e, t, o, c, u, d);
+}, cr = 5333, lr = [
 	233,
 	533,
 	1333
-], ir = 7533, ar = 123333, or = ({ init: e, subscribe: t, announce: n, deactivate: r }) => {
-	let i = {}, a = {}, o = {}, s = {}, c = new Cn(), l = () => Le(i).some((e) => G(e).length > 0), u = (e) => a[e] ??= {}, d = (e) => o[e] ??= {}, f = (e, t, n) => {
+], ur = 7533, dr = 123333, fr = ({ init: e, subscribe: t, announce: n, deactivate: r }) => {
+	let i = {}, a = {}, o = {}, s = {}, c = new On(), l = () => Le(i).some((e) => Ie(e).length > 0), u = (e) => a[e] ??= {}, d = (e) => o[e] ??= {}, f = (e, t, n) => {
 		c.getHealth(e.peer) === "live" && c.sendRoomPresence(e, t, n);
 	}, p = (e, t) => {
-		Fe(a[e] ?? {}).forEach(([n, r]) => {
+		Pe(a[e] ?? {}).forEach(([n, r]) => {
 			if (!r.shouldAdvertise()) return;
 			let { roomToken: i, roomTokenPromise: o } = r;
 			if (i) {
@@ -1876,64 +1876,64 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			i && s && a[e]?.[s]?.attachSharedPeerToRoom(t, i);
 		}));
 	}, g = (e) => {
-		i[e] && G(i[e]).length > 0 || (s[e]?.(), delete s[e], delete a[e], delete o[e]);
-	}, _ = !1, v = [], y = null, b = K;
+		i[e] && Ie(i[e]).length > 0 || (s[e]?.(), delete s[e], delete a[e], delete o[e]);
+	}, _ = !1, v = [], y = null, b = Re;
 	return (s, f, x) => {
-		if (!s) throw J("requires a config map as the first argument");
-		if (x && typeof x != "object") throw J("third argument must be a callbacks object");
+		if (!s) throw q("requires a config map as the first argument");
+		if (x && typeof x != "object") throw q("third argument must be a callbacks object");
 		let { appId: S } = s, C = x?.onJoinError, w = x?.onPeerHandshake, T = x?.handshakeTimeoutMs;
-		if (!S) throw J("config map is missing appId field");
-		if (!f) throw J("roomId argument required");
-		if (T !== void 0 && (!Number.isFinite(T) || T <= 0)) throw J("handshakeTimeoutMs must be a positive number");
+		if (!S) throw q("config map is missing appId field");
+		if (!f) throw q("roomId argument required");
+		if (T !== void 0 && (!Number.isFinite(T) || T <= 0)) throw q("handshakeTimeoutMs must be a positive number");
 		if (i[S]?.[f]) return i[S][f];
 		h(S);
-		let E = We(U, S, f), D = ut(E), O = ut(We(E, W)), k = dt(s.password ?? "", S, f), ee = ft(S, f), A = s._test_only_sharedPeerIdleMs ?? ar, j = !1, te = (e) => async (t) => ({
+		let E = qe(De, S, f), D = mt(E), O = mt(qe(E, je)), k = ht(s.password ?? "", S, f), A = gt(S, f), j = s._test_only_sharedPeerIdleMs ?? dr, M = !1, N = (e) => async (t) => ({
 			type: t.type,
 			sdp: await e(k, t.sdp)
-		}), M = te(gt), N = te(ht), P = c.getMap(S), ne = () => Nt(!0, s), F = !1;
-		y ||= new bt(ne);
-		let I = y, L = async (e) => {
-			let t = await e.getOffer(Date.now() - e.created > _t);
-			if (!t || t.type !== "offer") throw J("failed to get offer for peer");
-			return (await N(t)).sdp;
-		}, re = (e, t) => {
-			let n = zn(V.peerStates, e);
-			n.answeringExpiryTimer = q(n.answeringExpiryTimer), n.answeringPeer = null;
-			let { proxy: r, isNew: i } = c.bind(f, ee, t, { onDetach: () => {
-				let n = V.peerStates[e];
-				n?.connectedPeer === t.peer && (n.connectedPeer = null, n.connectedPeerUnhealthySinceMs = null, $(n));
+		}), P = N(bt), F = N(yt), I = c.getMap(S), L = () => Lt(!0, s), R = !1;
+		y ||= new wt(L);
+		let z = y, ee = async (e) => {
+			let t = await e.getOffer(Date.now() - e.created > xt);
+			if (!t || t.type !== "offer") throw q("failed to get offer for peer");
+			return (await F(t)).sdp;
+		}, B = (e, t) => {
+			let n = Wn(U.peerStates, e);
+			n.answeringExpiryTimer = K(n.answeringExpiryTimer), n.answeringPeer = null;
+			let { proxy: r, isNew: i } = c.bind(f, A, t, { onDetach: () => {
+				let n = U.peerStates[e];
+				n?.connectedPeer === t.peer && (n.connectedPeer = null, n.connectedPeerUnhealthySinceMs = null, Gn(n));
 			} });
-			n.connectedPeer = t.peer, n.connectedPeerUnhealthySinceMs = null, $(n), i && me(r, e), Gn(n, I);
-		}, ie = (e, t, n) => {
-			if (j) {
+			n.connectedPeer = t.peer, n.connectedPeerUnhealthySinceMs = null, Gn(n), i && pe(r, e), Zn(n, z);
+		}, V = (e, t, n) => {
+			if (M) {
 				e.destroy();
 				return;
 			}
-			let r = zn(V.peerStates, t);
+			let r = Wn(U.peerStates, t);
 			if (r.connectedPeer) {
-				let n = P[t];
+				let n = I[t];
 				if (n && r.connectedPeer === n.peer && n.bindings[f]) return;
 				r.connectedPeer !== e && !e.isDead && e.destroy();
 				return;
 			}
-			let i = P[t];
+			let i = I[t];
 			if (i && c.getHealth(i.peer) === "stale" && (c.clear(S, t, { destroyPeer: !0 }), i = void 0), i && i.peer !== e) {
-				e.isDead || e.destroy(), re(t, i);
+				e.isDead || e.destroy(), B(t, i);
 				return;
 			}
 			let a = !i;
-			i ||= c.register(S, t, e, A), re(t, i), a && p(S, i);
-		}, ae = (e, t) => {
-			if (j) return;
-			let n = V.peerStates[t];
-			n?.connectedPeer === e && (Vn(n, t, "close-event"), se(), !R && F && V.requeueAnnounce?.());
-		}, R = !!s.passive, z = null, B, oe = K, se = () => {
-			if (!R || !V.isActive) return;
+			i ||= c.register(S, t, e, j), B(t, i), a && p(S, i);
+		}, te = (e, t) => {
+			if (M) return;
+			let n = U.peerStates[t];
+			n?.connectedPeer === e && (qn(n, t, "close-event"), ae(), !H && R && U.requeueAnnounce?.());
+		}, H = !!s.passive, ne = null, re, ie = Re, ae = () => {
+			if (!H || !U.isActive) return;
 			let e = !1;
-			Fe(V.peerStates).forEach(([t, n]) => {
-				n.connectedPeer || n.answeringPeer || n.offerInitPromise || n.offerPeer || n.offerRelays.some(Boolean) ? e = !0 : n.status === "idle" && delete V.peerStates[t];
-			}), e || (V.isActive = !1, B = q(B), H.forEach(q), H.length = 0, oe(), z?.roomToken && m(S, z.roomToken, !1));
-		}, V = {
+			Pe(U.peerStates).forEach(([t, n]) => {
+				n.connectedPeer || n.answeringPeer || n.offerInitPromise || n.offerPeer || n.offerRelays.some(Boolean) ? e = !0 : n.status === "idle" && delete U.peerStates[t];
+			}), e || (U.isActive = !1, re = K(re), de.forEach(K), de.length = 0, ie(), ne?.roomToken && m(S, ne.roomToken, !1));
+		}, U = {
 			appId: S,
 			roomId: f,
 			config: s,
@@ -1941,74 +1941,74 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			rootTopicPlaintext: E,
 			rootTopicP: D,
 			selfTopicP: O,
-			toPlain: M,
-			toCipher: N,
-			isLeaving: () => j,
-			isPassive: R,
-			isActive: !R,
+			toPlain: P,
+			toCipher: F,
+			isLeaving: () => M,
+			isPassive: H,
+			isActive: !H,
 			onJoinError: C,
 			sharedPeers: c,
-			offerPool: I,
-			encryptOffer: L,
-			initPeer: Nt,
-			connectPeer: ie,
-			disconnectPeer: ae,
-			attachSharedPeerToRoom: re,
-			checkDeactivate: se,
+			offerPool: z,
+			encryptOffer: ee,
+			initPeer: Lt,
+			connectPeer: V,
+			disconnectPeer: te,
+			attachSharedPeerToRoom: B,
+			checkDeactivate: ae,
 			announceIntervals: [],
-			announceIntervalMs: nr
-		}, ce = {
+			announceIntervalMs: cr
+		}, oe = {
 			config: s,
 			appId: S,
 			roomId: f,
-			isPassive: R
-		}, le = tr(V);
+			isPassive: H
+		}, se = sr(U);
 		if (!_) {
 			let t = e(s);
-			v = (Array.isArray(t) ? t : [t]).map((e) => Promise.resolve(e)), _ = !0, b = s.relayConfig?.manualReconnection ? K : it();
+			v = (Array.isArray(t) ? t : [t]).map((e) => Promise.resolve(e)), _ = !0, b = s.relayConfig?.manualReconnection ? Re : ct();
 		}
-		!R && !I.isActive && I.warmup(), V.announceIntervals = v.map(() => nr);
-		let ue = v.map(() => nr), de = v.map(() => 0), fe = v.map(() => 0), H = [], pe = v.map(async (e, n) => t(await e, await D, await O, le(n), (e) => I.getOffers(e, L), ce));
-		Ne([D, O]).then(([e, t]) => {
-			if (j) return;
+		!H && !z.isActive && z.warmup(), U.announceIntervals = v.map(() => cr);
+		let ce = v.map(() => cr), le = v.map(() => 0), ue = v.map(() => 0), de = [], fe = v.map(async (e, n) => t(await e, await D, await O, se(n), (e) => z.getOffers(e, ee), oe));
+		Me([D, O]).then(([e, t]) => {
+			if (M) return;
 			let i = async (r, a) => {
-				if (j || R && !V.isActive) return;
-				let o = R ? { passive: !0 } : void 0, c;
+				if (M || H && !U.isActive) return;
+				let o = H ? { passive: !0 } : void 0, c;
 				try {
-					c = await n(r, e, t, o, ce), fe[a] = 0;
+					c = await n(r, e, t, o, oe), ue[a] = 0;
 				} catch (e) {
-					let t = fe[a] ?? 0;
-					t === 0 && s.relayConfig?.warnOnRelayFailure !== !1 && console.warn(`${U}: announce failed - ${ze(e, "")}`), fe[a] = t + 1;
+					let t = ue[a] ?? 0;
+					t === 0 && s.relayConfig?.warnOnRelayFailure !== !1 && console.warn(`${De}: announce failed - ${Be(e, "")}`), ue[a] = t + 1;
 				}
-				if (j || R && !V.isActive || c && typeof c != "number" && "stopAnnouncing" in c) return;
-				typeof c == "number" ? (V.announceIntervals[a] = c, ue[a] = c) : c && (ue[a] = c.nextAnnounceMs, F ||= c.reannounceOnDisconnect === !0);
-				let l = de[a] ?? 0;
-				de[a] = l + 1;
-				let u = ue[a] ?? nr, d = rr[l];
-				H[a] = setTimeout(() => {
+				if (M || H && !U.isActive || c && typeof c != "number" && "stopAnnouncing" in c) return;
+				typeof c == "number" ? (U.announceIntervals[a] = c, ce[a] = c) : c && (ce[a] = c.nextAnnounceMs, R ||= c.reannounceOnDisconnect === !0);
+				let l = le[a] ?? 0;
+				le[a] = l + 1;
+				let u = ce[a] ?? cr, d = lr[l];
+				de[a] = setTimeout(() => {
 					i(r, a);
 				}, typeof d == "number" ? Math.min(u, d) : u);
 			};
-			oe = () => {
+			ie = () => {
 				r && v.forEach(async (n) => {
 					let i = await n;
-					j || r(i, e, t, ce);
+					M || r(i, e, t, oe);
 				});
-			}, V.requeueAnnounce = () => {
-				H.forEach(q), H.length = 0, B = q(B), I.isActive || I.warmup(), z?.roomToken && m(S, z.roomToken, !0), B = setTimeout(se, ir), v.forEach(async (e, t) => {
+			}, U.requeueAnnounce = () => {
+				de.forEach(K), de.length = 0, re = K(re), z.isActive || z.warmup(), ne?.roomToken && m(S, ne.roomToken, !0), re = setTimeout(ae, ur), v.forEach(async (e, t) => {
 					let n = await e;
-					n && !j && (de[t] = 0, i(n, t));
+					n && !M && (le[t] = 0, i(n, t));
 				});
-			}, pe.forEach(async (e, t) => {
-				if (await e, j) return;
+			}, fe.forEach(async (e, t) => {
+				if (await e, M) return;
 				let n = await v[t];
-				n && !j && (!R || V.isActive) && i(n, t);
+				n && !M && (!H || U.isActive) && i(n, t);
 			});
 		});
-		let me = K, { compose: he } = St(s.password ?? "", S, f), ge = he(w), _e = {
-			...ge ? { onPeerHandshake: ge } : {},
+		let pe = Re, { compose: W } = Et(s.password ?? "", S, f), me = W(w), G = {
+			...me ? { onPeerHandshake: me } : {},
 			...T === void 0 ? {} : { handshakeTimeoutMs: T },
-			isPassive: R,
+			isPassive: H,
 			onHandshakeError: (e, t) => C?.({
 				error: t.replace(/^handshake failed: /, ""),
 				appId: S,
@@ -2017,132 +2017,132 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 			})
 		};
 		i[S] ??= {};
-		let ve = u(S), ye = hn((e) => me = e, (e) => {
-			if (j) return;
-			let t = V.peerStates[e];
-			t?.connectedPeer && (t.connectedPeer = null, $(t), se());
+		let he = u(S), ge = bn((e) => pe = e, (e) => {
+			if (M) return;
+			let t = U.peerStates[e];
+			t?.connectedPeer && (t.connectedPeer = null, Gn(t), ae());
 		}, () => {
-			j = !0, me = K;
+			M = !0, pe = Re;
 			let e = a[S]?.[f];
-			e?.roomToken && (m(S, e.roomToken, !1), delete o[S]?.[e.roomToken], o[S] && !G(o[S]).length && delete o[S]), a[S] && (delete a[S][f], G(a[S]).length || delete a[S]), Fe(V.peerStates).forEach(([e, t]) => {
-				if (t.answeringExpiryTimer = q(t.answeringExpiryTimer), t.connectedPeer && !t.connectedPeer.isDead) {
-					let n = P[e];
+			e?.roomToken && (m(S, e.roomToken, !1), delete o[S]?.[e.roomToken], o[S] && !Ie(o[S]).length && delete o[S]), a[S] && (delete a[S][f], Ie(a[S]).length || delete a[S]), Pe(U.peerStates).forEach(([e, t]) => {
+				if (t.answeringExpiryTimer = K(t.answeringExpiryTimer), t.connectedPeer && !t.connectedPeer.isDead) {
+					let n = I[e];
 					(!n || n.peer !== t.connectedPeer) && t.connectedPeer.destroy();
 				}
-				t.answeringPeer && !t.answeringPeer.isDead && t.answeringPeer.destroy(), Gn(t, I), t.connectedPeer = null, t.answeringPeer = null, $(t);
-			}), i[S] && (delete i[S][f], G(i[S]).length === 0 && delete i[S]), H.forEach(q), B = q(B), pe.forEach(async (e) => {
+				t.answeringPeer && !t.answeringPeer.isDead && t.answeringPeer.destroy(), Zn(t, z), t.connectedPeer = null, t.answeringPeer = null, Gn(t);
+			}), i[S] && (delete i[S][f], Ie(i[S]).length === 0 && delete i[S]), de.forEach(K), re = K(re), fe.forEach(async (e) => {
 				(await e)();
-			}), !l() && (_ = !1, I.destroy(), y = null, b(), g(S));
-		}, _e);
-		return z = {
+			}), !l() && (_ = !1, z.destroy(), y = null, b(), g(S));
+		}, G);
+		return ne = {
 			roomToken: null,
-			roomTokenPromise: ee,
-			attachSharedPeerToRoom: re,
-			shouldAdvertise: () => !R || V.isActive
-		}, ve[f] = z, ee.then((e) => {
-			let t = z;
-			t && !j && a[S]?.[f] === t && (t.roomToken = e, d(S)[e] = f, Le(P).forEach((t) => {
-				t.remoteRoomTokens.has(e) && re(t.peerId, t);
-			}), (!R || V.isActive) && m(S, e, !0));
-		}), i[S][f] = ye;
+			roomTokenPromise: A,
+			attachSharedPeerToRoom: B,
+			shouldAdvertise: () => !H || U.isActive
+		}, he[f] = ne, A.then((e) => {
+			let t = ne;
+			t && !M && a[S]?.[f] === t && (t.roomToken = e, d(S)[e] = f, Le(I).forEach((t) => {
+				t.remoteRoomTokens.has(e) && B(t.peerId, t);
+			}), (!H || U.isActive) && m(S, e, !0));
+		}), i[S][f] = ge;
 	};
-}, sr = [
+}, pr = [
 	"offer",
 	"answer",
 	"candidate"
-], cr = 6e4, lr = (e) => {
+], mr = 6e4, hr = (e) => {
 	if (typeof e == "string") try {
-		let t = qe(e);
+		let t = Ze(e);
 		return t && typeof t == "object" ? t : null;
 	} catch {
 		return null;
 	}
 	return e;
-}, ur = (e, t) => typeof e[t] == "string" && e[t] ? e[t] : void 0, dr = (e) => sr.some((t) => t in e && (typeof e[t] != "string" || e[t] === "")), fr = (e) => {
-	let t = lr(e);
-	if (!t || dr(t)) return !1;
-	let n = ur(t, "peerId");
-	return !(!n || n === W || t.passive === !0 || ur(t, "answer") || ur(t, "candidate"));
-}, pr = (e) => {
-	if (!e) throw J("topic strategy missing room context");
+}, gr = (e, t) => typeof e[t] == "string" && e[t] ? e[t] : void 0, _r = (e) => pr.some((t) => t in e && (typeof e[t] != "string" || e[t] === "")), vr = (e) => {
+	let t = hr(e);
+	if (!t || _r(t)) return !1;
+	let n = gr(t, "peerId");
+	return !(!n || n === je || t.passive === !0 || gr(t, "answer") || gr(t, "candidate"));
+}, yr = (e) => {
+	if (!e) throw q("topic strategy missing room context");
 	return e;
-}, mr = (e, t, n, r) => ({
+}, br = (e, t, n, r) => ({
 	kind: t,
 	appId: e.appId,
 	roomId: e.roomId,
 	rootTopic: n,
 	selfTopic: r
-}), hr = (e, t, n, r) => ({
+}), xr = (e, t, n, r) => ({
 	kind: t,
 	appId: e.appId,
 	roomId: e.roomId,
 	rootTopic: n,
 	selfTopic: r
-}), gr = ({ steadyAnnounceIntervalMs: e = cr, reannounceOnDisconnect: t = !0, init: n, subscribeTopic: r, publishTopic: i, unpublishTopic: a }) => or({
+}), Sr = ({ steadyAnnounceIntervalMs: e = mr, reannounceOnDisconnect: t = !0, init: n, subscribeTopic: r, publishTopic: i, unpublishTopic: a }) => fr({
 	init: n,
 	subscribe: async (e, t, n, a, o, s) => {
-		let c = pr(s), l = (r, a) => void i(e, r, a, hr(c, "signal", t, n)), u = null, d = !1, f = null, p = !1, m = (e) => {
+		let c = yr(s), l = (r, a) => void i(e, r, a, xr(c, "signal", t, n)), u = null, d = !1, f = null, p = !1, m = (e) => {
 			d || (d = !0, e());
 		}, h = () => (f ||= Promise.resolve(r(e, n, (e, t) => {
 			p || a(e, t, l);
-		}, mr(c, "self", t, n))).then((e) => {
+		}, br(c, "self", t, n))).then((e) => {
 			u = e, p && m(e);
 		}), f);
 		c.isPassive || await h();
 		let g = await r(e, t, async (e, t) => {
-			p || (c.isPassive && fr(t) && await h(), p || await a(e, t, l));
-		}, mr(c, "root", t, n));
+			p || (c.isPassive && vr(t) && await h(), p || await a(e, t, l));
+		}, br(c, "root", t, n));
 		return () => {
 			p = !0, u && m(u), g();
 		};
 	},
 	announce: async (n, r, a, o, s) => {
-		let c = pr(s), l = await i(n, r, Z({
-			peerId: W,
+		let c = yr(s), l = await i(n, r, Xe({
+			peerId: je,
 			...o
-		}), hr(c, "announce", r, a));
+		}), xr(c, "announce", r, a));
 		return typeof l == "number" || l !== void 0 && "stopAnnouncing" in l ? l : {
 			nextAnnounceMs: l?.nextAnnounceMs ?? e,
 			reannounceOnDisconnect: l?.reannounceOnDisconnect ?? t
 		};
 	},
-	...a ? { deactivate: (e, t, n, r) => a(e, t, hr(pr(r), "announce", t, n)) } : {}
-}), _r = rt((e) => e.socket), vr = 5, yr = "x", br = "EVENT", { secretKey: xr, publicKey: Sr } = Se.keygen(), Cr = Ue(Sr), wr = {}, Tr = {}, Er = {}, Dr = 250, Or = 6e4, kr = 9e5, Ar = 5333, jr = /* @__PURE__ */ new WeakMap(), Mr = /* @__PURE__ */ new WeakSet(), Nr = /* @__PURE__ */ new WeakMap(), Pr = (e) => {
-	let t = jr.get(e), n = Math.min(t?.delayMs ? Math.max(Or, t.delayMs * 2) : Or, kr);
-	return jr.set(e, {
+	...a ? { deactivate: (e, t, n, r) => a(e, t, xr(yr(r), "announce", t, n)) } : {}
+}), Cr = st((e) => e.socket), wr = 5, Tr = "x", Er = "EVENT", { secretKey: Dr, publicKey: Or } = ye.keygen(), kr = Ke(Or), Ar = {}, jr = {}, Mr = {}, Nr = 250, Pr = 6e4, Fr = 9e5, Ir = 5333, Lr = /* @__PURE__ */ new WeakMap(), Rr = /* @__PURE__ */ new WeakSet(), zr = /* @__PURE__ */ new WeakMap(), Br = (e) => {
+	let t = Lr.get(e), n = Math.min(t?.delayMs ? Math.max(Pr, t.delayMs * 2) : Pr, Fr);
+	return Lr.set(e, {
 		delayMs: n,
 		untilMs: Date.now() + n
 	}), n;
-}, Fr = (e) => {
-	let t = jr.get(e);
+}, Vr = (e) => {
+	let t = Lr.get(e);
 	if (!t) return 0;
 	let n = t.untilMs - Date.now();
 	return n > 0 ? n : 0;
-}, Ir = (e) => ({ nextAnnounceMs: e }), Lr = { stopAnnouncing: !0 }, Rr = (e) => {
-	if (Mr.has(e)) return !1;
-	let t = Nr.get(e);
-	return t && (clearTimeout(t.timer), Nr.delete(e)), Mr.add(e), jr.delete(e), e.close?.(), !0;
-}, zr = (e, t) => {
-	let n = Nr.get(e);
+}, Hr = (e) => ({ nextAnnounceMs: e }), Ur = { stopAnnouncing: !0 }, Wr = (e) => {
+	if (Rr.has(e)) return !1;
+	let t = zr.get(e);
+	return t && (clearTimeout(t.timer), zr.delete(e)), Rr.add(e), Lr.delete(e), e.close?.(), !0;
+}, Gr = (e, t) => {
+	let n = zr.get(e);
 	n && (clearTimeout(n.timer), n.eventIds.add(t));
 	let r = n?.eventIds ?? /* @__PURE__ */ new Set([t]), i = setTimeout(() => {
-		Nr.delete(e);
-	}, Ar);
-	Nr.set(e, {
+		zr.delete(e);
+	}, Ir);
+	zr.set(e, {
 		eventIds: r,
 		timer: i
 	});
-}, Br = (e, t) => {
-	let n = Nr.get(e);
-	return n?.eventIds.has(t) ? (clearTimeout(n.timer), Nr.delete(e), !0) : !1;
-}, Vr = () => Math.floor(Date.now() / 1e3), Hr = (e) => Er[e] ??= Je(e, 1e4) + 2e4, Ur = async (e, t) => {
+}, Kr = (e, t) => {
+	let n = zr.get(e);
+	return n?.eventIds.has(t) ? (clearTimeout(n.timer), zr.delete(e), !0) : !1;
+}, qr = () => Math.floor(Date.now() / 1e3), Jr = (e) => Mr[e] ??= Qe(e, 1e4) + 2e4, Yr = async (e, t) => {
 	let n = {
-		kind: Hr(e),
-		tags: [[yr, e]],
-		created_at: Vr(),
+		kind: Jr(e),
+		tags: [[Tr, e]],
+		created_at: qr(),
 		content: t,
-		pubkey: Cr
-	}, r = await lt("SHA-256", Z([
+		pubkey: kr
+	}, r = await pt("SHA-256", Xe([
 		0,
 		n.pubkey,
 		n.created_at,
@@ -2150,106 +2150,11068 @@ var ne = (e, t, n) => N.multiply(t, !1).add(e.multiply(n, !1)).assertValidity(),
 		n.tags,
 		n.content
 	]));
-	return Z([br, {
+	return Xe([Er, {
 		...n,
-		id: Ue(r),
-		sig: Ue(await Se.signAsync(r, xr))
+		id: Ke(r),
+		sig: Ke(await ye.signAsync(r, Dr))
 	}]);
-}, Wr = {}, Gr = (e) => {
+}, Xr = {}, Zr = (e) => {
 	e.flushWaiters.forEach((e) => e()), e.flushWaiters.clear();
-}, Kr = (e, t, n) => {
-	let r = Wr[e.url] ??= {
+}, Qr = (e, t, n) => {
+	let r = Xr[e.url] ??= {
 		subIds: [],
 		topics: /* @__PURE__ */ new Map(),
 		updateTimer: null,
 		flushWaiters: /* @__PURE__ */ new Set()
 	};
-	r.topics.set(t, n), Jr(e, r);
-}, qr = (e, t) => {
-	let n = Wr[e.url];
-	n && (n.topics.delete(t), n.topics.size === 0 ? (n.updateTimer !== null && (clearTimeout(n.updateTimer), n.updateTimer = null), Gr(n), n.subIds.forEach((t) => e.send(Z(["CLOSE", t]))), delete Wr[e.url]) : Jr(e, n));
-}, Jr = (e, t) => {
+	r.topics.set(t, n), ei(e, r);
+}, $r = (e, t) => {
+	let n = Xr[e.url];
+	n && (n.topics.delete(t), n.topics.size === 0 ? (n.updateTimer !== null && (clearTimeout(n.updateTimer), n.updateTimer = null), Zr(n), n.subIds.forEach((t) => e.send(Xe(["CLOSE", t]))), delete Xr[e.url]) : ei(e, n));
+}, ei = (e, t) => {
 	t.updateTimer === null && (t.updateTimer = setTimeout(() => {
 		t.updateTimer = null;
 		try {
-			Xr(e);
+			ni(e);
 		} finally {
-			Gr(t);
+			Zr(t);
 		}
 	}, 0));
-}, Yr = (e) => {
-	let t = Wr[e.url];
+}, ti = (e) => {
+	let t = Xr[e.url];
 	return !t || t.updateTimer === null ? Promise.resolve() : new Promise((e) => t.flushWaiters.add(e));
-}, Xr = (e) => {
-	let t = Wr[e.url];
+}, ni = (e) => {
+	let t = Xr[e.url];
 	if (!t || t.topics.size === 0) return;
-	let n = [...t.topics.keys()], r = [], i = Vr();
-	for (let e = 0; e < n.length; e += Dr) r.push(n.slice(e, e + Dr));
+	let n = [...t.topics.keys()], r = [], i = qr();
+	for (let e = 0; e < n.length; e += Nr) r.push(n.slice(e, e + Nr));
 	for (; t.subIds.length > r.length;) {
 		let n = t.subIds.pop();
-		n && e.send(Z(["CLOSE", n]));
+		n && e.send(Xe(["CLOSE", n]));
 	}
 	r.forEach((n, r) => {
-		let a = t.subIds[r] ??= Me(64);
-		e.send(Z([
+		let a = t.subIds[r] ??= Ae(64);
+		e.send(Xe([
 			"REQ",
 			a,
 			{
-				kinds: [...new Set(n.map(Hr))],
+				kinds: [...new Set(n.map(Jr))],
 				since: i,
 				"#x": n
 			}
 		]));
 	});
-}, Zr = (e) => {
-	let t = Wr[e.url];
-	t && t.topics.size > 0 && Xr(e);
-}, Qr = gr({
-	init: (e) => Ke(e, $r, vr, !0).map((t) => {
-		let n = _r.register(t, () => nt(t, (t) => {
-			let [r, i, a, o] = qe(t);
-			if (r !== br) {
-				let t = `${U}: relay failure from ${n.url} - `, s = r === "CLOSED" && typeof a == "string" ? a : o, c = r === "OK" && a === !1, l = c && s?.startsWith("rate-limited:"), u = c && s?.startsWith("duplicate:"), d = r === "CLOSED" || c && !l && !u, f = r === "OK" && Br(n, i);
-				if (d && !Rr(n)) return;
-				l ? Pr(n) : f && jr.delete(n), !u && e.relayConfig?.warnOnRelayFailure !== !1 && (r === "NOTICE" ? console.warn(t + i) : (c || r === "CLOSED") && console.warn(t + s));
+}, ri = (e) => {
+	let t = Xr[e.url];
+	t && t.topics.size > 0 && ni(e);
+}, ii = Sr({
+	init: (e) => Ye(e, ai, wr, !0).map((t) => {
+		let n = Cr.register(t, () => ot(t, (t) => {
+			let [r, i, a, o] = Ze(t);
+			if (r !== Er) {
+				let t = `${De}: relay failure from ${n.url} - `, s = r === "CLOSED" && typeof a == "string" ? a : o, c = r === "OK" && a === !1, l = c && s?.startsWith("rate-limited:"), u = c && s?.startsWith("duplicate:"), d = r === "CLOSED" || c && !l && !u, f = r === "OK" && Kr(n, i);
+				if (d && !Wr(n)) return;
+				l ? Br(n) : f && Lr.delete(n), !u && e.relayConfig?.warnOnRelayFailure !== !1 && (r === "NOTICE" ? console.warn(t + i) : (c || r === "CLOSED") && console.warn(t + s));
 				return;
 			}
 			if (a && typeof a == "object" && "content" in a) {
-				let { content: e } = a, t = Tr[i];
+				let { content: e } = a, t = jr[i];
 				if (t) {
-					t(wr[i] ?? "", e);
+					t(Ar[i] ?? "", e);
 					return;
 				}
-				let r = Wr[n.url];
+				let r = Xr[n.url];
 				if (r?.subIds.includes(i) && a.tags) {
-					let t = a.tags.find((e) => e[0] === yr);
+					let t = a.tags.find((e) => e[0] === Tr);
 					t?.[1] && r.topics.get(t[1])?.(t[1], e);
 				}
 			}
-		}, () => Zr(n)));
+		}, () => ri(n)));
 		return n.ready;
 	}),
 	subscribeTopic: (e, t, n, r) => {
-		Kr(e, t, (e, t) => void n(e, t));
+		Qr(e, t, (e, t) => void n(e, t));
 		let i = () => {
-			qr(e, t);
+			$r(e, t);
 		};
-		return r.kind === "root" ? Yr(e).then(() => i) : i;
+		return r.kind === "root" ? ti(e).then(() => i) : i;
 	},
 	publishTopic: async (e, t, n, r) => {
-		if (Mr.has(e) || e.isClosed) return r.kind === "announce" ? Lr : void 0;
+		if (Rr.has(e) || e.isClosed) return r.kind === "announce" ? Ur : void 0;
 		if (r.kind === "announce") {
-			let t = Fr(e);
-			if (t > 0) return Ir(Math.max(Or, t));
+			let t = Vr(e);
+			if (t > 0) return Hr(Math.max(Pr, t));
 		}
-		let i = await Ur(t, typeof n == "string" ? n : Z(n)), a = e.socket.readyState === 1;
+		let i = await Yr(t, typeof n == "string" ? n : Xe(n)), a = e.socket.readyState === 1;
 		if (e.send(i), r.kind !== "announce") return;
-		if (!a) return Ir(Pr(e));
-		let o = qe(i)[1].id;
-		return zr(e, o), Ir(Or);
+		if (!a) return Hr(Br(e));
+		let o = Ze(i)[1].id;
+		return Gr(e, o), Hr(Pr);
 	}
 });
-_r.getSockets;
-var $r = (/* @__PURE__ */ "basspistol.org,bucket.coracle.social,chorus.pjv.me,koru.bitcointxoko.org,nos.lol,nostr-01.uid.ovh,nostr-01.yakihonne.com,nostr-relay.corb.net,nostr.data.haus,nostr.islandarea.net,nostr.sathoarder.com,nostr.tegila.com.br,nostr.vulpem.com,purplerelay.com,relay-can.zombi.cloudrodion.com,relay-rpi.edufeed.org,relay.agorist.space,relay.artio.inf.unibe.ch,relay.mostr.pub,relay.mostro.network,relay.sigit.io,relay02.lnfi.network,schnorr.me,social.amanah.eblessing.co,staging.yabu.me,strfry.shock.network,top.testrelay.top,yabu.me/v2".split(",")).map((e) => "wss://" + e);
+Cr.getSockets;
+var ai = (/* @__PURE__ */ "basspistol.org,bucket.coracle.social,chorus.pjv.me,koru.bitcointxoko.org,nos.lol,nostr-01.uid.ovh,nostr-01.yakihonne.com,nostr-relay.corb.net,nostr.data.haus,nostr.islandarea.net,nostr.sathoarder.com,nostr.tegila.com.br,nostr.vulpem.com,purplerelay.com,relay-can.zombi.cloudrodion.com,relay-rpi.edufeed.org,relay.agorist.space,relay.artio.inf.unibe.ch,relay.mostr.pub,relay.mostro.network,relay.sigit.io,relay02.lnfi.network,schnorr.me,social.amanah.eblessing.co,staging.yabu.me,strfry.shock.network,top.testrelay.top,yabu.me/v2".split(",")).map((e) => "wss://" + e), oi = Object.defineProperty, si = Object.getOwnPropertyDescriptor, ci = Object.getOwnPropertyNames, li = Object.prototype.hasOwnProperty, ui = (e, t) => () => (e && (t = e(e = 0)), t), J = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), di = (e, t) => {
+	for (var n in t) oi(e, n, {
+		get: t[n],
+		enumerable: !0
+	});
+}, fi = (e, t, n, r) => {
+	if (t && typeof t == "object" || typeof t == "function") for (let i of ci(t)) !li.call(e, i) && i !== n && oi(e, i, {
+		get: () => t[i],
+		enumerable: !(r = si(t, i)) || r.enumerable
+	});
+	return e;
+}, Y = (e) => fi(oi({}, "__esModule", { value: !0 }), e), X = ui(() => {}), Z = {};
+di(Z, {
+	_debugEnd: () => pa,
+	_debugProcess: () => fa,
+	_events: () => ja,
+	_eventsCount: () => Ma,
+	_exiting: () => Zi,
+	_fatalExceptions: () => la,
+	_getActiveHandles: () => Si,
+	_getActiveRequests: () => xi,
+	_kill: () => ea,
+	_linkedBinding: () => yi,
+	_maxListeners: () => Aa,
+	_preload_modules: () => Ta,
+	_rawDebug: () => Ji,
+	_startProfilerIdleNotifier: () => ma,
+	_stopProfilerIdleNotifier: () => ha,
+	_tickCallback: () => da,
+	abort: () => ya,
+	addListener: () => Na,
+	allowedNodeEnvironmentFlags: () => sa,
+	arch: () => Pi,
+	argv: () => Li,
+	argv0: () => wa,
+	assert: () => Ci,
+	binding: () => Hi,
+	browser: () => qi,
+	chdir: () => Gi,
+	config: () => Qi,
+	cpuUsage: () => ta,
+	cwd: () => Wi,
+	debugPort: () => Ca,
+	default: () => Va,
+	dlopen: () => bi,
+	domain: () => Xi,
+	emit: () => Ra,
+	emitWarning: () => Vi,
+	env: () => Ii,
+	execArgv: () => Ri,
+	execPath: () => Sa,
+	exit: () => aa,
+	features: () => ca,
+	hasUncaughtExceptionCaptureCallback: () => wi,
+	hrtime: () => Ei,
+	kill: () => ia,
+	listeners: () => Oi,
+	memoryUsage: () => ra,
+	moduleLoadList: () => Yi,
+	nextTick: () => gi,
+	off: () => Fa,
+	on: () => Di,
+	once: () => Pa,
+	openStdin: () => oa,
+	pid: () => ba,
+	platform: () => Fi,
+	ppid: () => xa,
+	prependListener: () => za,
+	prependOnceListener: () => Ba,
+	reallyExit: () => $i,
+	release: () => Ki,
+	removeAllListeners: () => La,
+	removeListener: () => Ia,
+	resourceUsage: () => na,
+	setSourceMapsEnabled: () => Ea,
+	setUncaughtExceptionCaptureCallback: () => ua,
+	stderr: () => _a,
+	stdin: () => va,
+	stdout: () => ga,
+	title: () => Ni,
+	umask: () => Ui,
+	uptime: () => Ti,
+	version: () => zi,
+	versions: () => Bi
+});
+function pi(e) {
+	throw Error("Node.js process " + e + " is not supported by JSPM core outside of Node.js");
+}
+function mi() {
+	!Ai || !ji || (Ai = !1, ji.length ? ki = ji.concat(ki) : Mi = -1, ki.length && hi());
+}
+function hi() {
+	if (!Ai) {
+		var e = setTimeout(mi, 0);
+		Ai = !0;
+		for (var t = ki.length; t;) {
+			for (ji = ki, ki = []; ++Mi < t;) ji && ji[Mi].run();
+			Mi = -1, t = ki.length;
+		}
+		ji = null, Ai = !1, clearTimeout(e);
+	}
+}
+function gi(e) {
+	var t = Array(arguments.length - 1);
+	if (arguments.length > 1) for (var n = 1; n < arguments.length; n++) t[n - 1] = arguments[n];
+	ki.push(new _i(e, t)), ki.length === 1 && !Ai && setTimeout(hi, 0);
+}
+function _i(e, t) {
+	this.fun = e, this.array = t;
+}
+function vi() {}
+function yi(e) {
+	pi("_linkedBinding");
+}
+function bi(e) {
+	pi("dlopen");
+}
+function xi() {
+	return [];
+}
+function Si() {
+	return [];
+}
+function Ci(e, t) {
+	if (!e) throw Error(t || "assertion error");
+}
+function wi() {
+	return !1;
+}
+function Ti() {
+	return Da.now() / 1e3;
+}
+function Ei(e) {
+	var t = Math.floor((Date.now() - Da.now()) * .001), n = Da.now() * .001, r = Math.floor(n) + t, i = Math.floor(n % 1 * 1e9);
+	return e && (r -= e[0], i -= e[1], i < 0 && (r--, i += ka)), [r, i];
+}
+function Di() {
+	return Va;
+}
+function Oi(e) {
+	return [];
+}
+var ki, Ai, ji, Mi, Ni, Pi, Fi, Ii, Li, Ri, zi, Bi, Vi, Hi, Ui, Wi, Gi, Ki, qi, Ji, Yi, Xi, Zi, Qi, $i, ea, ta, na, ra, ia, aa, oa, sa, ca, la, ua, da, fa, pa, ma, ha, ga, _a, va, ya, ba, xa, Sa, Ca, wa, Ta, Ea, Da, Oa, ka, Aa, ja, Ma, Na, Pa, Fa, Ia, La, Ra, za, Ba, Va, Ha = ui(() => {
+	X(), $(), Q(), ki = [], Ai = !1, Mi = -1, _i.prototype.run = function() {
+		this.fun.apply(null, this.array);
+	}, Ni = "browser", Pi = "x64", Fi = "browser", Ii = {
+		PATH: "/usr/bin",
+		LANG: typeof navigator < "u" ? navigator.language + ".UTF-8" : void 0,
+		PWD: "/",
+		HOME: "/home",
+		TMP: "/tmp"
+	}, Li = ["/usr/bin/node"], Ri = [], zi = "v16.8.0", Bi = {}, Vi = function(e, t) {
+		console.warn((t ? t + ": " : "") + e);
+	}, Hi = function(e) {
+		pi("binding");
+	}, Ui = function(e) {
+		return 0;
+	}, Wi = function() {
+		return "/";
+	}, Gi = function(e) {}, Ki = {
+		name: "node",
+		sourceUrl: "",
+		headersUrl: "",
+		libUrl: ""
+	}, qi = !0, Ji = vi, Yi = [], Xi = {}, Zi = !1, Qi = {}, $i = vi, ea = vi, ta = function() {
+		return {};
+	}, na = ta, ra = ta, ia = vi, aa = vi, oa = vi, sa = {}, ca = {
+		inspector: !1,
+		debug: !1,
+		uv: !1,
+		ipv6: !1,
+		tls_alpn: !1,
+		tls_sni: !1,
+		tls_ocsp: !1,
+		tls: !1,
+		cached_builtins: !0
+	}, la = vi, ua = vi, da = vi, fa = vi, pa = vi, ma = vi, ha = vi, ga = void 0, _a = void 0, va = void 0, ya = vi, ba = 2, xa = 1, Sa = "/bin/usr/node", Ca = 9229, wa = "node", Ta = [], Ea = vi, Da = {
+		now: typeof performance < "u" ? performance.now.bind(performance) : void 0,
+		timing: typeof performance < "u" ? performance.timing : void 0
+	}, Da.now === void 0 && (Oa = Date.now(), Da.timing && Da.timing.navigationStart && (Oa = Da.timing.navigationStart), Da.now = () => Date.now() - Oa), ka = 1e9, Ei.bigint = function(e) {
+		var t = Ei(e);
+		return typeof BigInt > "u" ? t[0] * ka + t[1] : BigInt(t[0] * ka) + BigInt(t[1]);
+	}, Aa = 10, ja = {}, Ma = 0, Na = Di, Pa = Di, Fa = Di, Ia = Di, La = Di, Ra = vi, za = Di, Ba = Di, Va = {
+		version: zi,
+		versions: Bi,
+		arch: Pi,
+		platform: Fi,
+		browser: qi,
+		release: Ki,
+		_rawDebug: Ji,
+		moduleLoadList: Yi,
+		binding: Hi,
+		_linkedBinding: yi,
+		_events: ja,
+		_eventsCount: Ma,
+		_maxListeners: Aa,
+		on: Di,
+		addListener: Na,
+		once: Pa,
+		off: Fa,
+		removeListener: Ia,
+		removeAllListeners: La,
+		emit: Ra,
+		prependListener: za,
+		prependOnceListener: Ba,
+		listeners: Oi,
+		domain: Xi,
+		_exiting: Zi,
+		config: Qi,
+		dlopen: bi,
+		uptime: Ti,
+		_getActiveRequests: xi,
+		_getActiveHandles: Si,
+		reallyExit: $i,
+		_kill: ea,
+		cpuUsage: ta,
+		resourceUsage: na,
+		memoryUsage: ra,
+		kill: ia,
+		exit: aa,
+		openStdin: oa,
+		allowedNodeEnvironmentFlags: sa,
+		assert: Ci,
+		features: ca,
+		_fatalExceptions: la,
+		setUncaughtExceptionCaptureCallback: ua,
+		hasUncaughtExceptionCaptureCallback: wi,
+		emitWarning: Vi,
+		nextTick: gi,
+		_tickCallback: da,
+		_debugProcess: fa,
+		_debugEnd: pa,
+		_startProfilerIdleNotifier: ma,
+		_stopProfilerIdleNotifier: ha,
+		stdout: ga,
+		stdin: va,
+		stderr: _a,
+		abort: ya,
+		umask: Ui,
+		chdir: Gi,
+		cwd: Wi,
+		env: Ii,
+		title: Ni,
+		argv: Li,
+		execArgv: Ri,
+		pid: ba,
+		ppid: xa,
+		execPath: Sa,
+		debugPort: Ca,
+		hrtime: Ei,
+		argv0: wa,
+		_preload_modules: Ta,
+		setSourceMapsEnabled: Ea
+	};
+}), Q = ui(() => {
+	Ha();
+});
+function Ua() {
+	if (qa) return Ka;
+	qa = !0, Ka.byteLength = s, Ka.toByteArray = l, Ka.fromByteArray = f;
+	for (var e = [], t = [], n = typeof Uint8Array < "u" ? Uint8Array : Array, r = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/", i = 0, a = r.length; i < a; ++i) e[i] = r[i], t[r.charCodeAt(i)] = i;
+	t[45] = 62, t[95] = 63;
+	function o(e) {
+		var t = e.length;
+		if (t % 4 > 0) throw Error("Invalid string. Length must be a multiple of 4");
+		var n = e.indexOf("=");
+		n === -1 && (n = t);
+		var r = n === t ? 0 : 4 - n % 4;
+		return [n, r];
+	}
+	function s(e) {
+		var t = o(e), n = t[0], r = t[1];
+		return (n + r) * 3 / 4 - r;
+	}
+	function c(e, t, n) {
+		return (t + n) * 3 / 4 - n;
+	}
+	function l(e) {
+		for (var r, i = o(e), a = i[0], s = i[1], l = new n(c(e, a, s)), u = 0, d = s > 0 ? a - 4 : a, f = 0; f < d; f += 4) r = t[e.charCodeAt(f)] << 18 | t[e.charCodeAt(f + 1)] << 12 | t[e.charCodeAt(f + 2)] << 6 | t[e.charCodeAt(f + 3)], l[u++] = r >> 16 & 255, l[u++] = r >> 8 & 255, l[u++] = r & 255;
+		return s === 2 && (r = t[e.charCodeAt(f)] << 2 | t[e.charCodeAt(f + 1)] >> 4, l[u++] = r & 255), s === 1 && (r = t[e.charCodeAt(f)] << 10 | t[e.charCodeAt(f + 1)] << 4 | t[e.charCodeAt(f + 2)] >> 2, l[u++] = r >> 8 & 255, l[u++] = r & 255), l;
+	}
+	function u(t) {
+		return e[t >> 18 & 63] + e[t >> 12 & 63] + e[t >> 6 & 63] + e[t & 63];
+	}
+	function d(e, t, n) {
+		for (var r, i = [], a = t; a < n; a += 3) r = (e[a] << 16 & 16711680) + (e[a + 1] << 8 & 65280) + (e[a + 2] & 255), i.push(u(r));
+		return i.join("");
+	}
+	function f(t) {
+		for (var n, r = t.length, i = r % 3, a = [], o = 16383, s = 0, c = r - i; s < c; s += o) a.push(d(t, s, s + o > c ? c : s + o));
+		return i === 1 ? (n = t[r - 1], a.push(e[n >> 2] + e[n << 4 & 63] + "==")) : i === 2 && (n = (t[r - 2] << 8) + t[r - 1], a.push(e[n >> 10] + e[n >> 4 & 63] + e[n << 2 & 63] + "=")), a.join("");
+	}
+	return Ka;
+}
+function Wa() {
+	return Ya ? Ja : (Ya = !0, Ja.read = function(e, t, n, r, i) {
+		var a, o, s = i * 8 - r - 1, c = (1 << s) - 1, l = c >> 1, u = -7, d = n ? i - 1 : 0, f = n ? -1 : 1, p = e[t + d];
+		for (d += f, a = p & (1 << -u) - 1, p >>= -u, u += s; u > 0; a = a * 256 + e[t + d], d += f, u -= 8);
+		for (o = a & (1 << -u) - 1, a >>= -u, u += r; u > 0; o = o * 256 + e[t + d], d += f, u -= 8);
+		if (a === 0) a = 1 - l;
+		else {
+			if (a === c) return o ? NaN : 1 / 0 * (p ? -1 : 1);
+			o += 2 ** r, a -= l;
+		}
+		return (p ? -1 : 1) * o * 2 ** (a - r);
+	}, Ja.write = function(e, t, n, r, i, a) {
+		var o, s, c, l = a * 8 - i - 1, u = (1 << l) - 1, d = u >> 1, f = i === 23 ? 2 ** -24 - 2 ** -77 : 0, p = r ? 0 : a - 1, m = r ? 1 : -1, h = +(t < 0 || t === 0 && 1 / t < 0);
+		for (t = Math.abs(t), isNaN(t) || t === 1 / 0 ? (s = +!!isNaN(t), o = u) : (o = Math.floor(Math.log(t) / Math.LN2), t * (c = 2 ** -o) < 1 && (o--, c *= 2), o + d >= 1 ? t += f / c : t += f * 2 ** (1 - d), t * c >= 2 && (o++, c /= 2), o + d >= u ? (s = 0, o = u) : o + d >= 1 ? (s = (t * c - 1) * 2 ** i, o += d) : (s = t * 2 ** (d - 1) * 2 ** i, o = 0)); i >= 8; e[n + p] = s & 255, p += m, s /= 256, i -= 8);
+		for (o = o << i | s, l += i; l > 0; e[n + p] = o & 255, p += m, o /= 256, l -= 8);
+		e[n + p - m] |= h * 128;
+	}, Ja);
+}
+function Ga() {
+	if (Za) return Xa;
+	Za = !0;
+	let e = Ua(), t = Wa(), n = typeof Symbol == "function" && typeof Symbol.for == "function" ? Symbol.for("nodejs.util.inspect.custom") : null;
+	Xa.Buffer = o, Xa.SlowBuffer = _, Xa.INSPECT_MAX_BYTES = 50;
+	let r = 2147483647;
+	Xa.kMaxLength = r, o.TYPED_ARRAY_SUPPORT = i(), !o.TYPED_ARRAY_SUPPORT && typeof console < "u" && typeof console.error == "function" && console.error("This browser lacks typed array (Uint8Array) support which is required by `buffer` v5.x. Use `buffer` v4.x if you require old browser support.");
+	function i() {
+		try {
+			let e = /* @__PURE__ */ new Uint8Array(1), t = { foo: function() {
+				return 42;
+			} };
+			return Object.setPrototypeOf(t, Uint8Array.prototype), Object.setPrototypeOf(e, t), e.foo() === 42;
+		} catch {
+			return !1;
+		}
+	}
+	Object.defineProperty(o.prototype, "parent", {
+		enumerable: !0,
+		get: function() {
+			if (o.isBuffer(this)) return this.buffer;
+		}
+	}), Object.defineProperty(o.prototype, "offset", {
+		enumerable: !0,
+		get: function() {
+			if (o.isBuffer(this)) return this.byteOffset;
+		}
+	});
+	function a(e) {
+		if (e > r) throw RangeError("The value \"" + e + "\" is invalid for option \"size\"");
+		let t = new Uint8Array(e);
+		return Object.setPrototypeOf(t, o.prototype), t;
+	}
+	function o(e, t, n) {
+		if (typeof e == "number") {
+			if (typeof t == "string") throw TypeError("The \"string\" argument must be of type string. Received type number");
+			return u(e);
+		}
+		return s(e, t, n);
+	}
+	o.poolSize = 8192;
+	function s(e, t, n) {
+		if (typeof e == "string") return d(e, t);
+		if (ArrayBuffer.isView(e)) return p(e);
+		if (e == null) throw TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof e);
+		if (pe(e, ArrayBuffer) || e && pe(e.buffer, ArrayBuffer) || typeof SharedArrayBuffer < "u" && (pe(e, SharedArrayBuffer) || e && pe(e.buffer, SharedArrayBuffer))) return m(e, t, n);
+		if (typeof e == "number") throw TypeError("The \"value\" argument must not be of type number. Received type number");
+		let r = e.valueOf && e.valueOf();
+		if (r != null && r !== e) return o.from(r, t, n);
+		let i = h(e);
+		if (i) return i;
+		if (typeof Symbol < "u" && Symbol.toPrimitive != null && typeof e[Symbol.toPrimitive] == "function") return o.from(e[Symbol.toPrimitive]("string"), t, n);
+		throw TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof e);
+	}
+	o.from = function(e, t, n) {
+		return s(e, t, n);
+	}, Object.setPrototypeOf(o.prototype, Uint8Array.prototype), Object.setPrototypeOf(o, Uint8Array);
+	function c(e) {
+		if (typeof e != "number") throw TypeError("\"size\" argument must be of type number");
+		if (e < 0) throw RangeError("The value \"" + e + "\" is invalid for option \"size\"");
+	}
+	function l(e, t, n) {
+		return c(e), e <= 0 || t === void 0 ? a(e) : typeof n == "string" ? a(e).fill(t, n) : a(e).fill(t);
+	}
+	o.alloc = function(e, t, n) {
+		return l(e, t, n);
+	};
+	function u(e) {
+		return c(e), a(e < 0 ? 0 : g(e) | 0);
+	}
+	o.allocUnsafe = function(e) {
+		return u(e);
+	}, o.allocUnsafeSlow = function(e) {
+		return u(e);
+	};
+	function d(e, t) {
+		if ((typeof t != "string" || t === "") && (t = "utf8"), !o.isEncoding(t)) throw TypeError("Unknown encoding: " + t);
+		let n = v(e, t) | 0, r = a(n), i = r.write(e, t);
+		return i !== n && (r = r.slice(0, i)), r;
+	}
+	function f(e) {
+		let t = e.length < 0 ? 0 : g(e.length) | 0, n = a(t);
+		for (let r = 0; r < t; r += 1) n[r] = e[r] & 255;
+		return n;
+	}
+	function p(e) {
+		if (pe(e, Uint8Array)) {
+			let t = new Uint8Array(e);
+			return m(t.buffer, t.byteOffset, t.byteLength);
+		}
+		return f(e);
+	}
+	function m(e, t, n) {
+		if (t < 0 || e.byteLength < t) throw RangeError("\"offset\" is outside of buffer bounds");
+		if (e.byteLength < t + (n || 0)) throw RangeError("\"length\" is outside of buffer bounds");
+		let r;
+		return r = t === void 0 && n === void 0 ? new Uint8Array(e) : n === void 0 ? new Uint8Array(e, t) : new Uint8Array(e, t, n), Object.setPrototypeOf(r, o.prototype), r;
+	}
+	function h(e) {
+		if (o.isBuffer(e)) {
+			let t = g(e.length) | 0, n = a(t);
+			return n.length === 0 || e.copy(n, 0, 0, t), n;
+		}
+		if (e.length !== void 0) return typeof e.length != "number" || W(e.length) ? a(0) : f(e);
+		if (e.type === "Buffer" && Array.isArray(e.data)) return f(e.data);
+	}
+	function g(e) {
+		if (e >= r) throw RangeError("Attempt to allocate Buffer larger than maximum size: 0x" + r.toString(16) + " bytes");
+		return e | 0;
+	}
+	function _(e) {
+		return +e != e && (e = 0), o.alloc(+e);
+	}
+	o.isBuffer = function(e) {
+		return e != null && e._isBuffer === !0 && e !== o.prototype;
+	}, o.compare = function(e, t) {
+		if (pe(e, Uint8Array) && (e = o.from(e, e.offset, e.byteLength)), pe(t, Uint8Array) && (t = o.from(t, t.offset, t.byteLength)), !o.isBuffer(e) || !o.isBuffer(t)) throw TypeError("The \"buf1\", \"buf2\" arguments must be one of type Buffer or Uint8Array");
+		if (e === t) return 0;
+		let n = e.length, r = t.length;
+		for (let i = 0, a = Math.min(n, r); i < a; ++i) if (e[i] !== t[i]) {
+			n = e[i], r = t[i];
+			break;
+		}
+		return n < r ? -1 : +(r < n);
+	}, o.isEncoding = function(e) {
+		switch (String(e).toLowerCase()) {
+			case "hex":
+			case "utf8":
+			case "utf-8":
+			case "ascii":
+			case "latin1":
+			case "binary":
+			case "base64":
+			case "ucs2":
+			case "ucs-2":
+			case "utf16le":
+			case "utf-16le": return !0;
+			default: return !1;
+		}
+	}, o.concat = function(e, t) {
+		if (!Array.isArray(e)) throw TypeError("\"list\" argument must be an Array of Buffers");
+		if (e.length === 0) return o.alloc(0);
+		let n;
+		if (t === void 0) for (t = 0, n = 0; n < e.length; ++n) t += e[n].length;
+		let r = o.allocUnsafe(t), i = 0;
+		for (n = 0; n < e.length; ++n) {
+			let t = e[n];
+			if (pe(t, Uint8Array)) i + t.length > r.length ? (o.isBuffer(t) || (t = o.from(t)), t.copy(r, i)) : Uint8Array.prototype.set.call(r, t, i);
+			else if (o.isBuffer(t)) t.copy(r, i);
+			else throw TypeError("\"list\" argument must be an Array of Buffers");
+			i += t.length;
+		}
+		return r;
+	};
+	function v(e, t) {
+		if (o.isBuffer(e)) return e.length;
+		if (ArrayBuffer.isView(e) || pe(e, ArrayBuffer)) return e.byteLength;
+		if (typeof e != "string") throw TypeError("The \"string\" argument must be one of type string, Buffer, or ArrayBuffer. Received type " + typeof e);
+		let n = e.length, r = arguments.length > 2 && arguments[2] === !0;
+		if (!r && n === 0) return 0;
+		let i = !1;
+		for (;;) switch (t) {
+			case "ascii":
+			case "latin1":
+			case "binary": return n;
+			case "utf8":
+			case "utf-8": return ce(e).length;
+			case "ucs2":
+			case "ucs-2":
+			case "utf16le":
+			case "utf-16le": return n * 2;
+			case "hex": return n >>> 1;
+			case "base64": return de(e).length;
+			default:
+				if (i) return r ? -1 : ce(e).length;
+				t = ("" + t).toLowerCase(), i = !0;
+		}
+	}
+	o.byteLength = v;
+	function y(e, t, n) {
+		let r = !1;
+		if ((t === void 0 || t < 0) && (t = 0), t > this.length || ((n === void 0 || n > this.length) && (n = this.length), n <= 0) || (n >>>= 0, t >>>= 0, n <= t)) return "";
+		for (e ||= "utf8";;) switch (e) {
+			case "hex": return P(this, t, n);
+			case "utf8":
+			case "utf-8": return k(this, t, n);
+			case "ascii": return M(this, t, n);
+			case "latin1":
+			case "binary": return N(this, t, n);
+			case "base64": return O(this, t, n);
+			case "ucs2":
+			case "ucs-2":
+			case "utf16le":
+			case "utf-16le": return F(this, t, n);
+			default:
+				if (r) throw TypeError("Unknown encoding: " + e);
+				e = (e + "").toLowerCase(), r = !0;
+		}
+	}
+	o.prototype._isBuffer = !0;
+	function b(e, t, n) {
+		let r = e[t];
+		e[t] = e[n], e[n] = r;
+	}
+	o.prototype.swap16 = function() {
+		let e = this.length;
+		if (e % 2 != 0) throw RangeError("Buffer size must be a multiple of 16-bits");
+		for (let t = 0; t < e; t += 2) b(this, t, t + 1);
+		return this;
+	}, o.prototype.swap32 = function() {
+		let e = this.length;
+		if (e % 4 != 0) throw RangeError("Buffer size must be a multiple of 32-bits");
+		for (let t = 0; t < e; t += 4) b(this, t, t + 3), b(this, t + 1, t + 2);
+		return this;
+	}, o.prototype.swap64 = function() {
+		let e = this.length;
+		if (e % 8 != 0) throw RangeError("Buffer size must be a multiple of 64-bits");
+		for (let t = 0; t < e; t += 8) b(this, t, t + 7), b(this, t + 1, t + 6), b(this, t + 2, t + 5), b(this, t + 3, t + 4);
+		return this;
+	}, o.prototype.toString = function() {
+		let e = this.length;
+		return e === 0 ? "" : arguments.length === 0 ? k(this, 0, e) : y.apply(this, arguments);
+	}, o.prototype.toLocaleString = o.prototype.toString, o.prototype.equals = function(e) {
+		if (!o.isBuffer(e)) throw TypeError("Argument must be a Buffer");
+		return this === e || o.compare(this, e) === 0;
+	}, o.prototype.inspect = function() {
+		let e = "", t = Xa.INSPECT_MAX_BYTES;
+		return e = this.toString("hex", 0, t).replace(/(.{2})/g, "$1 ").trim(), this.length > t && (e += " ... "), "<Buffer " + e + ">";
+	}, n && (o.prototype[n] = o.prototype.inspect), o.prototype.compare = function(e, t, n, r, i) {
+		if (pe(e, Uint8Array) && (e = o.from(e, e.offset, e.byteLength)), !o.isBuffer(e)) throw TypeError("The \"target\" argument must be one of type Buffer or Uint8Array. Received type " + typeof e);
+		if (t === void 0 && (t = 0), n === void 0 && (n = e ? e.length : 0), r === void 0 && (r = 0), i === void 0 && (i = this.length), t < 0 || n > e.length || r < 0 || i > this.length) throw RangeError("out of range index");
+		if (r >= i && t >= n) return 0;
+		if (r >= i) return -1;
+		if (t >= n) return 1;
+		if (t >>>= 0, n >>>= 0, r >>>= 0, i >>>= 0, this === e) return 0;
+		let a = i - r, s = n - t, c = Math.min(a, s), l = this.slice(r, i), u = e.slice(t, n);
+		for (let e = 0; e < c; ++e) if (l[e] !== u[e]) {
+			a = l[e], s = u[e];
+			break;
+		}
+		return a < s ? -1 : +(s < a);
+	};
+	function x(e, t, n, r, i) {
+		if (e.length === 0) return -1;
+		if (typeof n == "string" ? (r = n, n = 0) : n > 2147483647 ? n = 2147483647 : n < -2147483648 && (n = -2147483648), n = +n, W(n) && (n = i ? 0 : e.length - 1), n < 0 && (n = e.length + n), n >= e.length) {
+			if (i) return -1;
+			n = e.length - 1;
+		} else if (n < 0) {
+			if (i) n = 0;
+			else return -1;
+		}
+		if (typeof t == "string" && (t = o.from(t, r)), o.isBuffer(t)) return t.length === 0 ? -1 : S(e, t, n, r, i);
+		if (typeof t == "number") return t &= 255, typeof Uint8Array.prototype.indexOf == "function" ? i ? Uint8Array.prototype.indexOf.call(e, t, n) : Uint8Array.prototype.lastIndexOf.call(e, t, n) : S(e, [t], n, r, i);
+		throw TypeError("val must be string, number or Buffer");
+	}
+	function S(e, t, n, r, i) {
+		let a = 1, o = e.length, s = t.length;
+		if (r !== void 0 && (r = String(r).toLowerCase(), r === "ucs2" || r === "ucs-2" || r === "utf16le" || r === "utf-16le")) {
+			if (e.length < 2 || t.length < 2) return -1;
+			a = 2, o /= 2, s /= 2, n /= 2;
+		}
+		function c(e, t) {
+			return a === 1 ? e[t] : e.readUInt16BE(t * a);
+		}
+		let l;
+		if (i) {
+			let r = -1;
+			for (l = n; l < o; l++) if (c(e, l) === c(t, r === -1 ? 0 : l - r)) {
+				if (r === -1 && (r = l), l - r + 1 === s) return r * a;
+			} else r !== -1 && (l -= l - r), r = -1;
+		} else for (n + s > o && (n = o - s), l = n; l >= 0; l--) {
+			let n = !0;
+			for (let r = 0; r < s; r++) if (c(e, l + r) !== c(t, r)) {
+				n = !1;
+				break;
+			}
+			if (n) return l;
+		}
+		return -1;
+	}
+	o.prototype.includes = function(e, t, n) {
+		return this.indexOf(e, t, n) !== -1;
+	}, o.prototype.indexOf = function(e, t, n) {
+		return x(this, e, t, n, !0);
+	}, o.prototype.lastIndexOf = function(e, t, n) {
+		return x(this, e, t, n, !1);
+	};
+	function C(e, t, n, r) {
+		n = Number(n) || 0;
+		let i = e.length - n;
+		r ? (r = Number(r), r > i && (r = i)) : r = i;
+		let a = t.length;
+		r > a / 2 && (r = a / 2);
+		let o = 0;
+		for (; o < r; ++o) {
+			let r = parseInt(t.substr(o * 2, 2), 16);
+			if (W(r)) return o;
+			e[n + o] = r;
+		}
+		return o;
+	}
+	function w(e, t, n, r) {
+		return fe(ce(t, e.length - n), e, n, r);
+	}
+	function T(e, t, n, r) {
+		return fe(le(t), e, n, r);
+	}
+	function E(e, t, n, r) {
+		return fe(de(t), e, n, r);
+	}
+	function D(e, t, n, r) {
+		return fe(ue(t, e.length - n), e, n, r);
+	}
+	o.prototype.write = function(e, t, n, r) {
+		if (t === void 0) r = "utf8", n = this.length, t = 0;
+		else if (n === void 0 && typeof t == "string") r = t, n = this.length, t = 0;
+		else if (isFinite(t)) t >>>= 0, isFinite(n) ? (n >>>= 0, r === void 0 && (r = "utf8")) : (r = n, n = void 0);
+		else throw Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");
+		let i = this.length - t;
+		if ((n === void 0 || n > i) && (n = i), e.length > 0 && (n < 0 || t < 0) || t > this.length) throw RangeError("Attempt to write outside buffer bounds");
+		r ||= "utf8";
+		let a = !1;
+		for (;;) switch (r) {
+			case "hex": return C(this, e, t, n);
+			case "utf8":
+			case "utf-8": return w(this, e, t, n);
+			case "ascii":
+			case "latin1":
+			case "binary": return T(this, e, t, n);
+			case "base64": return E(this, e, t, n);
+			case "ucs2":
+			case "ucs-2":
+			case "utf16le":
+			case "utf-16le": return D(this, e, t, n);
+			default:
+				if (a) throw TypeError("Unknown encoding: " + r);
+				r = ("" + r).toLowerCase(), a = !0;
+		}
+	}, o.prototype.toJSON = function() {
+		return {
+			type: "Buffer",
+			data: Array.prototype.slice.call(this._arr || this, 0)
+		};
+	};
+	function O(t, n, r) {
+		return n === 0 && r === t.length ? e.fromByteArray(t) : e.fromByteArray(t.slice(n, r));
+	}
+	function k(e, t, n) {
+		n = Math.min(e.length, n);
+		let r = [], i = t;
+		for (; i < n;) {
+			let t = e[i], a = null, o = t > 239 ? 4 : t > 223 ? 3 : t > 191 ? 2 : 1;
+			if (i + o <= n) {
+				let n, r, s, c;
+				switch (o) {
+					case 1:
+						t < 128 && (a = t);
+						break;
+					case 2:
+						n = e[i + 1], (n & 192) == 128 && (c = (t & 31) << 6 | n & 63, c > 127 && (a = c));
+						break;
+					case 3:
+						n = e[i + 1], r = e[i + 2], (n & 192) == 128 && (r & 192) == 128 && (c = (t & 15) << 12 | (n & 63) << 6 | r & 63, c > 2047 && (c < 55296 || c > 57343) && (a = c));
+						break;
+					case 4: n = e[i + 1], r = e[i + 2], s = e[i + 3], (n & 192) == 128 && (r & 192) == 128 && (s & 192) == 128 && (c = (t & 15) << 18 | (n & 63) << 12 | (r & 63) << 6 | s & 63, c > 65535 && c < 1114112 && (a = c));
+				}
+			}
+			a === null ? (a = 65533, o = 1) : a > 65535 && (a -= 65536, r.push(a >>> 10 & 1023 | 55296), a = 56320 | a & 1023), r.push(a), i += o;
+		}
+		return j(r);
+	}
+	let A = 4096;
+	function j(e) {
+		let t = e.length;
+		if (t <= A) return String.fromCharCode.apply(String, e);
+		let n = "", r = 0;
+		for (; r < t;) n += String.fromCharCode.apply(String, e.slice(r, r += A));
+		return n;
+	}
+	function M(e, t, n) {
+		let r = "";
+		n = Math.min(e.length, n);
+		for (let i = t; i < n; ++i) r += String.fromCharCode(e[i] & 127);
+		return r;
+	}
+	function N(e, t, n) {
+		let r = "";
+		n = Math.min(e.length, n);
+		for (let i = t; i < n; ++i) r += String.fromCharCode(e[i]);
+		return r;
+	}
+	function P(e, t, n) {
+		let r = e.length;
+		(!t || t < 0) && (t = 0), (!n || n < 0 || n > r) && (n = r);
+		let i = "";
+		for (let r = t; r < n; ++r) i += me[e[r]];
+		return i;
+	}
+	function F(e, t, n) {
+		let r = e.slice(t, n), i = "";
+		for (let e = 0; e < r.length - 1; e += 2) i += String.fromCharCode(r[e] + r[e + 1] * 256);
+		return i;
+	}
+	o.prototype.slice = function(e, t) {
+		let n = this.length;
+		e = ~~e, t = t === void 0 ? n : ~~t, e < 0 ? (e += n, e < 0 && (e = 0)) : e > n && (e = n), t < 0 ? (t += n, t < 0 && (t = 0)) : t > n && (t = n), t < e && (t = e);
+		let r = this.subarray(e, t);
+		return Object.setPrototypeOf(r, o.prototype), r;
+	};
+	function I(e, t, n) {
+		if (e % 1 != 0 || e < 0) throw RangeError("offset is not uint");
+		if (e + t > n) throw RangeError("Trying to access beyond buffer length");
+	}
+	o.prototype.readUintLE = o.prototype.readUIntLE = function(e, t, n) {
+		e >>>= 0, t >>>= 0, n || I(e, t, this.length);
+		let r = this[e], i = 1, a = 0;
+		for (; ++a < t && (i *= 256);) r += this[e + a] * i;
+		return r;
+	}, o.prototype.readUintBE = o.prototype.readUIntBE = function(e, t, n) {
+		e >>>= 0, t >>>= 0, n || I(e, t, this.length);
+		let r = this[e + --t], i = 1;
+		for (; t > 0 && (i *= 256);) r += this[e + --t] * i;
+		return r;
+	}, o.prototype.readUint8 = o.prototype.readUInt8 = function(e, t) {
+		return e >>>= 0, t || I(e, 1, this.length), this[e];
+	}, o.prototype.readUint16LE = o.prototype.readUInt16LE = function(e, t) {
+		return e >>>= 0, t || I(e, 2, this.length), this[e] | this[e + 1] << 8;
+	}, o.prototype.readUint16BE = o.prototype.readUInt16BE = function(e, t) {
+		return e >>>= 0, t || I(e, 2, this.length), this[e] << 8 | this[e + 1];
+	}, o.prototype.readUint32LE = o.prototype.readUInt32LE = function(e, t) {
+		return e >>>= 0, t || I(e, 4, this.length), (this[e] | this[e + 1] << 8 | this[e + 2] << 16) + this[e + 3] * 16777216;
+	}, o.prototype.readUint32BE = o.prototype.readUInt32BE = function(e, t) {
+		return e >>>= 0, t || I(e, 4, this.length), this[e] * 16777216 + (this[e + 1] << 16 | this[e + 2] << 8 | this[e + 3]);
+	}, o.prototype.readBigUInt64LE = G(function(e) {
+		e >>>= 0, ae(e, "offset");
+		let t = this[e], n = this[e + 7];
+		(t === void 0 || n === void 0) && U(e, this.length - 8);
+		let r = t + this[++e] * 256 + this[++e] * 2 ** 16 + this[++e] * 2 ** 24, i = this[++e] + this[++e] * 256 + this[++e] * 2 ** 16 + n * 2 ** 24;
+		return BigInt(r) + (BigInt(i) << BigInt(32));
+	}), o.prototype.readBigUInt64BE = G(function(e) {
+		e >>>= 0, ae(e, "offset");
+		let t = this[e], n = this[e + 7];
+		(t === void 0 || n === void 0) && U(e, this.length - 8);
+		let r = t * 2 ** 24 + this[++e] * 2 ** 16 + this[++e] * 256 + this[++e], i = this[++e] * 2 ** 24 + this[++e] * 2 ** 16 + this[++e] * 256 + n;
+		return (BigInt(r) << BigInt(32)) + BigInt(i);
+	}), o.prototype.readIntLE = function(e, t, n) {
+		e >>>= 0, t >>>= 0, n || I(e, t, this.length);
+		let r = this[e], i = 1, a = 0;
+		for (; ++a < t && (i *= 256);) r += this[e + a] * i;
+		return i *= 128, r >= i && (r -= 2 ** (8 * t)), r;
+	}, o.prototype.readIntBE = function(e, t, n) {
+		e >>>= 0, t >>>= 0, n || I(e, t, this.length);
+		let r = t, i = 1, a = this[e + --r];
+		for (; r > 0 && (i *= 256);) a += this[e + --r] * i;
+		return i *= 128, a >= i && (a -= 2 ** (8 * t)), a;
+	}, o.prototype.readInt8 = function(e, t) {
+		return e >>>= 0, t || I(e, 1, this.length), this[e] & 128 ? (255 - this[e] + 1) * -1 : this[e];
+	}, o.prototype.readInt16LE = function(e, t) {
+		e >>>= 0, t || I(e, 2, this.length);
+		let n = this[e] | this[e + 1] << 8;
+		return n & 32768 ? n | 4294901760 : n;
+	}, o.prototype.readInt16BE = function(e, t) {
+		e >>>= 0, t || I(e, 2, this.length);
+		let n = this[e + 1] | this[e] << 8;
+		return n & 32768 ? n | 4294901760 : n;
+	}, o.prototype.readInt32LE = function(e, t) {
+		return e >>>= 0, t || I(e, 4, this.length), this[e] | this[e + 1] << 8 | this[e + 2] << 16 | this[e + 3] << 24;
+	}, o.prototype.readInt32BE = function(e, t) {
+		return e >>>= 0, t || I(e, 4, this.length), this[e] << 24 | this[e + 1] << 16 | this[e + 2] << 8 | this[e + 3];
+	}, o.prototype.readBigInt64LE = G(function(e) {
+		e >>>= 0, ae(e, "offset");
+		let t = this[e], n = this[e + 7];
+		(t === void 0 || n === void 0) && U(e, this.length - 8);
+		let r = this[e + 4] + this[e + 5] * 256 + this[e + 6] * 2 ** 16 + (n << 24);
+		return (BigInt(r) << BigInt(32)) + BigInt(t + this[++e] * 256 + this[++e] * 2 ** 16 + this[++e] * 2 ** 24);
+	}), o.prototype.readBigInt64BE = G(function(e) {
+		e >>>= 0, ae(e, "offset");
+		let t = this[e], n = this[e + 7];
+		(t === void 0 || n === void 0) && U(e, this.length - 8);
+		let r = (t << 24) + this[++e] * 2 ** 16 + this[++e] * 256 + this[++e];
+		return (BigInt(r) << BigInt(32)) + BigInt(this[++e] * 2 ** 24 + this[++e] * 2 ** 16 + this[++e] * 256 + n);
+	}), o.prototype.readFloatLE = function(e, n) {
+		return e >>>= 0, n || I(e, 4, this.length), t.read(this, e, !0, 23, 4);
+	}, o.prototype.readFloatBE = function(e, n) {
+		return e >>>= 0, n || I(e, 4, this.length), t.read(this, e, !1, 23, 4);
+	}, o.prototype.readDoubleLE = function(e, n) {
+		return e >>>= 0, n || I(e, 8, this.length), t.read(this, e, !0, 52, 8);
+	}, o.prototype.readDoubleBE = function(e, n) {
+		return e >>>= 0, n || I(e, 8, this.length), t.read(this, e, !1, 52, 8);
+	};
+	function L(e, t, n, r, i, a) {
+		if (!o.isBuffer(e)) throw TypeError("\"buffer\" argument must be a Buffer instance");
+		if (t > i || t < a) throw RangeError("\"value\" argument is out of bounds");
+		if (n + r > e.length) throw RangeError("Index out of range");
+	}
+	o.prototype.writeUintLE = o.prototype.writeUIntLE = function(e, t, n, r) {
+		if (e = +e, t >>>= 0, n >>>= 0, !r) {
+			let r = 2 ** (8 * n) - 1;
+			L(this, e, t, n, r, 0);
+		}
+		let i = 1, a = 0;
+		for (this[t] = e & 255; ++a < n && (i *= 256);) this[t + a] = e / i & 255;
+		return t + n;
+	}, o.prototype.writeUintBE = o.prototype.writeUIntBE = function(e, t, n, r) {
+		if (e = +e, t >>>= 0, n >>>= 0, !r) {
+			let r = 2 ** (8 * n) - 1;
+			L(this, e, t, n, r, 0);
+		}
+		let i = n - 1, a = 1;
+		for (this[t + i] = e & 255; --i >= 0 && (a *= 256);) this[t + i] = e / a & 255;
+		return t + n;
+	}, o.prototype.writeUint8 = o.prototype.writeUInt8 = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 1, 255, 0), this[t] = e & 255, t + 1;
+	}, o.prototype.writeUint16LE = o.prototype.writeUInt16LE = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 2, 65535, 0), this[t] = e & 255, this[t + 1] = e >>> 8, t + 2;
+	}, o.prototype.writeUint16BE = o.prototype.writeUInt16BE = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 2, 65535, 0), this[t] = e >>> 8, this[t + 1] = e & 255, t + 2;
+	}, o.prototype.writeUint32LE = o.prototype.writeUInt32LE = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 4, 4294967295, 0), this[t + 3] = e >>> 24, this[t + 2] = e >>> 16, this[t + 1] = e >>> 8, this[t] = e & 255, t + 4;
+	}, o.prototype.writeUint32BE = o.prototype.writeUInt32BE = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 4, 4294967295, 0), this[t] = e >>> 24, this[t + 1] = e >>> 16, this[t + 2] = e >>> 8, this[t + 3] = e & 255, t + 4;
+	};
+	function R(e, t, n, r, i) {
+		ie(t, r, i, e, n, 7);
+		let a = Number(t & BigInt(4294967295));
+		e[n++] = a, a >>= 8, e[n++] = a, a >>= 8, e[n++] = a, a >>= 8, e[n++] = a;
+		let o = Number(t >> BigInt(32) & BigInt(4294967295));
+		return e[n++] = o, o >>= 8, e[n++] = o, o >>= 8, e[n++] = o, o >>= 8, e[n++] = o, n;
+	}
+	function z(e, t, n, r, i) {
+		ie(t, r, i, e, n, 7);
+		let a = Number(t & BigInt(4294967295));
+		e[n + 7] = a, a >>= 8, e[n + 6] = a, a >>= 8, e[n + 5] = a, a >>= 8, e[n + 4] = a;
+		let o = Number(t >> BigInt(32) & BigInt(4294967295));
+		return e[n + 3] = o, o >>= 8, e[n + 2] = o, o >>= 8, e[n + 1] = o, o >>= 8, e[n] = o, n + 8;
+	}
+	o.prototype.writeBigUInt64LE = G(function(e, t = 0) {
+		return R(this, e, t, BigInt(0), BigInt("0xffffffffffffffff"));
+	}), o.prototype.writeBigUInt64BE = G(function(e, t = 0) {
+		return z(this, e, t, BigInt(0), BigInt("0xffffffffffffffff"));
+	}), o.prototype.writeIntLE = function(e, t, n, r) {
+		if (e = +e, t >>>= 0, !r) {
+			let r = 2 ** (8 * n - 1);
+			L(this, e, t, n, r - 1, -r);
+		}
+		let i = 0, a = 1, o = 0;
+		for (this[t] = e & 255; ++i < n && (a *= 256);) e < 0 && o === 0 && this[t + i - 1] !== 0 && (o = 1), this[t + i] = (e / a >> 0) - o & 255;
+		return t + n;
+	}, o.prototype.writeIntBE = function(e, t, n, r) {
+		if (e = +e, t >>>= 0, !r) {
+			let r = 2 ** (8 * n - 1);
+			L(this, e, t, n, r - 1, -r);
+		}
+		let i = n - 1, a = 1, o = 0;
+		for (this[t + i] = e & 255; --i >= 0 && (a *= 256);) e < 0 && o === 0 && this[t + i + 1] !== 0 && (o = 1), this[t + i] = (e / a >> 0) - o & 255;
+		return t + n;
+	}, o.prototype.writeInt8 = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 1, 127, -128), e < 0 && (e = 255 + e + 1), this[t] = e & 255, t + 1;
+	}, o.prototype.writeInt16LE = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 2, 32767, -32768), this[t] = e & 255, this[t + 1] = e >>> 8, t + 2;
+	}, o.prototype.writeInt16BE = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 2, 32767, -32768), this[t] = e >>> 8, this[t + 1] = e & 255, t + 2;
+	}, o.prototype.writeInt32LE = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 4, 2147483647, -2147483648), this[t] = e & 255, this[t + 1] = e >>> 8, this[t + 2] = e >>> 16, this[t + 3] = e >>> 24, t + 4;
+	}, o.prototype.writeInt32BE = function(e, t, n) {
+		return e = +e, t >>>= 0, n || L(this, e, t, 4, 2147483647, -2147483648), e < 0 && (e = 4294967295 + e + 1), this[t] = e >>> 24, this[t + 1] = e >>> 16, this[t + 2] = e >>> 8, this[t + 3] = e & 255, t + 4;
+	}, o.prototype.writeBigInt64LE = G(function(e, t = 0) {
+		return R(this, e, t, -BigInt("0x8000000000000000"), BigInt("0x7fffffffffffffff"));
+	}), o.prototype.writeBigInt64BE = G(function(e, t = 0) {
+		return z(this, e, t, -BigInt("0x8000000000000000"), BigInt("0x7fffffffffffffff"));
+	});
+	function ee(e, t, n, r, i, a) {
+		if (n + r > e.length || n < 0) throw RangeError("Index out of range");
+	}
+	function B(e, n, r, i, a) {
+		return n = +n, r >>>= 0, a || ee(e, n, r, 4), t.write(e, n, r, i, 23, 4), r + 4;
+	}
+	o.prototype.writeFloatLE = function(e, t, n) {
+		return B(this, e, t, !0, n);
+	}, o.prototype.writeFloatBE = function(e, t, n) {
+		return B(this, e, t, !1, n);
+	};
+	function V(e, n, r, i, a) {
+		return n = +n, r >>>= 0, a || ee(e, n, r, 8), t.write(e, n, r, i, 52, 8), r + 8;
+	}
+	o.prototype.writeDoubleLE = function(e, t, n) {
+		return V(this, e, t, !0, n);
+	}, o.prototype.writeDoubleBE = function(e, t, n) {
+		return V(this, e, t, !1, n);
+	}, o.prototype.copy = function(e, t, n, r) {
+		if (!o.isBuffer(e)) throw TypeError("argument should be a Buffer");
+		if (n ||= 0, !r && r !== 0 && (r = this.length), t >= e.length && (t = e.length), t ||= 0, r > 0 && r < n && (r = n), r === n || e.length === 0 || this.length === 0) return 0;
+		if (t < 0) throw RangeError("targetStart out of bounds");
+		if (n < 0 || n >= this.length) throw RangeError("Index out of range");
+		if (r < 0) throw RangeError("sourceEnd out of bounds");
+		r > this.length && (r = this.length), e.length - t < r - n && (r = e.length - t + n);
+		let i = r - n;
+		return this === e && typeof Uint8Array.prototype.copyWithin == "function" ? this.copyWithin(t, n, r) : Uint8Array.prototype.set.call(e, this.subarray(n, r), t), i;
+	}, o.prototype.fill = function(e, t, n, r) {
+		if (typeof e == "string") {
+			if (typeof t == "string" ? (r = t, t = 0, n = this.length) : typeof n == "string" && (r = n, n = this.length), r !== void 0 && typeof r != "string") throw TypeError("encoding must be a string");
+			if (typeof r == "string" && !o.isEncoding(r)) throw TypeError("Unknown encoding: " + r);
+			if (e.length === 1) {
+				let t = e.charCodeAt(0);
+				(r === "utf8" && t < 128 || r === "latin1") && (e = t);
+			}
+		} else typeof e == "number" ? e &= 255 : typeof e == "boolean" && (e = Number(e));
+		if (t < 0 || this.length < t || this.length < n) throw RangeError("Out of range index");
+		if (n <= t) return this;
+		t >>>= 0, n = n === void 0 ? this.length : n >>> 0, e ||= 0;
+		let i;
+		if (typeof e == "number") for (i = t; i < n; ++i) this[i] = e;
+		else {
+			let a = o.isBuffer(e) ? e : o.from(e, r), s = a.length;
+			if (s === 0) throw TypeError("The value \"" + e + "\" is invalid for argument \"value\"");
+			for (i = 0; i < n - t; ++i) this[i + t] = a[i % s];
+		}
+		return this;
+	};
+	let te = {};
+	function H(e, t, n) {
+		te[e] = class extends n {
+			constructor() {
+				super(), Object.defineProperty(this, "message", {
+					value: t.apply(this, arguments),
+					writable: !0,
+					configurable: !0
+				}), this.name = `${this.name} [${e}]`, this.stack, delete this.name;
+			}
+			get code() {
+				return e;
+			}
+			set code(e) {
+				Object.defineProperty(this, "code", {
+					configurable: !0,
+					enumerable: !0,
+					value: e,
+					writable: !0
+				});
+			}
+			toString() {
+				return `${this.name} [${e}]: ${this.message}`;
+			}
+		};
+	}
+	H("ERR_BUFFER_OUT_OF_BOUNDS", function(e) {
+		return e ? `${e} is outside of buffer bounds` : "Attempt to access memory outside buffer bounds";
+	}, RangeError), H("ERR_INVALID_ARG_TYPE", function(e, t) {
+		return `The "${e}" argument must be of type number. Received type ${typeof t}`;
+	}, TypeError), H("ERR_OUT_OF_RANGE", function(e, t, n) {
+		let r = `The value of "${e}" is out of range.`, i = n;
+		return Number.isInteger(n) && Math.abs(n) > 2 ** 32 ? i = ne(String(n)) : typeof n == "bigint" && (i = String(n), (n > BigInt(2) ** BigInt(32) || n < -(BigInt(2) ** BigInt(32))) && (i = ne(i)), i += "n"), r += ` It must be ${t}. Received ${i}`, r;
+	}, RangeError);
+	function ne(e) {
+		let t = "", n = e.length, r = +(e[0] === "-");
+		for (; n >= r + 4; n -= 3) t = `_${e.slice(n - 3, n)}${t}`;
+		return `${e.slice(0, n)}${t}`;
+	}
+	function re(e, t, n) {
+		ae(t, "offset"), (e[t] === void 0 || e[t + n] === void 0) && U(t, e.length - (n + 1));
+	}
+	function ie(e, t, n, r, i, a) {
+		if (e > n || e < t) {
+			let n = typeof t == "bigint" ? "n" : "", r;
+			throw r = t === 0 || t === BigInt(0) ? `>= 0${n} and < 2${n} ** ${(a + 1) * 8}${n}` : `>= -(2${n} ** ${(a + 1) * 8 - 1}${n}) and < 2 ** ${(a + 1) * 8 - 1}${n}`, new te.ERR_OUT_OF_RANGE("value", r, e);
+		}
+		re(r, i, a);
+	}
+	function ae(e, t) {
+		if (typeof e != "number") throw new te.ERR_INVALID_ARG_TYPE(t, "number", e);
+	}
+	function U(e, t, n) {
+		throw Math.floor(e) === e ? t < 0 ? new te.ERR_BUFFER_OUT_OF_BOUNDS() : new te.ERR_OUT_OF_RANGE("offset", `>= 0 and <= ${t}`, e) : (ae(e, n), new te.ERR_OUT_OF_RANGE("offset", "an integer", e));
+	}
+	let oe = /[^+/0-9A-Za-z-_]/g;
+	function se(e) {
+		if (e = e.split("=")[0], e = e.trim().replace(oe, ""), e.length < 2) return "";
+		for (; e.length % 4 != 0;) e += "=";
+		return e;
+	}
+	function ce(e, t) {
+		t ||= 1 / 0;
+		let n, r = e.length, i = null, a = [];
+		for (let o = 0; o < r; ++o) {
+			if (n = e.charCodeAt(o), n > 55295 && n < 57344) {
+				if (!i) {
+					if (n > 56319) {
+						(t -= 3) > -1 && a.push(239, 191, 189);
+						continue;
+					}
+					if (o + 1 === r) {
+						(t -= 3) > -1 && a.push(239, 191, 189);
+						continue;
+					}
+					i = n;
+					continue;
+				}
+				if (n < 56320) {
+					(t -= 3) > -1 && a.push(239, 191, 189), i = n;
+					continue;
+				}
+				n = (i - 55296 << 10 | n - 56320) + 65536;
+			} else i && (t -= 3) > -1 && a.push(239, 191, 189);
+			if (i = null, n < 128) {
+				if (--t < 0) break;
+				a.push(n);
+			} else if (n < 2048) {
+				if ((t -= 2) < 0) break;
+				a.push(n >> 6 | 192, n & 63 | 128);
+			} else if (n < 65536) {
+				if ((t -= 3) < 0) break;
+				a.push(n >> 12 | 224, n >> 6 & 63 | 128, n & 63 | 128);
+			} else if (n < 1114112) {
+				if ((t -= 4) < 0) break;
+				a.push(n >> 18 | 240, n >> 12 & 63 | 128, n >> 6 & 63 | 128, n & 63 | 128);
+			} else throw Error("Invalid code point");
+		}
+		return a;
+	}
+	function le(e) {
+		let t = [];
+		for (let n = 0; n < e.length; ++n) t.push(e.charCodeAt(n) & 255);
+		return t;
+	}
+	function ue(e, t) {
+		let n, r, i, a = [];
+		for (let o = 0; o < e.length && !((t -= 2) < 0); ++o) n = e.charCodeAt(o), r = n >> 8, i = n % 256, a.push(i), a.push(r);
+		return a;
+	}
+	function de(t) {
+		return e.toByteArray(se(t));
+	}
+	function fe(e, t, n, r) {
+		let i = 0;
+		for (; i < r && !(i + n >= t.length || i >= e.length); ++i) t[i + n] = e[i];
+		return i;
+	}
+	function pe(e, t) {
+		return e instanceof t || e != null && e.constructor != null && e.constructor.name != null && e.constructor.name === t.name;
+	}
+	function W(e) {
+		return e !== e;
+	}
+	let me = (function() {
+		let e = "0123456789abcdef", t = Array(256);
+		for (let n = 0; n < 16; ++n) {
+			let r = n * 16;
+			for (let i = 0; i < 16; ++i) t[r + i] = e[n] + e[i];
+		}
+		return t;
+	})();
+	function G(e) {
+		return typeof BigInt > "u" ? he : e;
+	}
+	function he() {
+		throw Error("BigInt not supported");
+	}
+	return Xa;
+}
+var Ka, qa, Ja, Ya, Xa, Za, Qa = ui(() => {
+	X(), $(), Q(), Ka = {}, qa = !1, Ja = {}, Ya = !1, Xa = {}, Za = !1;
+}), $a = {};
+di($a, {
+	Buffer: () => to,
+	INSPECT_MAX_BYTES: () => no,
+	default: () => eo,
+	kMaxLength: () => ro
+});
+var eo, to, no, ro, io = ui(() => {
+	X(), $(), Q(), Qa(), eo = Ga(), eo.Buffer, eo.SlowBuffer, eo.INSPECT_MAX_BYTES, eo.kMaxLength, to = eo.Buffer, no = eo.INSPECT_MAX_BYTES, ro = eo.kMaxLength;
+}), $ = ui(() => {
+	io();
+}), ao = J((e, t) => {
+	X(), $(), Q(), t.exports = {
+		AggregateError: class extends Error {
+			constructor(e) {
+				if (!Array.isArray(e)) throw TypeError(`Expected input to be an Array, got ${typeof e}`);
+				let t = "";
+				for (let n = 0; n < e.length; n++) t += `    ${e[n].stack}
+`;
+				super(t), this.name = "AggregateError", this.errors = e;
+			}
+		},
+		ArrayIsArray(e) {
+			return Array.isArray(e);
+		},
+		ArrayPrototypeIncludes(e, t) {
+			return e.includes(t);
+		},
+		ArrayPrototypeIndexOf(e, t) {
+			return e.indexOf(t);
+		},
+		ArrayPrototypeJoin(e, t) {
+			return e.join(t);
+		},
+		ArrayPrototypeMap(e, t) {
+			return e.map(t);
+		},
+		ArrayPrototypePop(e, t) {
+			return e.pop(t);
+		},
+		ArrayPrototypePush(e, t) {
+			return e.push(t);
+		},
+		ArrayPrototypeSlice(e, t, n) {
+			return e.slice(t, n);
+		},
+		Error,
+		FunctionPrototypeCall(e, t, ...n) {
+			return e.call(t, ...n);
+		},
+		FunctionPrototypeSymbolHasInstance(e, t) {
+			return Function.prototype[Symbol.hasInstance].call(e, t);
+		},
+		MathFloor: Math.floor,
+		Number,
+		NumberIsInteger: Number.isInteger,
+		NumberIsNaN: Number.isNaN,
+		NumberMAX_SAFE_INTEGER: 2 ** 53 - 1,
+		NumberMIN_SAFE_INTEGER: -(2 ** 53 - 1),
+		NumberParseInt: Number.parseInt,
+		ObjectDefineProperties(e, t) {
+			return Object.defineProperties(e, t);
+		},
+		ObjectDefineProperty(e, t, n) {
+			return Object.defineProperty(e, t, n);
+		},
+		ObjectGetOwnPropertyDescriptor(e, t) {
+			return Object.getOwnPropertyDescriptor(e, t);
+		},
+		ObjectKeys(e) {
+			return Object.keys(e);
+		},
+		ObjectSetPrototypeOf(e, t) {
+			return Object.setPrototypeOf(e, t);
+		},
+		Promise,
+		PromisePrototypeCatch(e, t) {
+			return e.catch(t);
+		},
+		PromisePrototypeThen(e, t, n) {
+			return e.then(t, n);
+		},
+		PromiseReject(e) {
+			return Promise.reject(e);
+		},
+		PromiseResolve(e) {
+			return Promise.resolve(e);
+		},
+		ReflectApply: Reflect.apply,
+		RegExpPrototypeTest(e, t) {
+			return e.test(t);
+		},
+		SafeSet: Set,
+		String,
+		StringPrototypeSlice(e, t, n) {
+			return e.slice(t, n);
+		},
+		StringPrototypeToLowerCase(e) {
+			return e.toLowerCase();
+		},
+		StringPrototypeToUpperCase(e) {
+			return e.toUpperCase();
+		},
+		StringPrototypeTrim(e) {
+			return e.trim();
+		},
+		Symbol,
+		SymbolFor: Symbol.for,
+		SymbolAsyncIterator: Symbol.asyncIterator,
+		SymbolHasInstance: Symbol.hasInstance,
+		SymbolIterator: Symbol.iterator,
+		SymbolDispose: Symbol.dispose || Symbol("Symbol.dispose"),
+		SymbolAsyncDispose: Symbol.asyncDispose || Symbol("Symbol.asyncDispose"),
+		TypedArrayPrototypeSet(e, t, n) {
+			return e.set(t, n);
+		},
+		Boolean,
+		Uint8Array
+	};
+}), oo = J((e, t) => {
+	X(), $(), Q(), t.exports = {
+		format(e, ...t) {
+			return e.replace(/%([sdifj])/g, function(...[e, n]) {
+				let r = t.shift();
+				return n === "f" ? r.toFixed(6) : n === "j" ? JSON.stringify(r) : n === "s" && typeof r == "object" ? `${r.constructor === Object ? "" : r.constructor.name} {}`.trim() : r.toString();
+			});
+		},
+		inspect(e) {
+			switch (typeof e) {
+				case "string":
+					if (e.includes("'")) {
+						if (e.includes("\"")) {
+							if (!e.includes("`") && !e.includes("${")) return `\`${e}\``;
+						} else return `"${e}"`;
+					}
+					return `'${e}'`;
+				case "number": return isNaN(e) ? "NaN" : Object.is(e, -0) ? String(e) : e;
+				case "bigint": return `${String(e)}n`;
+				case "boolean":
+				case "undefined": return String(e);
+				case "object": return "{}";
+			}
+		}
+	};
+}), so = J((e, t) => {
+	X(), $(), Q();
+	var { format: n, inspect: r } = oo(), { AggregateError: i } = ao(), a = globalThis.AggregateError || i, o = Symbol("kIsNodeError"), s = [
+		"string",
+		"function",
+		"number",
+		"object",
+		"Function",
+		"Object",
+		"boolean",
+		"bigint",
+		"symbol"
+	], c = /^([A-Z][a-z0-9]*)+$/, l = "__node_internal_", u = {};
+	function d(e, t) {
+		if (!e) throw new u.ERR_INTERNAL_ASSERTION(t);
+	}
+	function f(e) {
+		let t = "", n = e.length, r = +(e[0] === "-");
+		for (; n >= r + 4; n -= 3) t = `_${e.slice(n - 3, n)}${t}`;
+		return `${e.slice(0, n)}${t}`;
+	}
+	function p(e, t, r) {
+		if (typeof t == "function") return d(t.length <= r.length, `Code: ${e}; The provided arguments length (${r.length}) does not match the required ones (${t.length}).`), t(...r);
+		let i = (t.match(/%[dfijoOs]/g) || []).length;
+		return d(i === r.length, `Code: ${e}; The provided arguments length (${r.length}) does not match the required ones (${i}).`), r.length === 0 ? t : n(t, ...r);
+	}
+	function m(e, t, n) {
+		n ||= Error;
+		class r extends n {
+			constructor(...n) {
+				super(p(e, t, n));
+			}
+			toString() {
+				return `${this.name} [${e}]: ${this.message}`;
+			}
+		}
+		Object.defineProperties(r.prototype, {
+			name: {
+				value: n.name,
+				writable: !0,
+				enumerable: !1,
+				configurable: !0
+			},
+			toString: {
+				value() {
+					return `${this.name} [${e}]: ${this.message}`;
+				},
+				writable: !0,
+				enumerable: !1,
+				configurable: !0
+			}
+		}), r.prototype.code = e, r.prototype[o] = !0, u[e] = r;
+	}
+	function h(e) {
+		let t = l + e.name;
+		return Object.defineProperty(e, "name", { value: t }), e;
+	}
+	function g(e, t) {
+		if (e && t && e !== t) {
+			if (Array.isArray(t.errors)) return t.errors.push(e), t;
+			let n = new a([t, e], t.message);
+			return n.code = t.code, n;
+		}
+		return e || t;
+	}
+	var _ = class extends Error {
+		constructor(e = "The operation was aborted", t = void 0) {
+			if (t !== void 0 && typeof t != "object") throw new u.ERR_INVALID_ARG_TYPE("options", "Object", t);
+			super(e, t), this.code = "ABORT_ERR", this.name = "AbortError";
+		}
+	};
+	m("ERR_ASSERTION", "%s", Error), m("ERR_INVALID_ARG_TYPE", (e, t, n) => {
+		d(typeof e == "string", "'name' must be a string"), Array.isArray(t) || (t = [t]);
+		let i = "The ";
+		e.endsWith(" argument") ? i += `${e} ` : i += `"${e}" ${e.includes(".") ? "property" : "argument"} `, i += "must be ";
+		let a = [], o = [], l = [];
+		for (let e of t) d(typeof e == "string", "All expected entries have to be of type string"), s.includes(e) ? a.push(e.toLowerCase()) : c.test(e) ? o.push(e) : (d(e !== "object", "The value \"object\" should be written as \"Object\""), l.push(e));
+		if (o.length > 0) {
+			let e = a.indexOf("object");
+			e !== -1 && (a.splice(a, e, 1), o.push("Object"));
+		}
+		if (a.length > 0) {
+			switch (a.length) {
+				case 1:
+					i += `of type ${a[0]}`;
+					break;
+				case 2:
+					i += `one of type ${a[0]} or ${a[1]}`;
+					break;
+				default: {
+					let e = a.pop();
+					i += `one of type ${a.join(", ")}, or ${e}`;
+				}
+			}
+			(o.length > 0 || l.length > 0) && (i += " or ");
+		}
+		if (o.length > 0) {
+			switch (o.length) {
+				case 1:
+					i += `an instance of ${o[0]}`;
+					break;
+				case 2:
+					i += `an instance of ${o[0]} or ${o[1]}`;
+					break;
+				default: {
+					let e = o.pop();
+					i += `an instance of ${o.join(", ")}, or ${e}`;
+				}
+			}
+			l.length > 0 && (i += " or ");
+		}
+		switch (l.length) {
+			case 0: break;
+			case 1:
+				l[0].toLowerCase() !== l[0] && (i += "an "), i += `${l[0]}`;
+				break;
+			case 2:
+				i += `one of ${l[0]} or ${l[1]}`;
+				break;
+			default: {
+				let e = l.pop();
+				i += `one of ${l.join(", ")}, or ${e}`;
+			}
+		}
+		if (n == null) i += `. Received ${n}`;
+		else if (typeof n == "function" && n.name) i += `. Received function ${n.name}`;
+		else if (typeof n == "object") {
+			var u;
+			if ((u = n.constructor) != null && u.name) i += `. Received an instance of ${n.constructor.name}`;
+			else {
+				let e = r(n, { depth: -1 });
+				i += `. Received ${e}`;
+			}
+		} else {
+			let e = r(n, { colors: !1 });
+			e.length > 25 && (e = `${e.slice(0, 25)}...`), i += `. Received type ${typeof n} (${e})`;
+		}
+		return i;
+	}, TypeError), m("ERR_INVALID_ARG_VALUE", (e, t, n = "is invalid") => {
+		let i = r(t);
+		return i.length > 128 && (i = i.slice(0, 128) + "..."), `The ${e.includes(".") ? "property" : "argument"} '${e}' ${n}. Received ${i}`;
+	}, TypeError), m("ERR_INVALID_RETURN_VALUE", (e, t, n) => {
+		var r;
+		return `Expected ${e} to be returned from the "${t}" function but got ${n != null && (r = n.constructor) != null && r.name ? `instance of ${n.constructor.name}` : `type ${typeof n}`}.`;
+	}, TypeError), m("ERR_MISSING_ARGS", (...e) => {
+		d(e.length > 0, "At least one arg needs to be specified");
+		let t, n = e.length;
+		switch (e = (Array.isArray(e) ? e : [e]).map((e) => `"${e}"`).join(" or "), n) {
+			case 1:
+				t += `The ${e[0]} argument`;
+				break;
+			case 2:
+				t += `The ${e[0]} and ${e[1]} arguments`;
+				break;
+			default: {
+				let n = e.pop();
+				t += `The ${e.join(", ")}, and ${n} arguments`;
+			}
+		}
+		return `${t} must be specified`;
+	}, TypeError), m("ERR_OUT_OF_RANGE", (e, t, n) => {
+		d(t, "Missing \"range\" argument");
+		let i;
+		if (Number.isInteger(n) && Math.abs(n) > 2 ** 32) i = f(String(n));
+		else if (typeof n == "bigint") {
+			i = String(n);
+			let e = BigInt(2) ** BigInt(32);
+			(n > e || n < -e) && (i = f(i)), i += "n";
+		} else i = r(n);
+		return `The value of "${e}" is out of range. It must be ${t}. Received ${i}`;
+	}, RangeError), m("ERR_MULTIPLE_CALLBACK", "Callback called multiple times", Error), m("ERR_METHOD_NOT_IMPLEMENTED", "The %s method is not implemented", Error), m("ERR_STREAM_ALREADY_FINISHED", "Cannot call %s after a stream was finished", Error), m("ERR_STREAM_CANNOT_PIPE", "Cannot pipe, not readable", Error), m("ERR_STREAM_DESTROYED", "Cannot call %s after a stream was destroyed", Error), m("ERR_STREAM_NULL_VALUES", "May not write null values to stream", TypeError), m("ERR_STREAM_PREMATURE_CLOSE", "Premature close", Error), m("ERR_STREAM_PUSH_AFTER_EOF", "stream.push() after EOF", Error), m("ERR_STREAM_UNSHIFT_AFTER_END_EVENT", "stream.unshift() after end event", Error), m("ERR_STREAM_WRITE_AFTER_END", "write after end", Error), m("ERR_UNKNOWN_ENCODING", "Unknown encoding: %s", TypeError), t.exports = {
+		AbortError: _,
+		aggregateTwoErrors: h(g),
+		hideStackFrames: h,
+		codes: u
+	};
+}), co = J((e, t) => {
+	X(), $(), Q();
+	var { AbortController: n, AbortSignal: r } = typeof self < "u" ? self : typeof window < "u" ? window : void 0;
+	t.exports = n, t.exports.AbortSignal = r, t.exports.default = n;
+}), lo = {};
+di(lo, {
+	EventEmitter: () => ho,
+	default: () => mo,
+	defaultMaxListeners: () => go,
+	init: () => _o,
+	listenerCount: () => vo,
+	on: () => yo,
+	once: () => bo
+});
+function uo() {
+	if (po) return fo;
+	po = !0;
+	var e = typeof Reflect == "object" ? Reflect : null, t = e && typeof e.apply == "function" ? e.apply : function(e, t, n) {
+		return Function.prototype.apply.call(e, t, n);
+	}, n = e && typeof e.ownKeys == "function" ? e.ownKeys : Object.getOwnPropertySymbols ? function(e) {
+		return Object.getOwnPropertyNames(e).concat(Object.getOwnPropertySymbols(e));
+	} : function(e) {
+		return Object.getOwnPropertyNames(e);
+	};
+	function r(e) {
+		console && console.warn && console.warn(e);
+	}
+	var i = Number.isNaN || function(e) {
+		return e !== e;
+	};
+	function a() {
+		a.init.call(this);
+	}
+	fo = a, fo.once = _, a.EventEmitter = a, a.prototype._events = void 0, a.prototype._eventsCount = 0, a.prototype._maxListeners = void 0;
+	var o = 10;
+	function s(e) {
+		if (typeof e != "function") throw TypeError("The \"listener\" argument must be of type Function. Received type " + typeof e);
+	}
+	Object.defineProperty(a, "defaultMaxListeners", {
+		enumerable: !0,
+		get: function() {
+			return o;
+		},
+		set: function(e) {
+			if (typeof e != "number" || e < 0 || i(e)) throw RangeError("The value of \"defaultMaxListeners\" is out of range. It must be a non-negative number. Received " + e + ".");
+			o = e;
+		}
+	}), a.init = function() {
+		(this._events === void 0 || this._events === Object.getPrototypeOf(this)._events) && (this._events = Object.create(null), this._eventsCount = 0), this._maxListeners = this._maxListeners || void 0;
+	}, a.prototype.setMaxListeners = function(e) {
+		if (typeof e != "number" || e < 0 || i(e)) throw RangeError("The value of \"n\" is out of range. It must be a non-negative number. Received " + e + ".");
+		return this._maxListeners = e, this;
+	};
+	function c(e) {
+		return e._maxListeners === void 0 ? a.defaultMaxListeners : e._maxListeners;
+	}
+	a.prototype.getMaxListeners = function() {
+		return c(this);
+	}, a.prototype.emit = function(e) {
+		for (var n = [], r = 1; r < arguments.length; r++) n.push(arguments[r]);
+		var i = e === "error", a = this._events;
+		if (a !== void 0) i &&= a.error === void 0;
+		else if (!i) return !1;
+		if (i) {
+			var o;
+			if (n.length > 0 && (o = n[0]), o instanceof Error) throw o;
+			var s = /* @__PURE__ */ Error("Unhandled error." + (o ? " (" + o.message + ")" : ""));
+			throw s.context = o, s;
+		}
+		var c = a[e];
+		if (c === void 0) return !1;
+		if (typeof c == "function") t(c, this, n);
+		else for (var l = c.length, u = m(c, l), r = 0; r < l; ++r) t(u[r], this, n);
+		return !0;
+	};
+	function l(e, t, n, i) {
+		var a, o, l;
+		if (s(n), o = e._events, o === void 0 ? (o = e._events = Object.create(null), e._eventsCount = 0) : (o.newListener !== void 0 && (e.emit("newListener", t, n.listener ? n.listener : n), o = e._events), l = o[t]), l === void 0) l = o[t] = n, ++e._eventsCount;
+		else if (typeof l == "function" ? l = o[t] = i ? [n, l] : [l, n] : i ? l.unshift(n) : l.push(n), a = c(e), a > 0 && l.length > a && !l.warned) {
+			l.warned = !0;
+			var u = /* @__PURE__ */ Error("Possible EventEmitter memory leak detected. " + l.length + " " + String(t) + " listeners added. Use emitter.setMaxListeners() to increase limit");
+			u.name = "MaxListenersExceededWarning", u.emitter = e, u.type = t, u.count = l.length, r(u);
+		}
+		return e;
+	}
+	a.prototype.addListener = function(e, t) {
+		return l(this, e, t, !1);
+	}, a.prototype.on = a.prototype.addListener, a.prototype.prependListener = function(e, t) {
+		return l(this, e, t, !0);
+	};
+	function u() {
+		if (!this.fired) return this.target.removeListener(this.type, this.wrapFn), this.fired = !0, arguments.length === 0 ? this.listener.call(this.target) : this.listener.apply(this.target, arguments);
+	}
+	function d(e, t, n) {
+		var r = {
+			fired: !1,
+			wrapFn: void 0,
+			target: e,
+			type: t,
+			listener: n
+		}, i = u.bind(r);
+		return i.listener = n, r.wrapFn = i, i;
+	}
+	a.prototype.once = function(e, t) {
+		return s(t), this.on(e, d(this, e, t)), this;
+	}, a.prototype.prependOnceListener = function(e, t) {
+		return s(t), this.prependListener(e, d(this, e, t)), this;
+	}, a.prototype.removeListener = function(e, t) {
+		var n, r, i, a, o;
+		if (s(t), r = this._events, r === void 0 || (n = r[e], n === void 0)) return this;
+		if (n === t || n.listener === t) --this._eventsCount === 0 ? this._events = Object.create(null) : (delete r[e], r.removeListener && this.emit("removeListener", e, n.listener || t));
+		else if (typeof n != "function") {
+			for (i = -1, a = n.length - 1; a >= 0; a--) if (n[a] === t || n[a].listener === t) {
+				o = n[a].listener, i = a;
+				break;
+			}
+			if (i < 0) return this;
+			i === 0 ? n.shift() : h(n, i), n.length === 1 && (r[e] = n[0]), r.removeListener !== void 0 && this.emit("removeListener", e, o || t);
+		}
+		return this;
+	}, a.prototype.off = a.prototype.removeListener, a.prototype.removeAllListeners = function(e) {
+		var t, n = this._events, r;
+		if (n === void 0) return this;
+		if (n.removeListener === void 0) return arguments.length === 0 ? (this._events = Object.create(null), this._eventsCount = 0) : n[e] !== void 0 && (--this._eventsCount === 0 ? this._events = Object.create(null) : delete n[e]), this;
+		if (arguments.length === 0) {
+			var i = Object.keys(n), a;
+			for (r = 0; r < i.length; ++r) a = i[r], a !== "removeListener" && this.removeAllListeners(a);
+			return this.removeAllListeners("removeListener"), this._events = Object.create(null), this._eventsCount = 0, this;
+		}
+		if (t = n[e], typeof t == "function") this.removeListener(e, t);
+		else if (t !== void 0) for (r = t.length - 1; r >= 0; r--) this.removeListener(e, t[r]);
+		return this;
+	};
+	function f(e, t, n) {
+		var r = e._events;
+		if (r === void 0) return [];
+		var i = r[t];
+		return i === void 0 ? [] : typeof i == "function" ? n ? [i.listener || i] : [i] : n ? g(i) : m(i, i.length);
+	}
+	a.prototype.listeners = function(e) {
+		return f(this, e, !0);
+	}, a.prototype.rawListeners = function(e) {
+		return f(this, e, !1);
+	}, a.listenerCount = function(e, t) {
+		return typeof e.listenerCount == "function" ? e.listenerCount(t) : p.call(e, t);
+	}, a.prototype.listenerCount = p;
+	function p(e) {
+		var t = this._events;
+		if (t !== void 0) {
+			var n = t[e];
+			if (typeof n == "function") return 1;
+			if (n !== void 0) return n.length;
+		}
+		return 0;
+	}
+	a.prototype.eventNames = function() {
+		return this._eventsCount > 0 ? n(this._events) : [];
+	};
+	function m(e, t) {
+		for (var n = Array(t), r = 0; r < t; ++r) n[r] = e[r];
+		return n;
+	}
+	function h(e, t) {
+		for (; t + 1 < e.length; t++) e[t] = e[t + 1];
+		e.pop();
+	}
+	function g(e) {
+		for (var t = Array(e.length), n = 0; n < t.length; ++n) t[n] = e[n].listener || e[n];
+		return t;
+	}
+	function _(e, t) {
+		return new Promise(function(n, r) {
+			function i(n) {
+				e.removeListener(t, a), r(n);
+			}
+			function a() {
+				typeof e.removeListener == "function" && e.removeListener("error", i), n([].slice.call(arguments));
+			}
+			y(e, t, a, { once: !0 }), t !== "error" && v(e, i, { once: !0 });
+		});
+	}
+	function v(e, t, n) {
+		typeof e.on == "function" && y(e, "error", t, n);
+	}
+	function y(e, t, n, r) {
+		if (typeof e.on == "function") r.once ? e.once(t, n) : e.on(t, n);
+		else if (typeof e.addEventListener == "function") e.addEventListener(t, function i(a) {
+			r.once && e.removeEventListener(t, i), n(a);
+		});
+		else throw TypeError("The \"emitter\" argument must be of type EventEmitter. Received type " + typeof e);
+	}
+	return fo;
+}
+var fo, po, mo, ho, go, _o, vo, yo, bo, xo = ui(() => {
+	X(), $(), Q(), fo = {}, po = !1, mo = uo(), mo.once, mo.once = function(e, t) {
+		return new Promise((n, r) => {
+			function i(...t) {
+				a !== void 0 && e.removeListener("error", a), n(t);
+			}
+			let a;
+			t !== "error" && (a = (t) => {
+				e.removeListener(name, i), r(t);
+			}, e.once("error", a)), e.once(t, i);
+		});
+	}, mo.on = function(e, t) {
+		let n = [], r = [], i = null, a = !1, o = {
+			async next() {
+				let e = n.shift();
+				if (e) return createIterResult(e, !1);
+				if (i) {
+					let e = Promise.reject(i);
+					return i = null, e;
+				}
+				return a ? createIterResult(void 0, !0) : new Promise((e, t) => r.push({
+					resolve: e,
+					reject: t
+				}));
+			},
+			async return() {
+				e.removeListener(t, s), e.removeListener("error", c), a = !0;
+				for (let e of r) e.resolve(createIterResult(void 0, !0));
+				return createIterResult(void 0, !0);
+			},
+			throw(n) {
+				i = n, e.removeListener(t, s), e.removeListener("error", c);
+			},
+			[Symbol.asyncIterator]() {
+				return this;
+			}
+		};
+		return e.on(t, s), e.on("error", c), o;
+		function s(...e) {
+			let t = r.shift();
+			t ? t.resolve(createIterResult(e, !1)) : n.push(e);
+		}
+		function c(e) {
+			a = !0;
+			let t = r.shift();
+			t ? t.reject(e) : i = e, o.return();
+		}
+	}, {EventEmitter: ho, defaultMaxListeners: go, init: _o, listenerCount: vo, on: yo, once: bo} = mo;
+}), So = J((e, t) => {
+	X(), $(), Q();
+	var n = (io(), Y($a)), { format: r, inspect: i } = oo(), { codes: { ERR_INVALID_ARG_TYPE: a } } = so(), { kResistStopPropagation: o, AggregateError: s, SymbolDispose: c } = ao(), l = globalThis.AbortSignal || co().AbortSignal, u = globalThis.AbortController || co().AbortController, d = Object.getPrototypeOf(async function() {}).constructor, f = globalThis.Blob || n.Blob, p = typeof f < "u" ? function(e) {
+		return e instanceof f;
+	} : function(e) {
+		return !1;
+	}, m = (e, t) => {
+		if (e !== void 0 && (typeof e != "object" || !e || !("aborted" in e))) throw new a(t, "AbortSignal", e);
+	}, h = (e, t) => {
+		if (typeof e != "function") throw new a(t, "Function", e);
+	};
+	t.exports = {
+		AggregateError: s,
+		kEmptyObject: Object.freeze({}),
+		once(e) {
+			let t = !1;
+			return function(...n) {
+				t || (t = !0, e.apply(this, n));
+			};
+		},
+		createDeferredPromise: function() {
+			let e, t;
+			return {
+				promise: new Promise((n, r) => {
+					e = n, t = r;
+				}),
+				resolve: e,
+				reject: t
+			};
+		},
+		promisify(e) {
+			return new Promise((t, n) => {
+				e((e, ...r) => e ? n(e) : t(...r));
+			});
+		},
+		debuglog() {
+			return function() {};
+		},
+		format: r,
+		inspect: i,
+		types: {
+			isAsyncFunction(e) {
+				return e instanceof d;
+			},
+			isArrayBufferView(e) {
+				return ArrayBuffer.isView(e);
+			}
+		},
+		isBlob: p,
+		deprecate(e, t) {
+			return e;
+		},
+		addAbortListener: (xo(), Y(lo)).addAbortListener || function(e, t) {
+			if (e === void 0) throw new a("signal", "AbortSignal", e);
+			m(e, "signal"), h(t, "listener");
+			let n;
+			return e.aborted ? queueMicrotask(() => t()) : (e.addEventListener("abort", t, {
+				__proto__: null,
+				once: !0,
+				[o]: !0
+			}), n = () => {
+				e.removeEventListener("abort", t);
+			}), {
+				__proto__: null,
+				[c]() {
+					var e;
+					(e = n) == null || e();
+				}
+			};
+		},
+		AbortSignalAny: l.any || function(e) {
+			if (e.length === 1) return e[0];
+			let t = new u(), n = () => t.abort();
+			return e.forEach((e) => {
+				m(e, "signals"), e.addEventListener("abort", n, { once: !0 });
+			}), t.signal.addEventListener("abort", () => {
+				e.forEach((e) => e.removeEventListener("abort", n));
+			}, { once: !0 }), t.signal;
+		}
+	}, t.exports.promisify.custom = Symbol.for("nodejs.util.promisify.custom");
+}), Co = J((e, t) => {
+	X(), $(), Q();
+	var { ArrayIsArray: n, ArrayPrototypeIncludes: r, ArrayPrototypeJoin: i, ArrayPrototypeMap: a, NumberIsInteger: o, NumberIsNaN: s, NumberMAX_SAFE_INTEGER: c, NumberMIN_SAFE_INTEGER: l, NumberParseInt: u, ObjectPrototypeHasOwnProperty: d, RegExpPrototypeExec: f, String: p, StringPrototypeToUpperCase: m, StringPrototypeTrim: h } = ao(), { hideStackFrames: g, codes: { ERR_SOCKET_BAD_PORT: _, ERR_INVALID_ARG_TYPE: v, ERR_INVALID_ARG_VALUE: y, ERR_OUT_OF_RANGE: b, ERR_UNKNOWN_SIGNAL: x } } = so(), { normalizeEncoding: S } = So(), { isAsyncFunction: C, isArrayBufferView: w } = So().types, T = {};
+	function E(e) {
+		return e === (e | 0);
+	}
+	function D(e) {
+		return e === e >>> 0;
+	}
+	var O = /^[0-7]+$/, k = "must be a 32-bit unsigned integer or an octal string";
+	function A(e, t, n) {
+		if (typeof e > "u" && (e = n), typeof e == "string") {
+			if (f(O, e) === null) throw new y(t, e, k);
+			e = u(e, 8);
+		}
+		return N(e, t), e;
+	}
+	var j = g((e, t, n = l, r = c) => {
+		if (typeof e != "number") throw new v(t, "number", e);
+		if (!o(e)) throw new b(t, "an integer", e);
+		if (e < n || e > r) throw new b(t, `>= ${n} && <= ${r}`, e);
+	}), M = g((e, t, n = -2147483648, r = 2147483647) => {
+		if (typeof e != "number") throw new v(t, "number", e);
+		if (!o(e)) throw new b(t, "an integer", e);
+		if (e < n || e > r) throw new b(t, `>= ${n} && <= ${r}`, e);
+	}), N = g((e, t, n = !1) => {
+		if (typeof e != "number") throw new v(t, "number", e);
+		if (!o(e)) throw new b(t, "an integer", e);
+		let r = +!!n, i = 4294967295;
+		if (e < r || e > i) throw new b(t, `>= ${r} && <= ${i}`, e);
+	});
+	function P(e, t) {
+		if (typeof e != "string") throw new v(t, "string", e);
+	}
+	function F(e, t, n = void 0, r) {
+		if (typeof e != "number") throw new v(t, "number", e);
+		if (n != null && e < n || r != null && e > r || (n != null || r != null) && s(e)) throw new b(t, `${n == null ? "" : `>= ${n}`}${n != null && r != null ? " && " : ""}${r == null ? "" : `<= ${r}`}`, e);
+	}
+	var I = g((e, t, n) => {
+		if (!r(n, e)) throw new y(t, e, "must be one of: " + i(a(n, (e) => typeof e == "string" ? `'${e}'` : p(e)), ", "));
+	});
+	function L(e, t) {
+		if (typeof e != "boolean") throw new v(t, "boolean", e);
+	}
+	function R(e, t, n) {
+		return e == null || !d(e, t) ? n : e[t];
+	}
+	var z = g((e, t, r = null) => {
+		let i = R(r, "allowArray", !1), a = R(r, "allowFunction", !1);
+		if (!R(r, "nullable", !1) && e === null || !i && n(e) || typeof e != "object" && (!a || typeof e != "function")) throw new v(t, "Object", e);
+	}), ee = g((e, t) => {
+		if (e != null && typeof e != "object" && typeof e != "function") throw new v(t, "a dictionary", e);
+	}), B = g((e, t, r = 0) => {
+		if (!n(e)) throw new v(t, "Array", e);
+		if (e.length < r) throw new y(t, e, `must be longer than ${r}`);
+	});
+	function V(e, t) {
+		B(e, t);
+		for (let n = 0; n < e.length; n++) P(e[n], `${t}[${n}]`);
+	}
+	function te(e, t) {
+		B(e, t);
+		for (let n = 0; n < e.length; n++) L(e[n], `${t}[${n}]`);
+	}
+	function H(e, t) {
+		B(e, t);
+		for (let n = 0; n < e.length; n++) {
+			let r = e[n], i = `${t}[${n}]`;
+			if (r == null) throw new v(i, "AbortSignal", r);
+			U(r, i);
+		}
+	}
+	function ne(e, t = "signal") {
+		if (P(e, t), T[e] === void 0) throw T[m(e)] === void 0 ? new x(e) : new x(e + " (signals must use all capital letters)");
+	}
+	var re = g((e, t = "buffer") => {
+		if (!w(e)) throw new v(t, [
+			"Buffer",
+			"TypedArray",
+			"DataView"
+		], e);
+	});
+	function ie(e, t) {
+		let n = S(t), r = e.length;
+		if (n === "hex" && r % 2 != 0) throw new y("encoding", t, `is invalid for data of length ${r}`);
+	}
+	function ae(e, t = "Port", n = !0) {
+		if (typeof e != "number" && typeof e != "string" || typeof e == "string" && h(e).length === 0 || +e != e >>> 0 || e > 65535 || e === 0 && !n) throw new _(t, e, n);
+		return e | 0;
+	}
+	var U = g((e, t) => {
+		if (e !== void 0 && (typeof e != "object" || !e || !("aborted" in e))) throw new v(t, "AbortSignal", e);
+	}), oe = g((e, t) => {
+		if (typeof e != "function") throw new v(t, "Function", e);
+	}), se = g((e, t) => {
+		if (typeof e != "function" || C(e)) throw new v(t, "Function", e);
+	}), ce = g((e, t) => {
+		if (e !== void 0) throw new v(t, "undefined", e);
+	});
+	function le(e, t, n) {
+		if (!r(n, e)) throw new v(t, `('${i(n, "|")}')`, e);
+	}
+	var ue = /^(?:<[^>]*>)(?:\s*;\s*[^;"\s]+(?:=(")?[^;"\s]*\1)?)*$/;
+	function de(e, t) {
+		if (typeof e > "u" || !f(ue, e)) throw new y(t, e, "must be an array or string of format \"</styles.css>; rel=preload; as=style\"");
+	}
+	function fe(e) {
+		if (typeof e == "string") return de(e, "hints"), e;
+		if (n(e)) {
+			let t = e.length, n = "";
+			if (t === 0) return n;
+			for (let r = 0; r < t; r++) {
+				let i = e[r];
+				de(i, "hints"), n += i, r !== t - 1 && (n += ", ");
+			}
+			return n;
+		}
+		throw new y("hints", e, "must be an array or string of format \"</styles.css>; rel=preload; as=style\"");
+	}
+	t.exports = {
+		isInt32: E,
+		isUint32: D,
+		parseFileMode: A,
+		validateArray: B,
+		validateStringArray: V,
+		validateBooleanArray: te,
+		validateAbortSignalArray: H,
+		validateBoolean: L,
+		validateBuffer: re,
+		validateDictionary: ee,
+		validateEncoding: ie,
+		validateFunction: oe,
+		validateInt32: M,
+		validateInteger: j,
+		validateNumber: F,
+		validateObject: z,
+		validateOneOf: I,
+		validatePlainFunction: se,
+		validatePort: ae,
+		validateSignalName: ne,
+		validateString: P,
+		validateUint32: N,
+		validateUndefined: ce,
+		validateUnion: le,
+		validateAbortSignal: U,
+		validateLinkHeaderValue: fe
+	};
+}), wo = J((e, t) => {
+	X(), $(), Q();
+	var n = t.exports = {}, r, i;
+	function a() {
+		throw Error("setTimeout has not been defined");
+	}
+	function o() {
+		throw Error("clearTimeout has not been defined");
+	}
+	(function() {
+		try {
+			r = typeof setTimeout == "function" ? setTimeout : a;
+		} catch {
+			r = a;
+		}
+		try {
+			i = typeof clearTimeout == "function" ? clearTimeout : o;
+		} catch {
+			i = o;
+		}
+	})();
+	function s(e) {
+		if (r === setTimeout) return setTimeout(e, 0);
+		if ((r === a || !r) && setTimeout) return r = setTimeout, setTimeout(e, 0);
+		try {
+			return r(e, 0);
+		} catch {
+			try {
+				return r.call(null, e, 0);
+			} catch {
+				return r.call(this, e, 0);
+			}
+		}
+	}
+	function c(e) {
+		if (i === clearTimeout) return clearTimeout(e);
+		if ((i === o || !i) && clearTimeout) return i = clearTimeout, clearTimeout(e);
+		try {
+			return i(e);
+		} catch {
+			try {
+				return i.call(null, e);
+			} catch {
+				return i.call(this, e);
+			}
+		}
+	}
+	var l = [], u = !1, d, f = -1;
+	function p() {
+		!u || !d || (u = !1, d.length ? l = d.concat(l) : f = -1, l.length && m());
+	}
+	function m() {
+		if (!u) {
+			var e = s(p);
+			u = !0;
+			for (var t = l.length; t;) {
+				for (d = l, l = []; ++f < t;) d && d[f].run();
+				f = -1, t = l.length;
+			}
+			d = null, u = !1, c(e);
+		}
+	}
+	n.nextTick = function(e) {
+		var t = Array(arguments.length - 1);
+		if (arguments.length > 1) for (var n = 1; n < arguments.length; n++) t[n - 1] = arguments[n];
+		l.push(new h(e, t)), l.length === 1 && !u && s(m);
+	};
+	function h(e, t) {
+		this.fun = e, this.array = t;
+	}
+	h.prototype.run = function() {
+		this.fun.apply(null, this.array);
+	}, n.title = "browser", n.browser = !0, n.env = {}, n.argv = [], n.version = "", n.versions = {};
+	function g() {}
+	n.on = g, n.addListener = g, n.once = g, n.off = g, n.removeListener = g, n.removeAllListeners = g, n.emit = g, n.prependListener = g, n.prependOnceListener = g, n.listeners = function(e) {
+		return [];
+	}, n.binding = function(e) {
+		throw Error("process.binding is not supported");
+	}, n.cwd = function() {
+		return "/";
+	}, n.chdir = function(e) {
+		throw Error("process.chdir is not supported");
+	}, n.umask = function() {
+		return 0;
+	};
+}), To = J((e, t) => {
+	X(), $(), Q();
+	var { SymbolAsyncIterator: n, SymbolIterator: r, SymbolFor: i } = ao(), a = i("nodejs.stream.destroyed"), o = i("nodejs.stream.errored"), s = i("nodejs.stream.readable"), c = i("nodejs.stream.writable"), l = i("nodejs.stream.disturbed"), u = i("nodejs.webstream.isClosedPromise"), d = i("nodejs.webstream.controllerErrorFunction");
+	function f(e, t = !1) {
+		return !(!e || typeof e.pipe != "function" || typeof e.on != "function" || t && (typeof e.pause != "function" || typeof e.resume != "function") || e._writableState && e._readableState?.readable === !1 || e._writableState && !e._readableState);
+	}
+	function p(e) {
+		return !(!e || typeof e.write != "function" || typeof e.on != "function" || e._readableState && e._writableState?.writable === !1);
+	}
+	function m(e) {
+		return !!(e && typeof e.pipe == "function" && e._readableState && typeof e.on == "function" && typeof e.write == "function");
+	}
+	function h(e) {
+		return e && (e._readableState || e._writableState || typeof e.write == "function" && typeof e.on == "function" || typeof e.pipe == "function" && typeof e.on == "function");
+	}
+	function g(e) {
+		return !(!e || h(e) || typeof e.pipeThrough != "function" || typeof e.getReader != "function" || typeof e.cancel != "function");
+	}
+	function _(e) {
+		return !(!e || h(e) || typeof e.getWriter != "function" || typeof e.abort != "function");
+	}
+	function v(e) {
+		return !(!e || h(e) || typeof e.readable != "object" || typeof e.writable != "object");
+	}
+	function y(e) {
+		return g(e) || _(e) || v(e);
+	}
+	function b(e, t) {
+		return e == null ? !1 : t === !0 ? typeof e[n] == "function" : t === !1 ? typeof e[r] == "function" : typeof e[n] == "function" || typeof e[r] == "function";
+	}
+	function x(e) {
+		if (!h(e)) return null;
+		let t = e._writableState, n = e._readableState, r = t || n;
+		return !!(e.destroyed || e[a] || r != null && r.destroyed);
+	}
+	function S(e) {
+		if (!p(e)) return null;
+		if (e.writableEnded === !0) return !0;
+		let t = e._writableState;
+		return t != null && t.errored ? !1 : typeof t?.ended == "boolean" ? t.ended : null;
+	}
+	function C(e, t) {
+		if (!p(e)) return null;
+		if (e.writableFinished === !0) return !0;
+		let n = e._writableState;
+		return n != null && n.errored ? !1 : typeof n?.finished == "boolean" ? !!(n.finished || t === !1 && n.ended === !0 && n.length === 0) : null;
+	}
+	function w(e) {
+		if (!f(e)) return null;
+		if (e.readableEnded === !0) return !0;
+		let t = e._readableState;
+		return !t || t.errored ? !1 : typeof t?.ended == "boolean" ? t.ended : null;
+	}
+	function T(e, t) {
+		if (!f(e)) return null;
+		let n = e._readableState;
+		return n != null && n.errored ? !1 : typeof n?.endEmitted == "boolean" ? !!(n.endEmitted || t === !1 && n.ended === !0 && n.length === 0) : null;
+	}
+	function E(e) {
+		return e && e[s] != null ? e[s] : typeof e?.readable == "boolean" ? !x(e) && f(e) && e.readable && !T(e) : null;
+	}
+	function D(e) {
+		return e && e[c] != null ? e[c] : typeof e?.writable == "boolean" ? !x(e) && p(e) && e.writable && !S(e) : null;
+	}
+	function O(e, t) {
+		return h(e) ? x(e) ? !0 : !(t?.readable !== !1 && E(e) || t?.writable !== !1 && D(e)) : null;
+	}
+	function k(e) {
+		return h(e) ? e.writableErrored ? e.writableErrored : e._writableState?.errored ?? null : null;
+	}
+	function A(e) {
+		return h(e) ? e.readableErrored ? e.readableErrored : e._readableState?.errored ?? null : null;
+	}
+	function j(e) {
+		if (!h(e)) return null;
+		if (typeof e.closed == "boolean") return e.closed;
+		let t = e._writableState, n = e._readableState;
+		return typeof t?.closed == "boolean" || typeof n?.closed == "boolean" ? t?.closed || n?.closed : typeof e._closed == "boolean" && M(e) ? e._closed : null;
+	}
+	function M(e) {
+		return typeof e._closed == "boolean" && typeof e._defaultKeepAlive == "boolean" && typeof e._removedConnection == "boolean" && typeof e._removedContLen == "boolean";
+	}
+	function N(e) {
+		return typeof e._sent100 == "boolean" && M(e);
+	}
+	function P(e) {
+		return typeof e._consuming == "boolean" && typeof e._dumped == "boolean" && e.req?.upgradeOrConnect === void 0;
+	}
+	function F(e) {
+		if (!h(e)) return null;
+		let t = e._writableState, n = e._readableState, r = t || n;
+		return !r && N(e) || !!(r && r.autoDestroy && r.emitClose && r.closed === !1);
+	}
+	function I(e) {
+		return !!(e && (e[l] ?? (e.readableDidRead || e.readableAborted)));
+	}
+	function L(e) {
+		var t;
+		return !!(e && (e[o] ?? e.readableErrored ?? e.writableErrored ?? e._readableState?.errorEmitted ?? e._writableState?.errorEmitted ?? e._readableState?.errored ?? ((t = e._writableState) != null && t.errored)));
+	}
+	t.exports = {
+		isDestroyed: x,
+		kIsDestroyed: a,
+		isDisturbed: I,
+		kIsDisturbed: l,
+		isErrored: L,
+		kIsErrored: o,
+		isReadable: E,
+		kIsReadable: s,
+		kIsClosedPromise: u,
+		kControllerErrorFunction: d,
+		kIsWritable: c,
+		isClosed: j,
+		isDuplexNodeStream: m,
+		isFinished: O,
+		isIterable: b,
+		isReadableNodeStream: f,
+		isReadableStream: g,
+		isReadableEnded: w,
+		isReadableFinished: T,
+		isReadableErrored: A,
+		isNodeStream: h,
+		isWebStream: y,
+		isWritable: D,
+		isWritableNodeStream: p,
+		isWritableStream: _,
+		isWritableEnded: S,
+		isWritableFinished: C,
+		isWritableErrored: k,
+		isServerRequest: P,
+		isServerResponse: N,
+		willEmitClose: F,
+		isTransformStream: v
+	};
+}), Eo = J((e, t) => {
+	X(), $(), Q();
+	var n = wo(), { AbortError: r, codes: i } = so(), { ERR_INVALID_ARG_TYPE: a, ERR_STREAM_PREMATURE_CLOSE: o } = i, { kEmptyObject: s, once: c } = So(), { validateAbortSignal: l, validateFunction: u, validateObject: d, validateBoolean: f } = Co(), { Promise: p, PromisePrototypeThen: m, SymbolDispose: h } = ao(), { isClosed: g, isReadable: _, isReadableNodeStream: v, isReadableStream: y, isReadableFinished: b, isReadableErrored: x, isWritable: S, isWritableNodeStream: C, isWritableStream: w, isWritableFinished: T, isWritableErrored: E, isNodeStream: D, willEmitClose: O, kIsClosedPromise: k } = To(), A;
+	function j(e) {
+		return e.setHeader && typeof e.abort == "function";
+	}
+	var M = () => {};
+	function N(e, t, i) {
+		if (arguments.length === 2 ? (i = t, t = s) : t == null ? t = s : d(t, "options"), u(i, "callback"), l(t.signal, "options.signal"), i = c(i), y(e) || w(e)) return P(e, t, i);
+		if (!D(e)) throw new a("stream", [
+			"ReadableStream",
+			"WritableStream",
+			"Stream"
+		], e);
+		let f = t.readable ?? v(e), p = t.writable ?? C(e), m = e._writableState, k = e._readableState, N = () => {
+			e.writable || L();
+		}, F = O(e) && v(e) === f && C(e) === p, I = T(e, !1), L = () => {
+			I = !0, e.destroyed && (F = !1), (!F || e.readable && !f) && (!f || R) && i.call(e);
+		}, R = b(e, !1), z = () => {
+			R = !0, e.destroyed && (F = !1), (!F || e.writable && !p) && (!p || I) && i.call(e);
+		}, ee = (t) => {
+			i.call(e, t);
+		}, B = g(e), V = () => {
+			B = !0;
+			let t = E(e) || x(e);
+			if (t && typeof t != "boolean") return i.call(e, t);
+			if (f && !R && v(e, !0) && !b(e, !1) || p && !I && !T(e, !1)) return i.call(e, new o());
+			i.call(e);
+		}, te = () => {
+			B = !0;
+			let t = E(e) || x(e);
+			if (t && typeof t != "boolean") return i.call(e, t);
+			i.call(e);
+		}, H = () => {
+			e.req.on("finish", L);
+		};
+		j(e) ? (e.on("complete", L), F || e.on("abort", V), e.req ? H() : e.on("request", H)) : p && !m && (e.on("end", N), e.on("close", N)), !F && typeof e.aborted == "boolean" && e.on("aborted", V), e.on("end", z), e.on("finish", L), t.error !== !1 && e.on("error", ee), e.on("close", V), B ? n.nextTick(V) : m != null && m.errorEmitted || k != null && k.errorEmitted ? F || n.nextTick(te) : (!f && (!F || _(e)) && (I || S(e) === !1) || !p && (!F || S(e)) && (R || _(e) === !1) || k && e.req && e.aborted) && n.nextTick(te);
+		let ne = () => {
+			i = M, e.removeListener("aborted", V), e.removeListener("complete", L), e.removeListener("abort", V), e.removeListener("request", H), e.req && e.req.removeListener("finish", L), e.removeListener("end", N), e.removeListener("close", N), e.removeListener("finish", L), e.removeListener("end", z), e.removeListener("error", ee), e.removeListener("close", V);
+		};
+		if (t.signal && !B) {
+			let a = () => {
+				let n = i;
+				ne(), n.call(e, new r(void 0, { cause: t.signal.reason }));
+			};
+			if (t.signal.aborted) n.nextTick(a);
+			else {
+				A ||= So().addAbortListener;
+				let n = A(t.signal, a), r = i;
+				i = c((...t) => {
+					n[h](), r.apply(e, t);
+				});
+			}
+		}
+		return ne;
+	}
+	function P(e, t, i) {
+		let a = !1, o = M;
+		if (t.signal) {
+			if (o = () => {
+				a = !0, i.call(e, new r(void 0, { cause: t.signal.reason }));
+			}, t.signal.aborted) n.nextTick(o);
+			else {
+				A ||= So().addAbortListener;
+				let n = A(t.signal, o), r = i;
+				i = c((...t) => {
+					n[h](), r.apply(e, t);
+				});
+			}
+		}
+		let s = (...t) => {
+			a || n.nextTick(() => i.apply(e, t));
+		};
+		return m(e[k].promise, s, s), M;
+	}
+	function F(e, t) {
+		var n;
+		let r = !1;
+		return t === null && (t = s), (n = t) != null && n.cleanup && (f(t.cleanup, "cleanup"), r = t.cleanup), new p((n, i) => {
+			let a = N(e, t, (e) => {
+				r && a(), e ? i(e) : n();
+			});
+		});
+	}
+	t.exports = N, t.exports.finished = F;
+}), Do = J((e, t) => {
+	X(), $(), Q();
+	var n = wo(), { aggregateTwoErrors: r, codes: { ERR_MULTIPLE_CALLBACK: i }, AbortError: a } = so(), { Symbol: o } = ao(), { kIsDestroyed: s, isDestroyed: c, isFinished: l, isServerRequest: u } = To(), d = o("kDestroy"), f = o("kConstruct");
+	function p(e, t, n) {
+		e && (e.stack, t && !t.errored && (t.errored = e), n && !n.errored && (n.errored = e));
+	}
+	function m(e, t) {
+		let n = this._readableState, i = this._writableState, a = i || n;
+		return i != null && i.destroyed || n != null && n.destroyed ? (typeof t == "function" && t(), this) : (p(e, i, n), i && (i.destroyed = !0), n && (n.destroyed = !0), a.constructed ? h(this, e, t) : this.once(d, function(n) {
+			h(this, r(n, e), t);
+		}), this);
+	}
+	function h(e, t, r) {
+		let i = !1;
+		function a(t) {
+			if (i) return;
+			i = !0;
+			let a = e._readableState, o = e._writableState;
+			p(t, o, a), o && (o.closed = !0), a && (a.closed = !0), typeof r == "function" && r(t), t ? n.nextTick(g, e, t) : n.nextTick(_, e);
+		}
+		try {
+			e._destroy(t || null, a);
+		} catch (e) {
+			a(e);
+		}
+	}
+	function g(e, t) {
+		v(e, t), _(e);
+	}
+	function _(e) {
+		let t = e._readableState, n = e._writableState;
+		n && (n.closeEmitted = !0), t && (t.closeEmitted = !0), (n != null && n.emitClose || t != null && t.emitClose) && e.emit("close");
+	}
+	function v(e, t) {
+		let n = e._readableState, r = e._writableState;
+		r != null && r.errorEmitted || n != null && n.errorEmitted || (r && (r.errorEmitted = !0), n && (n.errorEmitted = !0), e.emit("error", t));
+	}
+	function y() {
+		let e = this._readableState, t = this._writableState;
+		e && (e.constructed = !0, e.closed = !1, e.closeEmitted = !1, e.destroyed = !1, e.errored = null, e.errorEmitted = !1, e.reading = !1, e.ended = e.readable === !1, e.endEmitted = e.readable === !1), t && (t.constructed = !0, t.destroyed = !1, t.closed = !1, t.closeEmitted = !1, t.errored = null, t.errorEmitted = !1, t.finalCalled = !1, t.prefinished = !1, t.ended = t.writable === !1, t.ending = t.writable === !1, t.finished = t.writable === !1);
+	}
+	function b(e, t, r) {
+		let i = e._readableState, a = e._writableState;
+		if (a != null && a.destroyed || i != null && i.destroyed) return this;
+		i != null && i.autoDestroy || a != null && a.autoDestroy ? e.destroy(t) : t && (t.stack, a && !a.errored && (a.errored = t), i && !i.errored && (i.errored = t), r ? n.nextTick(v, e, t) : v(e, t));
+	}
+	function x(e, t) {
+		if (typeof e._construct != "function") return;
+		let r = e._readableState, i = e._writableState;
+		r && (r.constructed = !1), i && (i.constructed = !1), e.once(f, t), !(e.listenerCount(f) > 1) && n.nextTick(S, e);
+	}
+	function S(e) {
+		let t = !1;
+		function r(r) {
+			if (t) {
+				b(e, r ?? new i());
+				return;
+			}
+			t = !0;
+			let a = e._readableState, o = e._writableState, s = o || a;
+			a && (a.constructed = !0), o && (o.constructed = !0), s.destroyed ? e.emit(d, r) : r ? b(e, r, !0) : n.nextTick(C, e);
+		}
+		try {
+			e._construct((e) => {
+				n.nextTick(r, e);
+			});
+		} catch (e) {
+			n.nextTick(r, e);
+		}
+	}
+	function C(e) {
+		e.emit(f);
+	}
+	function w(e) {
+		return e?.setHeader && typeof e.abort == "function";
+	}
+	function T(e) {
+		e.emit("close");
+	}
+	function E(e, t) {
+		e.emit("error", t), n.nextTick(T, e);
+	}
+	function D(e, t) {
+		!e || c(e) || (!t && !l(e) && (t = new a()), u(e) ? (e.socket = null, e.destroy(t)) : w(e) ? e.abort() : w(e.req) ? e.req.abort() : typeof e.destroy == "function" ? e.destroy(t) : typeof e.close == "function" ? e.close() : t ? n.nextTick(E, e, t) : n.nextTick(T, e), e.destroyed || (e[s] = !0));
+	}
+	t.exports = {
+		construct: x,
+		destroyer: D,
+		destroy: m,
+		undestroy: y,
+		errorOrDestroy: b
+	};
+}), Oo = J((e, t) => {
+	X(), $(), Q();
+	var { ArrayIsArray: n, ObjectSetPrototypeOf: r } = ao(), { EventEmitter: i } = (xo(), Y(lo));
+	function a(e) {
+		i.call(this, e);
+	}
+	r(a.prototype, i.prototype), r(a, i), a.prototype.pipe = function(e, t) {
+		let n = this;
+		function r(t) {
+			e.writable && e.write(t) === !1 && n.pause && n.pause();
+		}
+		n.on("data", r);
+		function a() {
+			n.readable && n.resume && n.resume();
+		}
+		e.on("drain", a), !e._isStdio && (!t || t.end !== !1) && (n.on("end", c), n.on("close", l));
+		let s = !1;
+		function c() {
+			s || (s = !0, e.end());
+		}
+		function l() {
+			s || (s = !0, typeof e.destroy == "function" && e.destroy());
+		}
+		function u(e) {
+			d(), i.listenerCount(this, "error") === 0 && this.emit("error", e);
+		}
+		o(n, "error", u), o(e, "error", u);
+		function d() {
+			n.removeListener("data", r), e.removeListener("drain", a), n.removeListener("end", c), n.removeListener("close", l), n.removeListener("error", u), e.removeListener("error", u), n.removeListener("end", d), n.removeListener("close", d), e.removeListener("close", d);
+		}
+		return n.on("end", d), n.on("close", d), e.on("close", d), e.emit("pipe", n), e;
+	};
+	function o(e, t, r) {
+		if (typeof e.prependListener == "function") return e.prependListener(t, r);
+		!e._events || !e._events[t] ? e.on(t, r) : n(e._events[t]) ? e._events[t].unshift(r) : e._events[t] = [r, e._events[t]];
+	}
+	t.exports = {
+		Stream: a,
+		prependListener: o
+	};
+}), ko = J((e, t) => {
+	X(), $(), Q();
+	var { SymbolDispose: n } = ao(), { AbortError: r, codes: i } = so(), { isNodeStream: a, isWebStream: o, kControllerErrorFunction: s } = To(), c = Eo(), { ERR_INVALID_ARG_TYPE: l } = i, u, d = (e, t) => {
+		if (typeof e != "object" || !("aborted" in e)) throw new l(t, "AbortSignal", e);
+	};
+	t.exports.addAbortSignal = function(e, n) {
+		if (d(e, "signal"), !a(n) && !o(n)) throw new l("stream", [
+			"ReadableStream",
+			"WritableStream",
+			"Stream"
+		], n);
+		return t.exports.addAbortSignalNoValidate(e, n);
+	}, t.exports.addAbortSignalNoValidate = function(e, t) {
+		if (typeof e != "object" || !("aborted" in e)) return t;
+		let i = a(t) ? () => {
+			t.destroy(new r(void 0, { cause: e.reason }));
+		} : () => {
+			t[s](new r(void 0, { cause: e.reason }));
+		};
+		return e.aborted ? i() : (u ||= So().addAbortListener, c(t, u(e, i)[n])), t;
+	};
+}), Ao = J((e, t) => {
+	X(), $(), Q();
+	var { StringPrototypeSlice: n, SymbolIterator: r, TypedArrayPrototypeSet: i, Uint8Array: a } = ao(), { Buffer: o } = (io(), Y($a)), { inspect: s } = So();
+	t.exports = class {
+		constructor() {
+			this.head = null, this.tail = null, this.length = 0;
+		}
+		push(e) {
+			let t = {
+				data: e,
+				next: null
+			};
+			this.length > 0 ? this.tail.next = t : this.head = t, this.tail = t, ++this.length;
+		}
+		unshift(e) {
+			let t = {
+				data: e,
+				next: this.head
+			};
+			this.length === 0 && (this.tail = t), this.head = t, ++this.length;
+		}
+		shift() {
+			if (this.length === 0) return;
+			let e = this.head.data;
+			return this.head = this.length === 1 ? this.tail = null : this.head.next, --this.length, e;
+		}
+		clear() {
+			this.head = this.tail = null, this.length = 0;
+		}
+		join(e) {
+			if (this.length === 0) return "";
+			let t = this.head, n = "" + t.data;
+			for (; (t = t.next) !== null;) n += e + t.data;
+			return n;
+		}
+		concat(e) {
+			if (this.length === 0) return o.alloc(0);
+			let t = o.allocUnsafe(e >>> 0), n = this.head, r = 0;
+			for (; n;) i(t, n.data, r), r += n.data.length, n = n.next;
+			return t;
+		}
+		consume(e, t) {
+			let n = this.head.data;
+			if (e < n.length) {
+				let t = n.slice(0, e);
+				return this.head.data = n.slice(e), t;
+			}
+			return e === n.length ? this.shift() : t ? this._getString(e) : this._getBuffer(e);
+		}
+		first() {
+			return this.head.data;
+		}
+		*[r]() {
+			for (let e = this.head; e; e = e.next) yield e.data;
+		}
+		_getString(e) {
+			let t = "", r = this.head, i = 0;
+			do {
+				let a = r.data;
+				if (e > a.length) t += a, e -= a.length;
+				else {
+					e === a.length ? (t += a, ++i, this.head = r.next ? r.next : this.tail = null) : (t += n(a, 0, e), this.head = r, r.data = n(a, e));
+					break;
+				}
+				++i;
+			} while ((r = r.next) !== null);
+			return this.length -= i, t;
+		}
+		_getBuffer(e) {
+			let t = o.allocUnsafe(e), n = e, r = this.head, s = 0;
+			do {
+				let o = r.data;
+				if (e > o.length) i(t, o, n - e), e -= o.length;
+				else {
+					e === o.length ? (i(t, o, n - e), ++s, this.head = r.next ? r.next : this.tail = null) : (i(t, new a(o.buffer, o.byteOffset, e), n - e), this.head = r, r.data = o.slice(e));
+					break;
+				}
+				++s;
+			} while ((r = r.next) !== null);
+			return this.length -= s, t;
+		}
+		[Symbol.for("nodejs.util.inspect.custom")](e, t) {
+			return s(this, {
+				...t,
+				depth: 0,
+				customInspect: !1
+			});
+		}
+	};
+}), jo = J((e, t) => {
+	X(), $(), Q();
+	var { MathFloor: n, NumberIsInteger: r } = ao(), { validateInteger: i } = Co(), { ERR_INVALID_ARG_VALUE: a } = so().codes, o = 16384, s = 16;
+	function c(e, t, n) {
+		return e.highWaterMark == null ? t ? e[n] : null : e.highWaterMark;
+	}
+	function l(e) {
+		return e ? s : o;
+	}
+	function u(e, t) {
+		i(t, "value", 0), e ? s = t : o = t;
+	}
+	function d(e, t, i, o) {
+		let s = c(t, o, i);
+		if (s != null) {
+			if (!r(s) || s < 0) throw new a(o ? `options.${i}` : "options.highWaterMark", s);
+			return n(s);
+		}
+		return l(e.objectMode);
+	}
+	t.exports = {
+		getHighWaterMark: d,
+		getDefaultHighWaterMark: l,
+		setDefaultHighWaterMark: u
+	};
+}), Mo = J((e, t) => {
+	X(), $(), Q();
+	var n = (io(), Y($a)), r = n.Buffer;
+	function i(e, t) {
+		for (var n in e) t[n] = e[n];
+	}
+	r.from && r.alloc && r.allocUnsafe && r.allocUnsafeSlow ? t.exports = n : (i(n, e), e.Buffer = a);
+	function a(e, t, n) {
+		return r(e, t, n);
+	}
+	a.prototype = Object.create(r.prototype), i(r, a), a.from = function(e, t, n) {
+		if (typeof e == "number") throw TypeError("Argument must not be a number");
+		return r(e, t, n);
+	}, a.alloc = function(e, t, n) {
+		if (typeof e != "number") throw TypeError("Argument must be a number");
+		var i = r(e);
+		return t === void 0 ? i.fill(0) : typeof n == "string" ? i.fill(t, n) : i.fill(t), i;
+	}, a.allocUnsafe = function(e) {
+		if (typeof e != "number") throw TypeError("Argument must be a number");
+		return r(e);
+	}, a.allocUnsafeSlow = function(e) {
+		if (typeof e != "number") throw TypeError("Argument must be a number");
+		return n.SlowBuffer(e);
+	};
+}), No = J((e) => {
+	X(), $(), Q();
+	var t = Mo().Buffer, n = t.isEncoding || function(e) {
+		switch (e = "" + e, e && e.toLowerCase()) {
+			case "hex":
+			case "utf8":
+			case "utf-8":
+			case "ascii":
+			case "binary":
+			case "base64":
+			case "ucs2":
+			case "ucs-2":
+			case "utf16le":
+			case "utf-16le":
+			case "raw": return !0;
+			default: return !1;
+		}
+	};
+	function r(e) {
+		if (!e) return "utf8";
+		for (var t;;) switch (e) {
+			case "utf8":
+			case "utf-8": return "utf8";
+			case "ucs2":
+			case "ucs-2":
+			case "utf16le":
+			case "utf-16le": return "utf16le";
+			case "latin1":
+			case "binary": return "latin1";
+			case "base64":
+			case "ascii":
+			case "hex": return e;
+			default:
+				if (t) return;
+				e = ("" + e).toLowerCase(), t = !0;
+		}
+	}
+	function i(e) {
+		var i = r(e);
+		if (typeof i != "string" && (t.isEncoding === n || !n(e))) throw Error("Unknown encoding: " + e);
+		return i || e;
+	}
+	e.StringDecoder = a;
+	function a(e) {
+		this.encoding = i(e);
+		var n;
+		switch (this.encoding) {
+			case "utf16le":
+				this.text = f, this.end = p, n = 4;
+				break;
+			case "utf8":
+				this.fillLast = l, n = 4;
+				break;
+			case "base64":
+				this.text = m, this.end = h, n = 3;
+				break;
+			default:
+				this.write = g, this.end = _;
+				return;
+		}
+		this.lastNeed = 0, this.lastTotal = 0, this.lastChar = t.allocUnsafe(n);
+	}
+	a.prototype.write = function(e) {
+		if (e.length === 0) return "";
+		var t, n;
+		if (this.lastNeed) {
+			if (t = this.fillLast(e), t === void 0) return "";
+			n = this.lastNeed, this.lastNeed = 0;
+		} else n = 0;
+		return n < e.length ? t ? t + this.text(e, n) : this.text(e, n) : t || "";
+	}, a.prototype.end = d, a.prototype.text = u, a.prototype.fillLast = function(e) {
+		if (this.lastNeed <= e.length) return e.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed), this.lastChar.toString(this.encoding, 0, this.lastTotal);
+		e.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, e.length), this.lastNeed -= e.length;
+	};
+	function o(e) {
+		return e <= 127 ? 0 : e >> 5 == 6 ? 2 : e >> 4 == 14 ? 3 : e >> 3 == 30 ? 4 : e >> 6 == 2 ? -1 : -2;
+	}
+	function s(e, t, n) {
+		var r = t.length - 1;
+		if (r < n) return 0;
+		var i = o(t[r]);
+		return i >= 0 ? (i > 0 && (e.lastNeed = i - 1), i) : --r < n || i === -2 ? 0 : (i = o(t[r]), i >= 0 ? (i > 0 && (e.lastNeed = i - 2), i) : --r < n || i === -2 ? 0 : (i = o(t[r]), i >= 0 ? (i > 0 && (i === 2 ? i = 0 : e.lastNeed = i - 3), i) : 0));
+	}
+	function c(e, t, n) {
+		if ((t[0] & 192) != 128) return e.lastNeed = 0, "�";
+		if (e.lastNeed > 1 && t.length > 1) {
+			if ((t[1] & 192) != 128) return e.lastNeed = 1, "�";
+			if (e.lastNeed > 2 && t.length > 2 && (t[2] & 192) != 128) return e.lastNeed = 2, "�";
+		}
+	}
+	function l(e) {
+		var t = this.lastTotal - this.lastNeed, n = c(this, e, t);
+		if (n !== void 0) return n;
+		if (this.lastNeed <= e.length) return e.copy(this.lastChar, t, 0, this.lastNeed), this.lastChar.toString(this.encoding, 0, this.lastTotal);
+		e.copy(this.lastChar, t, 0, e.length), this.lastNeed -= e.length;
+	}
+	function u(e, t) {
+		var n = s(this, e, t);
+		if (!this.lastNeed) return e.toString("utf8", t);
+		this.lastTotal = n;
+		var r = e.length - (n - this.lastNeed);
+		return e.copy(this.lastChar, 0, r), e.toString("utf8", t, r);
+	}
+	function d(e) {
+		var t = e && e.length ? this.write(e) : "";
+		return this.lastNeed ? t + "�" : t;
+	}
+	function f(e, t) {
+		if ((e.length - t) % 2 == 0) {
+			var n = e.toString("utf16le", t);
+			if (n) {
+				var r = n.charCodeAt(n.length - 1);
+				if (r >= 55296 && r <= 56319) return this.lastNeed = 2, this.lastTotal = 4, this.lastChar[0] = e[e.length - 2], this.lastChar[1] = e[e.length - 1], n.slice(0, -1);
+			}
+			return n;
+		}
+		return this.lastNeed = 1, this.lastTotal = 2, this.lastChar[0] = e[e.length - 1], e.toString("utf16le", t, e.length - 1);
+	}
+	function p(e) {
+		var t = e && e.length ? this.write(e) : "";
+		if (this.lastNeed) {
+			var n = this.lastTotal - this.lastNeed;
+			return t + this.lastChar.toString("utf16le", 0, n);
+		}
+		return t;
+	}
+	function m(e, t) {
+		var n = (e.length - t) % 3;
+		return n === 0 ? e.toString("base64", t) : (this.lastNeed = 3 - n, this.lastTotal = 3, n === 1 ? this.lastChar[0] = e[e.length - 1] : (this.lastChar[0] = e[e.length - 2], this.lastChar[1] = e[e.length - 1]), e.toString("base64", t, e.length - n));
+	}
+	function h(e) {
+		var t = e && e.length ? this.write(e) : "";
+		return this.lastNeed ? t + this.lastChar.toString("base64", 0, 3 - this.lastNeed) : t;
+	}
+	function g(e) {
+		return e.toString(this.encoding);
+	}
+	function _(e) {
+		return e && e.length ? this.write(e) : "";
+	}
+}), Po = J((e, t) => {
+	X(), $(), Q();
+	var n = wo(), { PromisePrototypeThen: r, SymbolAsyncIterator: i, SymbolIterator: a } = ao(), { Buffer: o } = (io(), Y($a)), { ERR_INVALID_ARG_TYPE: s, ERR_STREAM_NULL_VALUES: c } = so().codes;
+	function l(e, t, l) {
+		let u;
+		if (typeof t == "string" || t instanceof o) return new e({
+			objectMode: !0,
+			...l,
+			read() {
+				this.push(t), this.push(null);
+			}
+		});
+		let d;
+		if (t && t[i]) d = !0, u = t[i]();
+		else if (t && t[a]) d = !1, u = t[a]();
+		else throw new s("iterable", ["Iterable"], t);
+		let f = new e({
+			objectMode: !0,
+			highWaterMark: 1,
+			...l
+		}), p = !1;
+		f._read = function() {
+			p || (p = !0, h());
+		}, f._destroy = function(e, t) {
+			r(m(e), () => n.nextTick(t, e), (r) => n.nextTick(t, r || e));
+		};
+		async function m(e) {
+			let t = e != null, n = typeof u.throw == "function";
+			if (t && n) {
+				let { value: t, done: n } = await u.throw(e);
+				if (await t, n) return;
+			}
+			if (typeof u.return == "function") {
+				let { value: e } = await u.return();
+				await e;
+			}
+		}
+		async function h() {
+			for (;;) {
+				try {
+					let { value: e, done: t } = d ? await u.next() : u.next();
+					if (t) f.push(null);
+					else {
+						let t = e && typeof e.then == "function" ? await e : e;
+						if (t === null) throw p = !1, new c();
+						if (f.push(t)) continue;
+						p = !1;
+					}
+				} catch (e) {
+					f.destroy(e);
+				}
+				break;
+			}
+		}
+		return f;
+	}
+	t.exports = l;
+}), Fo = J((e, t) => {
+	X(), $(), Q();
+	var n = wo(), { ArrayPrototypeIndexOf: r, NumberIsInteger: i, NumberIsNaN: a, NumberParseInt: o, ObjectDefineProperties: s, ObjectKeys: c, ObjectSetPrototypeOf: l, Promise: u, SafeSet: d, SymbolAsyncDispose: f, SymbolAsyncIterator: p, Symbol: m } = ao();
+	t.exports = G, G.ReadableState = me;
+	var { EventEmitter: h } = (xo(), Y(lo)), { Stream: g, prependListener: _ } = Oo(), { Buffer: v } = (io(), Y($a)), { addAbortSignal: y } = ko(), b = Eo(), x = So().debuglog("stream", (e) => {
+		x = e;
+	}), S = Ao(), C = Do(), { getHighWaterMark: w, getDefaultHighWaterMark: T } = jo(), { aggregateTwoErrors: E, codes: { ERR_INVALID_ARG_TYPE: D, ERR_METHOD_NOT_IMPLEMENTED: O, ERR_OUT_OF_RANGE: k, ERR_STREAM_PUSH_AFTER_EOF: A, ERR_STREAM_UNSHIFT_AFTER_END_EVENT: j }, AbortError: M } = so(), { validateObject: N } = Co(), P = m("kPaused"), { StringDecoder: F } = No(), I = Po();
+	l(G.prototype, g.prototype), l(G, g);
+	var L = () => {}, { errorOrDestroy: R } = C, z = 1, ee = 2, B = 4, V = 8, te = 16, H = 32, ne = 64, re = 128, ie = 256, ae = 512, U = 1024, oe = 2048, se = 4096, ce = 8192, le = 16384, ue = 32768, de = 65536, fe = 1 << 17, pe = 1 << 18;
+	function W(e) {
+		return {
+			enumerable: !1,
+			get() {
+				return (this.state & e) !== 0;
+			},
+			set(t) {
+				t ? this.state |= e : this.state &= ~e;
+			}
+		};
+	}
+	s(me.prototype, {
+		objectMode: W(z),
+		ended: W(ee),
+		endEmitted: W(B),
+		reading: W(V),
+		constructed: W(te),
+		sync: W(H),
+		needReadable: W(ne),
+		emittedReadable: W(re),
+		readableListening: W(ie),
+		resumeScheduled: W(ae),
+		errorEmitted: W(U),
+		emitClose: W(oe),
+		autoDestroy: W(se),
+		destroyed: W(ce),
+		closed: W(le),
+		closeEmitted: W(ue),
+		multiAwaitDrain: W(de),
+		readingMore: W(fe),
+		dataEmitted: W(pe)
+	});
+	function me(e, t, n) {
+		typeof n != "boolean" && (n = t instanceof Ro()), this.state = oe | se | te | H, e && e.objectMode && (this.state |= z), n && e && e.readableObjectMode && (this.state |= z), this.highWaterMark = e ? w(this, e, "readableHighWaterMark", n) : T(!1), this.buffer = new S(), this.length = 0, this.pipes = [], this.flowing = null, this[P] = null, e && e.emitClose === !1 && (this.state &= ~oe), e && e.autoDestroy === !1 && (this.state &= ~se), this.errored = null, this.defaultEncoding = e && e.defaultEncoding || "utf8", this.awaitDrainWriters = null, this.decoder = null, this.encoding = null, e && e.encoding && (this.decoder = new F(e.encoding), this.encoding = e.encoding);
+	}
+	function G(e) {
+		if (!(this instanceof G)) return new G(e);
+		let t = this instanceof Ro();
+		this._readableState = new me(e, this, t), e && (typeof e.read == "function" && (this._read = e.read), typeof e.destroy == "function" && (this._destroy = e.destroy), typeof e.construct == "function" && (this._construct = e.construct), e.signal && !t && y(e.signal, this)), g.call(this, e), C.construct(this, () => {
+			this._readableState.needReadable && Ce(this, this._readableState);
+		});
+	}
+	G.prototype.destroy = C.destroy, G.prototype._undestroy = C.undestroy, G.prototype._destroy = function(e, t) {
+		t(e);
+	}, G.prototype[h.captureRejectionSymbol] = function(e) {
+		this.destroy(e);
+	}, G.prototype[f] = function() {
+		let e;
+		return this.destroyed || (e = this.readableEnded ? null : new M(), this.destroy(e)), new u((t, n) => b(this, (r) => r && r !== e ? n(r) : t(null)));
+	}, G.prototype.push = function(e, t) {
+		return he(this, e, t, !1);
+	}, G.prototype.unshift = function(e, t) {
+		return he(this, e, t, !0);
+	};
+	function he(e, t, n, r) {
+		x("readableAddChunk", t);
+		let i = e._readableState, a;
+		if ((i.state & z) === 0 && (typeof t == "string" ? (n ||= i.defaultEncoding, i.encoding !== n && (r && i.encoding ? t = v.from(t, n).toString(i.encoding) : (t = v.from(t, n), n = ""))) : t instanceof v ? n = "" : g._isUint8Array(t) ? (t = g._uint8ArrayToBuffer(t), n = "") : t != null && (a = new D("chunk", [
+			"string",
+			"Buffer",
+			"Uint8Array"
+		], t))), a) R(e, a);
+		else if (t === null) i.state &= ~V, be(e, i);
+		else if ((i.state & z) !== 0 || t && t.length > 0) {
+			if (r) {
+				if ((i.state & B) !== 0) R(e, new j());
+				else {
+					if (i.destroyed || i.errored) return !1;
+					ge(e, i, t, !0);
+				}
+			} else if (i.ended) R(e, new A());
+			else {
+				if (i.destroyed || i.errored) return !1;
+				i.state &= ~V, i.decoder && !n ? (t = i.decoder.write(t), i.objectMode || t.length !== 0 ? ge(e, i, t, !1) : Ce(e, i)) : ge(e, i, t, !1);
+			}
+		} else r || (i.state &= ~V, Ce(e, i));
+		return !i.ended && (i.length < i.highWaterMark || i.length === 0);
+	}
+	function ge(e, t, n, r) {
+		t.flowing && t.length === 0 && !t.sync && e.listenerCount("data") > 0 ? ((t.state & de) === 0 ? t.awaitDrainWriters = null : t.awaitDrainWriters.clear(), t.dataEmitted = !0, e.emit("data", n)) : (t.length += t.objectMode ? 1 : n.length, r ? t.buffer.unshift(n) : t.buffer.push(n), (t.state & ne) !== 0 && xe(e)), Ce(e, t);
+	}
+	G.prototype.isPaused = function() {
+		let e = this._readableState;
+		return e[P] === !0 || e.flowing === !1;
+	}, G.prototype.setEncoding = function(e) {
+		let t = new F(e);
+		this._readableState.decoder = t, this._readableState.encoding = this._readableState.decoder.encoding;
+		let n = this._readableState.buffer, r = "";
+		for (let e of n) r += t.write(e);
+		return n.clear(), r !== "" && n.push(r), this._readableState.length = r.length, this;
+	};
+	var _e = 1073741824;
+	function ve(e) {
+		if (e > _e) throw new k("size", "<= 1GiB", e);
+		return e--, e |= e >>> 1, e |= e >>> 2, e |= e >>> 4, e |= e >>> 8, e |= e >>> 16, e++, e;
+	}
+	function ye(e, t) {
+		return e <= 0 || t.length === 0 && t.ended ? 0 : (t.state & z) === 0 ? a(e) ? t.flowing && t.length ? t.buffer.first().length : t.length : e <= t.length ? e : t.ended ? t.length : 0 : 1;
+	}
+	G.prototype.read = function(e) {
+		x("read", e), e === void 0 ? e = NaN : i(e) || (e = o(e, 10));
+		let t = this._readableState, n = e;
+		if (e > t.highWaterMark && (t.highWaterMark = ve(e)), e !== 0 && (t.state &= ~re), e === 0 && t.needReadable && ((t.highWaterMark === 0 ? t.length > 0 : t.length >= t.highWaterMark) || t.ended)) return x("read: emitReadable", t.length, t.ended), t.length === 0 && t.ended ? Pe(this) : xe(this), null;
+		if (e = ye(e, t), e === 0 && t.ended) return t.length === 0 && Pe(this), null;
+		let r = (t.state & ne) !== 0;
+		if (x("need readable", r), (t.length === 0 || t.length - e < t.highWaterMark) && (r = !0, x("length less than watermark", r)), t.ended || t.reading || t.destroyed || t.errored || !t.constructed) r = !1, x("reading, ended or constructing", r);
+		else if (r) {
+			x("do read"), t.state |= V | H, t.length === 0 && (t.state |= ne);
+			try {
+				this._read(t.highWaterMark);
+			} catch (e) {
+				R(this, e);
+			}
+			t.state &= ~H, t.reading || (e = ye(n, t));
+		}
+		let a;
+		return a = e > 0 ? Ne(e, t) : null, a === null ? (t.needReadable = t.length <= t.highWaterMark, e = 0) : (t.length -= e, t.multiAwaitDrain ? t.awaitDrainWriters.clear() : t.awaitDrainWriters = null), t.length === 0 && (t.ended || (t.needReadable = !0), n !== e && t.ended && Pe(this)), a !== null && !t.errorEmitted && !t.closeEmitted && (t.dataEmitted = !0, this.emit("data", a)), a;
+	};
+	function be(e, t) {
+		if (x("onEofChunk"), !t.ended) {
+			if (t.decoder) {
+				let e = t.decoder.end();
+				e && e.length && (t.buffer.push(e), t.length += t.objectMode ? 1 : e.length);
+			}
+			t.ended = !0, t.sync ? xe(e) : (t.needReadable = !1, t.emittedReadable = !0, Se(e));
+		}
+	}
+	function xe(e) {
+		let t = e._readableState;
+		x("emitReadable", t.needReadable, t.emittedReadable), t.needReadable = !1, t.emittedReadable || (x("emitReadable", t.flowing), t.emittedReadable = !0, n.nextTick(Se, e));
+	}
+	function Se(e) {
+		let t = e._readableState;
+		x("emitReadable_", t.destroyed, t.length, t.ended), !t.destroyed && !t.errored && (t.length || t.ended) && (e.emit("readable"), t.emittedReadable = !1), t.needReadable = !t.flowing && !t.ended && t.length <= t.highWaterMark, Ae(e);
+	}
+	function Ce(e, t) {
+		!t.readingMore && t.constructed && (t.readingMore = !0, n.nextTick(we, e, t));
+	}
+	function we(e, t) {
+		for (; !t.reading && !t.ended && (t.length < t.highWaterMark || t.flowing && t.length === 0);) {
+			let n = t.length;
+			if (x("maybeReadMore read 0"), e.read(0), n === t.length) break;
+		}
+		t.readingMore = !1;
+	}
+	G.prototype._read = function(e) {
+		throw new O("_read()");
+	}, G.prototype.pipe = function(e, t) {
+		let r = this, i = this._readableState;
+		i.pipes.length === 1 && (i.multiAwaitDrain || (i.multiAwaitDrain = !0, i.awaitDrainWriters = new d(i.awaitDrainWriters ? [i.awaitDrainWriters] : []))), i.pipes.push(e), x("pipe count=%d opts=%j", i.pipes.length, t);
+		let a = (!t || t.end !== !1) && e !== n.stdout && e !== n.stderr ? s : v;
+		i.endEmitted ? n.nextTick(a) : r.once("end", a), e.on("unpipe", o);
+		function o(e, t) {
+			x("onunpipe"), e === r && t && t.hasUnpiped === !1 && (t.hasUnpiped = !0, u());
+		}
+		function s() {
+			x("onend"), e.end();
+		}
+		let c, l = !1;
+		function u() {
+			x("cleanup"), e.removeListener("close", h), e.removeListener("finish", g), c && e.removeListener("drain", c), e.removeListener("error", m), e.removeListener("unpipe", o), r.removeListener("end", s), r.removeListener("end", v), r.removeListener("data", p), l = !0, c && i.awaitDrainWriters && (!e._writableState || e._writableState.needDrain) && c();
+		}
+		function f() {
+			l || (i.pipes.length === 1 && i.pipes[0] === e ? (x("false write response, pause", 0), i.awaitDrainWriters = e, i.multiAwaitDrain = !1) : i.pipes.length > 1 && i.pipes.includes(e) && (x("false write response, pause", i.awaitDrainWriters.size), i.awaitDrainWriters.add(e)), r.pause()), c || (c = Te(r, e), e.on("drain", c));
+		}
+		r.on("data", p);
+		function p(t) {
+			x("ondata");
+			let n = e.write(t);
+			x("dest.write", n), n === !1 && f();
+		}
+		function m(t) {
+			if (x("onerror", t), v(), e.removeListener("error", m), e.listenerCount("error") === 0) {
+				let n = e._writableState || e._readableState;
+				n && !n.errorEmitted ? R(e, t) : e.emit("error", t);
+			}
+		}
+		_(e, "error", m);
+		function h() {
+			e.removeListener("finish", g), v();
+		}
+		e.once("close", h);
+		function g() {
+			x("onfinish"), e.removeListener("close", h), v();
+		}
+		e.once("finish", g);
+		function v() {
+			x("unpipe"), r.unpipe(e);
+		}
+		return e.emit("pipe", r), e.writableNeedDrain === !0 ? f() : i.flowing || (x("pipe resume"), r.resume()), e;
+	};
+	function Te(e, t) {
+		return function() {
+			let n = e._readableState;
+			n.awaitDrainWriters === t ? (x("pipeOnDrain", 1), n.awaitDrainWriters = null) : n.multiAwaitDrain && (x("pipeOnDrain", n.awaitDrainWriters.size), n.awaitDrainWriters.delete(t)), (!n.awaitDrainWriters || n.awaitDrainWriters.size === 0) && e.listenerCount("data") && e.resume();
+		};
+	}
+	G.prototype.unpipe = function(e) {
+		let t = this._readableState, n = { hasUnpiped: !1 };
+		if (t.pipes.length === 0) return this;
+		if (!e) {
+			let e = t.pipes;
+			t.pipes = [], this.pause();
+			for (let t = 0; t < e.length; t++) e[t].emit("unpipe", this, { hasUnpiped: !1 });
+			return this;
+		}
+		let i = r(t.pipes, e);
+		return i === -1 ? this : (t.pipes.splice(i, 1), t.pipes.length === 0 && this.pause(), e.emit("unpipe", this, n), this);
+	}, G.prototype.on = function(e, t) {
+		let r = g.prototype.on.call(this, e, t), i = this._readableState;
+		return e === "data" ? (i.readableListening = this.listenerCount("readable") > 0, i.flowing !== !1 && this.resume()) : e === "readable" && !i.endEmitted && !i.readableListening && (i.readableListening = i.needReadable = !0, i.flowing = !1, i.emittedReadable = !1, x("on readable", i.length, i.reading), i.length ? xe(this) : i.reading || n.nextTick(De, this)), r;
+	}, G.prototype.addListener = G.prototype.on, G.prototype.removeListener = function(e, t) {
+		let r = g.prototype.removeListener.call(this, e, t);
+		return e === "readable" && n.nextTick(Ee, this), r;
+	}, G.prototype.off = G.prototype.removeListener, G.prototype.removeAllListeners = function(e) {
+		let t = g.prototype.removeAllListeners.apply(this, arguments);
+		return (e === "readable" || e === void 0) && n.nextTick(Ee, this), t;
+	};
+	function Ee(e) {
+		let t = e._readableState;
+		t.readableListening = e.listenerCount("readable") > 0, t.resumeScheduled && t[P] === !1 ? t.flowing = !0 : e.listenerCount("data") > 0 ? e.resume() : t.readableListening || (t.flowing = null);
+	}
+	function De(e) {
+		x("readable nexttick read 0"), e.read(0);
+	}
+	G.prototype.resume = function() {
+		let e = this._readableState;
+		return e.flowing || (x("resume"), e.flowing = !e.readableListening, Oe(this, e)), e[P] = !1, this;
+	};
+	function Oe(e, t) {
+		t.resumeScheduled || (t.resumeScheduled = !0, n.nextTick(ke, e, t));
+	}
+	function ke(e, t) {
+		x("resume", t.reading), t.reading || e.read(0), t.resumeScheduled = !1, e.emit("resume"), Ae(e), t.flowing && !t.reading && e.read(0);
+	}
+	G.prototype.pause = function() {
+		return x("call pause flowing=%j", this._readableState.flowing), this._readableState.flowing !== !1 && (x("pause"), this._readableState.flowing = !1, this.emit("pause")), this._readableState[P] = !0, this;
+	};
+	function Ae(e) {
+		let t = e._readableState;
+		for (x("flow", t.flowing); t.flowing && e.read() !== null;);
+	}
+	G.prototype.wrap = function(e) {
+		let t = !1;
+		e.on("data", (n) => {
+			!this.push(n) && e.pause && (t = !0, e.pause());
+		}), e.on("end", () => {
+			this.push(null);
+		}), e.on("error", (e) => {
+			R(this, e);
+		}), e.on("close", () => {
+			this.destroy();
+		}), e.on("destroy", () => {
+			this.destroy();
+		}), this._read = () => {
+			t && e.resume && (t = !1, e.resume());
+		};
+		let n = c(e);
+		for (let t = 1; t < n.length; t++) {
+			let r = n[t];
+			this[r] === void 0 && typeof e[r] == "function" && (this[r] = e[r].bind(e));
+		}
+		return this;
+	}, G.prototype[p] = function() {
+		return je(this);
+	}, G.prototype.iterator = function(e) {
+		return e !== void 0 && N(e, "options"), je(this, e);
+	};
+	function je(e, t) {
+		typeof e.read != "function" && (e = G.wrap(e, { objectMode: !0 }));
+		let n = Me(e, t);
+		return n.stream = e, n;
+	}
+	async function* Me(e, t) {
+		let n = L;
+		function r(t) {
+			this === e ? (n(), n = L) : n = t;
+		}
+		e.on("readable", r);
+		let i, a = b(e, { writable: !1 }, (e) => {
+			i = e ? E(i, e) : null, n(), n = L;
+		});
+		try {
+			for (;;) {
+				let t = e.destroyed ? null : e.read();
+				if (t !== null) yield t;
+				else {
+					if (i) throw i;
+					if (i === null) return;
+					await new u(r);
+				}
+			}
+		} catch (e) {
+			throw i = E(i, e), i;
+		} finally {
+			(i || t?.destroyOnReturn !== !1) && (i === void 0 || e._readableState.autoDestroy) ? C.destroyer(e, null) : (e.off("readable", r), a());
+		}
+	}
+	s(G.prototype, {
+		readable: {
+			__proto__: null,
+			get() {
+				let e = this._readableState;
+				return !!e && e.readable !== !1 && !e.destroyed && !e.errorEmitted && !e.endEmitted;
+			},
+			set(e) {
+				this._readableState && (this._readableState.readable = !!e);
+			}
+		},
+		readableDidRead: {
+			__proto__: null,
+			enumerable: !1,
+			get: function() {
+				return this._readableState.dataEmitted;
+			}
+		},
+		readableAborted: {
+			__proto__: null,
+			enumerable: !1,
+			get: function() {
+				return !(this._readableState.readable === !1 || !this._readableState.destroyed && !this._readableState.errored || this._readableState.endEmitted);
+			}
+		},
+		readableHighWaterMark: {
+			__proto__: null,
+			enumerable: !1,
+			get: function() {
+				return this._readableState.highWaterMark;
+			}
+		},
+		readableBuffer: {
+			__proto__: null,
+			enumerable: !1,
+			get: function() {
+				return this._readableState && this._readableState.buffer;
+			}
+		},
+		readableFlowing: {
+			__proto__: null,
+			enumerable: !1,
+			get: function() {
+				return this._readableState.flowing;
+			},
+			set: function(e) {
+				this._readableState && (this._readableState.flowing = e);
+			}
+		},
+		readableLength: {
+			__proto__: null,
+			enumerable: !1,
+			get() {
+				return this._readableState.length;
+			}
+		},
+		readableObjectMode: {
+			__proto__: null,
+			enumerable: !1,
+			get() {
+				return this._readableState ? this._readableState.objectMode : !1;
+			}
+		},
+		readableEncoding: {
+			__proto__: null,
+			enumerable: !1,
+			get() {
+				return this._readableState ? this._readableState.encoding : null;
+			}
+		},
+		errored: {
+			__proto__: null,
+			enumerable: !1,
+			get() {
+				return this._readableState ? this._readableState.errored : null;
+			}
+		},
+		closed: {
+			__proto__: null,
+			get() {
+				return this._readableState ? this._readableState.closed : !1;
+			}
+		},
+		destroyed: {
+			__proto__: null,
+			enumerable: !1,
+			get() {
+				return this._readableState ? this._readableState.destroyed : !1;
+			},
+			set(e) {
+				this._readableState && (this._readableState.destroyed = e);
+			}
+		},
+		readableEnded: {
+			__proto__: null,
+			enumerable: !1,
+			get() {
+				return this._readableState ? this._readableState.endEmitted : !1;
+			}
+		}
+	}), s(me.prototype, {
+		pipesCount: {
+			__proto__: null,
+			get() {
+				return this.pipes.length;
+			}
+		},
+		paused: {
+			__proto__: null,
+			get() {
+				return this[P] !== !1;
+			},
+			set(e) {
+				this[P] = !!e;
+			}
+		}
+	}), G._fromList = Ne;
+	function Ne(e, t) {
+		if (t.length === 0) return null;
+		let n;
+		return t.objectMode ? n = t.buffer.shift() : !e || e >= t.length ? (n = t.decoder ? t.buffer.join("") : t.buffer.length === 1 ? t.buffer.first() : t.buffer.concat(t.length), t.buffer.clear()) : n = t.buffer.consume(e, t.decoder), n;
+	}
+	function Pe(e) {
+		let t = e._readableState;
+		x("endReadable", t.endEmitted), t.endEmitted || (t.ended = !0, n.nextTick(Fe, t, e));
+	}
+	function Fe(e, t) {
+		if (x("endReadableNT", e.endEmitted, e.length), !e.errored && !e.closeEmitted && !e.endEmitted && e.length === 0) {
+			if (e.endEmitted = !0, t.emit("end"), t.writable && t.allowHalfOpen === !1) n.nextTick(Ie, t);
+			else if (e.autoDestroy) {
+				let e = t._writableState;
+				(!e || e.autoDestroy && (e.finished || e.writable === !1)) && t.destroy();
+			}
+		}
+	}
+	function Ie(e) {
+		e.writable && !e.writableEnded && !e.destroyed && e.end();
+	}
+	G.from = function(e, t) {
+		return I(G, e, t);
+	};
+	var Le;
+	function Re() {
+		return Le === void 0 && (Le = {}), Le;
+	}
+	G.fromWeb = function(e, t) {
+		return Re().newStreamReadableFromReadableStream(e, t);
+	}, G.toWeb = function(e, t) {
+		return Re().newReadableStreamFromStreamReadable(e, t);
+	}, G.wrap = function(e, t) {
+		return new G({
+			objectMode: e.readableObjectMode ?? e.objectMode ?? !0,
+			...t,
+			destroy(t, n) {
+				C.destroyer(e, t), n(t);
+			}
+		}).wrap(e);
+	};
+}), Io = J((e, t) => {
+	X(), $(), Q();
+	var n = wo(), { ArrayPrototypeSlice: r, Error: i, FunctionPrototypeSymbolHasInstance: a, ObjectDefineProperty: o, ObjectDefineProperties: s, ObjectSetPrototypeOf: c, StringPrototypeToLowerCase: l, Symbol: u, SymbolHasInstance: d } = ao();
+	t.exports = N, N.WritableState = j;
+	var { EventEmitter: f } = (xo(), Y(lo)), p = Oo().Stream, { Buffer: m } = (io(), Y($a)), h = Do(), { addAbortSignal: g } = ko(), { getHighWaterMark: _, getDefaultHighWaterMark: v } = jo(), { ERR_INVALID_ARG_TYPE: y, ERR_METHOD_NOT_IMPLEMENTED: b, ERR_MULTIPLE_CALLBACK: x, ERR_STREAM_CANNOT_PIPE: S, ERR_STREAM_DESTROYED: C, ERR_STREAM_ALREADY_FINISHED: w, ERR_STREAM_NULL_VALUES: T, ERR_STREAM_WRITE_AFTER_END: E, ERR_UNKNOWN_ENCODING: D } = so().codes, { errorOrDestroy: O } = h;
+	c(N.prototype, p.prototype), c(N, p);
+	function k() {}
+	var A = u("kOnFinished");
+	function j(e, t, n) {
+		typeof n != "boolean" && (n = t instanceof Ro()), this.objectMode = !!(e && e.objectMode), n && (this.objectMode = this.objectMode || !!(e && e.writableObjectMode)), this.highWaterMark = e ? _(this, e, "writableHighWaterMark", n) : v(!1), this.finalCalled = !1, this.needDrain = !1, this.ending = !1, this.ended = !1, this.finished = !1, this.destroyed = !1;
+		let r = !!(e && e.decodeStrings === !1);
+		this.decodeStrings = !r, this.defaultEncoding = e && e.defaultEncoding || "utf8", this.length = 0, this.writing = !1, this.corked = 0, this.sync = !0, this.bufferProcessing = !1, this.onwrite = R.bind(void 0, t), this.writecb = null, this.writelen = 0, this.afterWriteTickInfo = null, M(this), this.pendingcb = 0, this.constructed = !0, this.prefinished = !1, this.errorEmitted = !1, this.emitClose = !e || e.emitClose !== !1, this.autoDestroy = !e || e.autoDestroy !== !1, this.errored = null, this.closed = !1, this.closeEmitted = !1, this[A] = [];
+	}
+	function M(e) {
+		e.buffered = [], e.bufferedIndex = 0, e.allBuffers = !0, e.allNoop = !0;
+	}
+	j.prototype.getBuffer = function() {
+		return r(this.buffered, this.bufferedIndex);
+	}, o(j.prototype, "bufferedRequestCount", {
+		__proto__: null,
+		get() {
+			return this.buffered.length - this.bufferedIndex;
+		}
+	});
+	function N(e) {
+		let t = this instanceof Ro();
+		if (!t && !a(N, this)) return new N(e);
+		this._writableState = new j(e, this, t), e && (typeof e.write == "function" && (this._write = e.write), typeof e.writev == "function" && (this._writev = e.writev), typeof e.destroy == "function" && (this._destroy = e.destroy), typeof e.final == "function" && (this._final = e.final), typeof e.construct == "function" && (this._construct = e.construct), e.signal && g(e.signal, this)), p.call(this, e), h.construct(this, () => {
+			let e = this._writableState;
+			e.writing || V(this, e), re(this, e);
+		});
+	}
+	o(N, d, {
+		__proto__: null,
+		value: function(e) {
+			return a(this, e) ? !0 : this === N && e && e._writableState instanceof j;
+		}
+	}), N.prototype.pipe = function() {
+		O(this, new S());
+	};
+	function P(e, t, r, i) {
+		let a = e._writableState;
+		if (typeof r == "function") i = r, r = a.defaultEncoding;
+		else {
+			if (!r) r = a.defaultEncoding;
+			else if (r !== "buffer" && !m.isEncoding(r)) throw new D(r);
+			typeof i != "function" && (i = k);
+		}
+		if (t === null) throw new T();
+		if (!a.objectMode) {
+			if (typeof t == "string") a.decodeStrings !== !1 && (t = m.from(t, r), r = "buffer");
+			else if (t instanceof m) r = "buffer";
+			else if (p._isUint8Array(t)) t = p._uint8ArrayToBuffer(t), r = "buffer";
+			else throw new y("chunk", [
+				"string",
+				"Buffer",
+				"Uint8Array"
+			], t);
+		}
+		let o;
+		return a.ending ? o = new E() : a.destroyed && (o = new C("write")), o ? (n.nextTick(i, o), O(e, o, !0), o) : (a.pendingcb++, F(e, a, t, r, i));
+	}
+	N.prototype.write = function(e, t, n) {
+		return P(this, e, t, n) === !0;
+	}, N.prototype.cork = function() {
+		this._writableState.corked++;
+	}, N.prototype.uncork = function() {
+		let e = this._writableState;
+		e.corked && (e.corked--, e.writing || V(this, e));
+	}, N.prototype.setDefaultEncoding = function(e) {
+		if (typeof e == "string" && (e = l(e)), !m.isEncoding(e)) throw new D(e);
+		return this._writableState.defaultEncoding = e, this;
+	};
+	function F(e, t, n, r, i) {
+		let a = t.objectMode ? 1 : n.length;
+		t.length += a;
+		let o = t.length < t.highWaterMark;
+		return o || (t.needDrain = !0), t.writing || t.corked || t.errored || !t.constructed ? (t.buffered.push({
+			chunk: n,
+			encoding: r,
+			callback: i
+		}), t.allBuffers && r !== "buffer" && (t.allBuffers = !1), t.allNoop && i !== k && (t.allNoop = !1)) : (t.writelen = a, t.writecb = i, t.writing = !0, t.sync = !0, e._write(n, r, t.onwrite), t.sync = !1), o && !t.errored && !t.destroyed;
+	}
+	function I(e, t, n, r, i, a, o) {
+		t.writelen = r, t.writecb = o, t.writing = !0, t.sync = !0, t.destroyed ? t.onwrite(new C("write")) : n ? e._writev(i, t.onwrite) : e._write(i, a, t.onwrite), t.sync = !1;
+	}
+	function L(e, t, n, r) {
+		--t.pendingcb, r(n), B(t), O(e, n);
+	}
+	function R(e, t) {
+		let r = e._writableState, i = r.sync, a = r.writecb;
+		if (typeof a != "function") {
+			O(e, new x());
+			return;
+		}
+		r.writing = !1, r.writecb = null, r.length -= r.writelen, r.writelen = 0, t ? (t.stack, r.errored ||= t, e._readableState && !e._readableState.errored && (e._readableState.errored = t), i ? n.nextTick(L, e, r, t, a) : L(e, r, t, a)) : (r.buffered.length > r.bufferedIndex && V(e, r), i ? r.afterWriteTickInfo !== null && r.afterWriteTickInfo.cb === a ? r.afterWriteTickInfo.count++ : (r.afterWriteTickInfo = {
+			count: 1,
+			cb: a,
+			stream: e,
+			state: r
+		}, n.nextTick(z, r.afterWriteTickInfo)) : ee(e, r, 1, a));
+	}
+	function z({ stream: e, state: t, count: n, cb: r }) {
+		return t.afterWriteTickInfo = null, ee(e, t, n, r);
+	}
+	function ee(e, t, n, r) {
+		for (!t.ending && !e.destroyed && t.length === 0 && t.needDrain && (t.needDrain = !1, e.emit("drain")); n-- > 0;) t.pendingcb--, r();
+		t.destroyed && B(t), re(e, t);
+	}
+	function B(e) {
+		if (e.writing) return;
+		for (let t = e.bufferedIndex; t < e.buffered.length; ++t) {
+			let { chunk: n, callback: r } = e.buffered[t], i = e.objectMode ? 1 : n.length;
+			e.length -= i, r(e.errored ?? new C("write"));
+		}
+		let t = e[A].splice(0);
+		for (let n = 0; n < t.length; n++) t[n](e.errored ?? new C("end"));
+		M(e);
+	}
+	function V(e, t) {
+		if (t.corked || t.bufferProcessing || t.destroyed || !t.constructed) return;
+		let { buffered: n, bufferedIndex: i, objectMode: a } = t, o = n.length - i;
+		if (!o) return;
+		let s = i;
+		if (t.bufferProcessing = !0, o > 1 && e._writev) {
+			t.pendingcb -= o - 1;
+			let i = t.allNoop ? k : (e) => {
+				for (let t = s; t < n.length; ++t) n[t].callback(e);
+			}, a = t.allNoop && s === 0 ? n : r(n, s);
+			a.allBuffers = t.allBuffers, I(e, t, !0, t.length, a, "", i), M(t);
+		} else {
+			do {
+				let { chunk: r, encoding: i, callback: o } = n[s];
+				n[s++] = null, I(e, t, !1, a ? 1 : r.length, r, i, o);
+			} while (s < n.length && !t.writing);
+			s === n.length ? M(t) : s > 256 ? (n.splice(0, s), t.bufferedIndex = 0) : t.bufferedIndex = s;
+		}
+		t.bufferProcessing = !1;
+	}
+	N.prototype._write = function(e, t, n) {
+		if (this._writev) this._writev([{
+			chunk: e,
+			encoding: t
+		}], n);
+		else throw new b("_write()");
+	}, N.prototype._writev = null, N.prototype.end = function(e, t, r) {
+		let a = this._writableState;
+		typeof e == "function" ? (r = e, e = null, t = null) : typeof t == "function" && (r = t, t = null);
+		let o;
+		if (e != null) {
+			let n = P(this, e, t);
+			n instanceof i && (o = n);
+		}
+		return a.corked && (a.corked = 1, this.uncork()), o || (!a.errored && !a.ending ? (a.ending = !0, re(this, a, !0), a.ended = !0) : a.finished ? o = new w("end") : a.destroyed && (o = new C("end"))), typeof r == "function" && (o || a.finished ? n.nextTick(r, o) : a[A].push(r)), this;
+	};
+	function te(e) {
+		return e.ending && !e.destroyed && e.constructed && e.length === 0 && !e.errored && e.buffered.length === 0 && !e.finished && !e.writing && !e.errorEmitted && !e.closeEmitted;
+	}
+	function H(e, t) {
+		let r = !1;
+		function i(i) {
+			if (r) {
+				O(e, i ?? x());
+				return;
+			}
+			if (r = !0, t.pendingcb--, i) {
+				let n = t[A].splice(0);
+				for (let e = 0; e < n.length; e++) n[e](i);
+				O(e, i, t.sync);
+			} else te(t) && (t.prefinished = !0, e.emit("prefinish"), t.pendingcb++, n.nextTick(ie, e, t));
+		}
+		t.sync = !0, t.pendingcb++;
+		try {
+			e._final(i);
+		} catch (e) {
+			i(e);
+		}
+		t.sync = !1;
+	}
+	function ne(e, t) {
+		!t.prefinished && !t.finalCalled && (typeof e._final == "function" && !t.destroyed ? (t.finalCalled = !0, H(e, t)) : (t.prefinished = !0, e.emit("prefinish")));
+	}
+	function re(e, t, r) {
+		te(t) && (ne(e, t), t.pendingcb === 0 && (r ? (t.pendingcb++, n.nextTick((e, t) => {
+			te(t) ? ie(e, t) : t.pendingcb--;
+		}, e, t)) : te(t) && (t.pendingcb++, ie(e, t))));
+	}
+	function ie(e, t) {
+		t.pendingcb--, t.finished = !0;
+		let n = t[A].splice(0);
+		for (let e = 0; e < n.length; e++) n[e]();
+		if (e.emit("finish"), t.autoDestroy) {
+			let t = e._readableState;
+			(!t || t.autoDestroy && (t.endEmitted || t.readable === !1)) && e.destroy();
+		}
+	}
+	s(N.prototype, {
+		closed: {
+			__proto__: null,
+			get() {
+				return this._writableState ? this._writableState.closed : !1;
+			}
+		},
+		destroyed: {
+			__proto__: null,
+			get() {
+				return this._writableState ? this._writableState.destroyed : !1;
+			},
+			set(e) {
+				this._writableState && (this._writableState.destroyed = e);
+			}
+		},
+		writable: {
+			__proto__: null,
+			get() {
+				let e = this._writableState;
+				return !!e && e.writable !== !1 && !e.destroyed && !e.errored && !e.ending && !e.ended;
+			},
+			set(e) {
+				this._writableState && (this._writableState.writable = !!e);
+			}
+		},
+		writableFinished: {
+			__proto__: null,
+			get() {
+				return this._writableState ? this._writableState.finished : !1;
+			}
+		},
+		writableObjectMode: {
+			__proto__: null,
+			get() {
+				return this._writableState ? this._writableState.objectMode : !1;
+			}
+		},
+		writableBuffer: {
+			__proto__: null,
+			get() {
+				return this._writableState && this._writableState.getBuffer();
+			}
+		},
+		writableEnded: {
+			__proto__: null,
+			get() {
+				return this._writableState ? this._writableState.ending : !1;
+			}
+		},
+		writableNeedDrain: {
+			__proto__: null,
+			get() {
+				let e = this._writableState;
+				return e ? !e.destroyed && !e.ending && e.needDrain : !1;
+			}
+		},
+		writableHighWaterMark: {
+			__proto__: null,
+			get() {
+				return this._writableState && this._writableState.highWaterMark;
+			}
+		},
+		writableCorked: {
+			__proto__: null,
+			get() {
+				return this._writableState ? this._writableState.corked : 0;
+			}
+		},
+		writableLength: {
+			__proto__: null,
+			get() {
+				return this._writableState && this._writableState.length;
+			}
+		},
+		errored: {
+			__proto__: null,
+			enumerable: !1,
+			get() {
+				return this._writableState ? this._writableState.errored : null;
+			}
+		},
+		writableAborted: {
+			__proto__: null,
+			enumerable: !1,
+			get: function() {
+				return !(this._writableState.writable === !1 || !this._writableState.destroyed && !this._writableState.errored || this._writableState.finished);
+			}
+		}
+	});
+	var ae = h.destroy;
+	N.prototype.destroy = function(e, t) {
+		let r = this._writableState;
+		return !r.destroyed && (r.bufferedIndex < r.buffered.length || r[A].length) && n.nextTick(B, r), ae.call(this, e, t), this;
+	}, N.prototype._undestroy = h.undestroy, N.prototype._destroy = function(e, t) {
+		t(e);
+	}, N.prototype[f.captureRejectionSymbol] = function(e) {
+		this.destroy(e);
+	};
+	var U;
+	function oe() {
+		return U === void 0 && (U = {}), U;
+	}
+	N.fromWeb = function(e, t) {
+		return oe().newStreamWritableFromWritableStream(e, t);
+	}, N.toWeb = function(e) {
+		return oe().newWritableStreamFromStreamWritable(e);
+	};
+}), Lo = J((e, t) => {
+	X(), $(), Q();
+	var n = wo(), r = (io(), Y($a)), { isReadable: i, isWritable: a, isIterable: o, isNodeStream: s, isReadableNodeStream: c, isWritableNodeStream: l, isDuplexNodeStream: u, isReadableStream: d, isWritableStream: f } = To(), p = Eo(), { AbortError: m, codes: { ERR_INVALID_ARG_TYPE: h, ERR_INVALID_RETURN_VALUE: g } } = so(), { destroyer: _ } = Do(), v = Ro(), y = Fo(), b = Io(), { createDeferredPromise: x } = So(), S = Po(), C = globalThis.Blob || r.Blob, w = typeof C < "u" ? function(e) {
+		return e instanceof C;
+	} : function(e) {
+		return !1;
+	}, T = globalThis.AbortController || co().AbortController, { FunctionPrototypeCall: E } = ao(), D = class extends v {
+		constructor(e) {
+			super(e), e?.readable === !1 && (this._readableState.readable = !1, this._readableState.ended = !0, this._readableState.endEmitted = !0), e?.writable === !1 && (this._writableState.writable = !1, this._writableState.ending = !0, this._writableState.ended = !0, this._writableState.finished = !0);
+		}
+	};
+	t.exports = function e(t, r) {
+		if (u(t)) return t;
+		if (c(t)) return k({ readable: t });
+		if (l(t)) return k({ writable: t });
+		if (s(t)) return k({
+			writable: !1,
+			readable: !1
+		});
+		if (d(t)) return k({ readable: y.fromWeb(t) });
+		if (f(t)) return k({ writable: b.fromWeb(t) });
+		if (typeof t == "function") {
+			let { value: e, write: i, final: a, destroy: s } = O(t);
+			if (o(e)) return S(D, e, {
+				objectMode: !0,
+				write: i,
+				final: a,
+				destroy: s
+			});
+			let c = e?.then;
+			if (typeof c == "function") {
+				let t, r = E(c, e, (e) => {
+					if (e != null) throw new g("nully", "body", e);
+				}, (e) => {
+					_(t, e);
+				});
+				return t = new D({
+					objectMode: !0,
+					readable: !1,
+					write: i,
+					final(e) {
+						a(async () => {
+							try {
+								await r, n.nextTick(e, null);
+							} catch (t) {
+								n.nextTick(e, t);
+							}
+						});
+					},
+					destroy: s
+				});
+			}
+			throw new g("Iterable, AsyncIterable or AsyncFunction", r, e);
+		}
+		if (w(t)) return e(t.arrayBuffer());
+		if (o(t)) return S(D, t, {
+			objectMode: !0,
+			writable: !1
+		});
+		if (d(t?.readable) && f(t?.writable)) return D.fromWeb(t);
+		if (typeof t?.writable == "object" || typeof t?.readable == "object") return k({
+			readable: t != null && t.readable ? c(t?.readable) ? t?.readable : e(t.readable) : void 0,
+			writable: t != null && t.writable ? l(t?.writable) ? t?.writable : e(t.writable) : void 0
+		});
+		let i = t?.then;
+		if (typeof i == "function") {
+			let e;
+			return E(i, t, (t) => {
+				t != null && e.push(t), e.push(null);
+			}, (t) => {
+				_(e, t);
+			}), e = new D({
+				objectMode: !0,
+				writable: !1,
+				read() {}
+			});
+		}
+		throw new h(r, [
+			"Blob",
+			"ReadableStream",
+			"WritableStream",
+			"Stream",
+			"Iterable",
+			"AsyncIterable",
+			"Function",
+			"{ readable, writable } pair",
+			"Promise"
+		], t);
+	};
+	function O(e) {
+		let { promise: t, resolve: r } = x(), i = new T(), a = i.signal;
+		return {
+			value: e((async function* () {
+				for (;;) {
+					let e = t;
+					t = null;
+					let { chunk: i, done: o, cb: s } = await e;
+					if (n.nextTick(s), o) return;
+					if (a.aborted) throw new m(void 0, { cause: a.reason });
+					({promise: t, resolve: r} = x()), yield i;
+				}
+			})(), { signal: a }),
+			write(e, t, n) {
+				let i = r;
+				r = null, i({
+					chunk: e,
+					done: !1,
+					cb: n
+				});
+			},
+			final(e) {
+				let t = r;
+				r = null, t({
+					done: !0,
+					cb: e
+				});
+			},
+			destroy(e, t) {
+				i.abort(), t(e);
+			}
+		};
+	}
+	function k(e) {
+		let t = e.readable && typeof e.readable.read != "function" ? y.wrap(e.readable) : e.readable, n = e.writable, r = !!i(t), o = !!a(n), s, c, l, u, d;
+		function f(e) {
+			let t = u;
+			u = null, t ? t(e) : e && d.destroy(e);
+		}
+		return d = new D({
+			readableObjectMode: !!(t != null && t.readableObjectMode),
+			writableObjectMode: !!(n != null && n.writableObjectMode),
+			readable: r,
+			writable: o
+		}), o && (p(n, (e) => {
+			o = !1, e && _(t, e), f(e);
+		}), d._write = function(e, t, r) {
+			n.write(e, t) ? r() : s = r;
+		}, d._final = function(e) {
+			n.end(), c = e;
+		}, n.on("drain", function() {
+			if (s) {
+				let e = s;
+				s = null, e();
+			}
+		}), n.on("finish", function() {
+			if (c) {
+				let e = c;
+				c = null, e();
+			}
+		})), r && (p(t, (e) => {
+			r = !1, e && _(t, e), f(e);
+		}), t.on("readable", function() {
+			if (l) {
+				let e = l;
+				l = null, e();
+			}
+		}), t.on("end", function() {
+			d.push(null);
+		}), d._read = function() {
+			for (;;) {
+				let e = t.read();
+				if (e === null) {
+					l = d._read;
+					return;
+				}
+				if (!d.push(e)) return;
+			}
+		}), d._destroy = function(e, r) {
+			!e && u !== null && (e = new m()), l = null, s = null, c = null, u === null ? r(e) : (u = r, _(n, e), _(t, e));
+		}, d;
+	}
+}), Ro = J((e, t) => {
+	X(), $(), Q();
+	var { ObjectDefineProperties: n, ObjectGetOwnPropertyDescriptor: r, ObjectKeys: i, ObjectSetPrototypeOf: a } = ao();
+	t.exports = c;
+	var o = Fo(), s = Io();
+	a(c.prototype, o.prototype), a(c, o);
+	{
+		let e = i(s.prototype);
+		for (let t = 0; t < e.length; t++) {
+			let n = e[t];
+			c.prototype[n] || (c.prototype[n] = s.prototype[n]);
+		}
+	}
+	function c(e) {
+		if (!(this instanceof c)) return new c(e);
+		o.call(this, e), s.call(this, e), e ? (this.allowHalfOpen = e.allowHalfOpen !== !1, e.readable === !1 && (this._readableState.readable = !1, this._readableState.ended = !0, this._readableState.endEmitted = !0), e.writable === !1 && (this._writableState.writable = !1, this._writableState.ending = !0, this._writableState.ended = !0, this._writableState.finished = !0)) : this.allowHalfOpen = !0;
+	}
+	n(c.prototype, {
+		writable: {
+			__proto__: null,
+			...r(s.prototype, "writable")
+		},
+		writableHighWaterMark: {
+			__proto__: null,
+			...r(s.prototype, "writableHighWaterMark")
+		},
+		writableObjectMode: {
+			__proto__: null,
+			...r(s.prototype, "writableObjectMode")
+		},
+		writableBuffer: {
+			__proto__: null,
+			...r(s.prototype, "writableBuffer")
+		},
+		writableLength: {
+			__proto__: null,
+			...r(s.prototype, "writableLength")
+		},
+		writableFinished: {
+			__proto__: null,
+			...r(s.prototype, "writableFinished")
+		},
+		writableCorked: {
+			__proto__: null,
+			...r(s.prototype, "writableCorked")
+		},
+		writableEnded: {
+			__proto__: null,
+			...r(s.prototype, "writableEnded")
+		},
+		writableNeedDrain: {
+			__proto__: null,
+			...r(s.prototype, "writableNeedDrain")
+		},
+		destroyed: {
+			__proto__: null,
+			get() {
+				return this._readableState === void 0 || this._writableState === void 0 ? !1 : this._readableState.destroyed && this._writableState.destroyed;
+			},
+			set(e) {
+				this._readableState && this._writableState && (this._readableState.destroyed = e, this._writableState.destroyed = e);
+			}
+		}
+	});
+	var l;
+	function u() {
+		return l === void 0 && (l = {}), l;
+	}
+	c.fromWeb = function(e, t) {
+		return u().newStreamDuplexFromReadableWritablePair(e, t);
+	}, c.toWeb = function(e) {
+		return u().newReadableWritablePairFromDuplex(e);
+	};
+	var d;
+	c.from = function(e) {
+		return d ||= Lo(), d(e, "body");
+	};
+}), zo = J((e, t) => {
+	X(), $(), Q();
+	var { ObjectSetPrototypeOf: n, Symbol: r } = ao();
+	t.exports = c;
+	var { ERR_METHOD_NOT_IMPLEMENTED: i } = so().codes, a = Ro(), { getHighWaterMark: o } = jo();
+	n(c.prototype, a.prototype), n(c, a);
+	var s = r("kCallback");
+	function c(e) {
+		if (!(this instanceof c)) return new c(e);
+		let t = e ? o(this, e, "readableHighWaterMark", !0) : null;
+		t === 0 && (e = {
+			...e,
+			highWaterMark: null,
+			readableHighWaterMark: t,
+			writableHighWaterMark: e.writableHighWaterMark || 0
+		}), a.call(this, e), this._readableState.sync = !1, this[s] = null, e && (typeof e.transform == "function" && (this._transform = e.transform), typeof e.flush == "function" && (this._flush = e.flush)), this.on("prefinish", u);
+	}
+	function l(e) {
+		typeof this._flush == "function" && !this.destroyed ? this._flush((t, n) => {
+			if (t) {
+				e ? e(t) : this.destroy(t);
+				return;
+			}
+			n != null && this.push(n), this.push(null), e && e();
+		}) : (this.push(null), e && e());
+	}
+	function u() {
+		this._final !== l && l.call(this);
+	}
+	c.prototype._final = l, c.prototype._transform = function(e, t, n) {
+		throw new i("_transform()");
+	}, c.prototype._write = function(e, t, n) {
+		let r = this._readableState, i = this._writableState, a = r.length;
+		this._transform(e, t, (e, t) => {
+			if (e) {
+				n(e);
+				return;
+			}
+			t != null && this.push(t), i.ended || a === r.length || r.length < r.highWaterMark ? n() : this[s] = n;
+		});
+	}, c.prototype._read = function() {
+		if (this[s]) {
+			let e = this[s];
+			this[s] = null, e();
+		}
+	};
+}), Bo = J((e, t) => {
+	X(), $(), Q();
+	var { ObjectSetPrototypeOf: n } = ao();
+	t.exports = i;
+	var r = zo();
+	n(i.prototype, r.prototype), n(i, r);
+	function i(e) {
+		if (!(this instanceof i)) return new i(e);
+		r.call(this, e);
+	}
+	i.prototype._transform = function(e, t, n) {
+		n(null, e);
+	};
+}), Vo = J((e, t) => {
+	X(), $(), Q();
+	var n = wo(), { ArrayIsArray: r, Promise: i, SymbolAsyncIterator: a, SymbolDispose: o } = ao(), s = Eo(), { once: c } = So(), l = Do(), u = Ro(), { aggregateTwoErrors: d, codes: { ERR_INVALID_ARG_TYPE: f, ERR_INVALID_RETURN_VALUE: p, ERR_MISSING_ARGS: m, ERR_STREAM_DESTROYED: h, ERR_STREAM_PREMATURE_CLOSE: g }, AbortError: _ } = so(), { validateFunction: v, validateAbortSignal: y } = Co(), { isIterable: b, isReadable: x, isReadableNodeStream: S, isNodeStream: C, isTransformStream: w, isWebStream: T, isReadableStream: E, isReadableFinished: D } = To(), O = globalThis.AbortController || co().AbortController, k, A, j;
+	function M(e, t, n) {
+		let r = !1;
+		return e.on("close", () => {
+			r = !0;
+		}), {
+			destroy: (t) => {
+				r || (r = !0, l.destroyer(e, t || new h("pipe")));
+			},
+			cleanup: s(e, {
+				readable: t,
+				writable: n
+			}, (e) => {
+				r = !e;
+			})
+		};
+	}
+	function N(e) {
+		return v(e[e.length - 1], "streams[stream.length - 1]"), e.pop();
+	}
+	function P(e) {
+		if (b(e)) return e;
+		if (S(e)) return F(e);
+		throw new f("val", [
+			"Readable",
+			"Iterable",
+			"AsyncIterable"
+		], e);
+	}
+	async function* F(e) {
+		A ||= Fo(), yield* A.prototype[a].call(e);
+	}
+	async function I(e, t, n, { end: r }) {
+		let a, o = null, c = (e) => {
+			if (e && (a = e), o) {
+				let e = o;
+				o = null, e();
+			}
+		}, l = () => new i((e, t) => {
+			a ? t(a) : o = () => {
+				a ? t(a) : e();
+			};
+		});
+		t.on("drain", c);
+		let u = s(t, { readable: !1 }, c);
+		try {
+			t.writableNeedDrain && await l();
+			for await (let n of e) t.write(n) || await l();
+			r && (t.end(), await l()), n();
+		} catch (e) {
+			n(a === e ? e : d(a, e));
+		} finally {
+			u(), t.off("drain", c);
+		}
+	}
+	async function L(e, t, n, { end: r }) {
+		w(t) && (t = t.writable);
+		let i = t.getWriter();
+		try {
+			for await (let t of e) await i.ready, i.write(t).catch(() => {});
+			await i.ready, r && await i.close(), n();
+		} catch (e) {
+			try {
+				await i.abort(e), n(e);
+			} catch (e) {
+				n(e);
+			}
+		}
+	}
+	function R(...e) {
+		return z(e, c(N(e)));
+	}
+	function z(e, t, i) {
+		if (e.length === 1 && r(e[0]) && (e = e[0]), e.length < 2) throw new m("streams");
+		let a = new O(), s = a.signal, c = i?.signal, l = [];
+		y(c, "options.signal");
+		function d() {
+			F(new _());
+		}
+		j ||= So().addAbortListener;
+		let h;
+		c && (h = j(c, d));
+		let g, v, D = [], A = 0;
+		function N(e) {
+			F(e, --A === 0);
+		}
+		function F(e, r) {
+			var i;
+			if (e && (!g || g.code === "ERR_STREAM_PREMATURE_CLOSE") && (g = e), g || r) {
+				for (; D.length;) D.shift()(g);
+				(i = h) == null || i[o](), a.abort(), r && (g || l.forEach((e) => e()), n.nextTick(t, g, v));
+			}
+		}
+		let R;
+		for (let t = 0; t < e.length; t++) {
+			let r = e[t], a = t < e.length - 1, o = t > 0, c = a || i?.end !== !1, d = t === e.length - 1;
+			if (C(r)) {
+				let e = function(e) {
+					e && e.name !== "AbortError" && e.code !== "ERR_STREAM_PREMATURE_CLOSE" && N(e);
+				};
+				if (c) {
+					let { destroy: e, cleanup: t } = M(r, a, o);
+					D.push(e), x(r) && d && l.push(t);
+				}
+				r.on("error", e), x(r) && d && l.push(() => {
+					r.removeListener("error", e);
+				});
+			}
+			if (t === 0) {
+				if (typeof r == "function") {
+					if (R = r({ signal: s }), !b(R)) throw new p("Iterable, AsyncIterable or Stream", "source", R);
+				} else R = b(r) || S(r) || w(r) ? r : u.from(r);
+			} else if (typeof r == "function") {
+				if (R = w(R) ? P(R?.readable) : P(R), R = r(R, { signal: s }), a) {
+					if (!b(R, !0)) throw new p("AsyncIterable", `transform[${t - 1}]`, R);
+				} else {
+					k ||= Bo();
+					let e = new k({ objectMode: !0 }), t = R?.then;
+					if (typeof t == "function") A++, t.call(R, (t) => {
+						v = t, t != null && e.write(t), c && e.end(), n.nextTick(N);
+					}, (t) => {
+						e.destroy(t), n.nextTick(N, t);
+					});
+					else if (b(R, !0)) A++, I(R, e, N, { end: c });
+					else if (E(R) || w(R)) {
+						let t = R.readable || R;
+						A++, I(t, e, N, { end: c });
+					} else throw new p("AsyncIterable or Promise", "destination", R);
+					R = e;
+					let { destroy: r, cleanup: i } = M(R, !1, !0);
+					D.push(r), d && l.push(i);
+				}
+			} else if (C(r)) {
+				if (S(R)) {
+					A += 2;
+					let e = ee(R, r, N, { end: c });
+					x(r) && d && l.push(e);
+				} else if (w(R) || E(R)) {
+					let e = R.readable || R;
+					A++, I(e, r, N, { end: c });
+				} else if (b(R)) A++, I(R, r, N, { end: c });
+				else throw new f("val", [
+					"Readable",
+					"Iterable",
+					"AsyncIterable",
+					"ReadableStream",
+					"TransformStream"
+				], R);
+				R = r;
+			} else if (T(r)) {
+				if (S(R)) A++, L(P(R), r, N, { end: c });
+				else if (E(R) || b(R)) A++, L(R, r, N, { end: c });
+				else if (w(R)) A++, L(R.readable, r, N, { end: c });
+				else throw new f("val", [
+					"Readable",
+					"Iterable",
+					"AsyncIterable",
+					"ReadableStream",
+					"TransformStream"
+				], R);
+				R = r;
+			} else R = u.from(r);
+		}
+		return (s != null && s.aborted || c != null && c.aborted) && n.nextTick(d), R;
+	}
+	function ee(e, t, r, { end: i }) {
+		let a = !1;
+		if (t.on("close", () => {
+			a || r(new g());
+		}), e.pipe(t, { end: !1 }), i) {
+			let r = function() {
+				a = !0, t.end();
+			};
+			D(e) ? n.nextTick(r) : e.once("end", r);
+		} else r();
+		return s(e, {
+			readable: !0,
+			writable: !1
+		}, (t) => {
+			let n = e._readableState;
+			t && t.code === "ERR_STREAM_PREMATURE_CLOSE" && n && n.ended && !n.errored && !n.errorEmitted ? e.once("end", r).once("error", r) : r(t);
+		}), s(t, {
+			readable: !1,
+			writable: !0
+		}, r);
+	}
+	t.exports = {
+		pipelineImpl: z,
+		pipeline: R
+	};
+}), Ho = J((e, t) => {
+	X(), $(), Q();
+	var { pipeline: n } = Vo(), r = Ro(), { destroyer: i } = Do(), { isNodeStream: a, isReadable: o, isWritable: s, isWebStream: c, isTransformStream: l, isWritableStream: u, isReadableStream: d } = To(), { AbortError: f, codes: { ERR_INVALID_ARG_VALUE: p, ERR_MISSING_ARGS: m } } = so(), h = Eo();
+	t.exports = function(...e) {
+		if (e.length === 0) throw new m("streams");
+		if (e.length === 1) return r.from(e[0]);
+		let t = [...e];
+		if (typeof e[0] == "function" && (e[0] = r.from(e[0])), typeof e[e.length - 1] == "function") {
+			let t = e.length - 1;
+			e[t] = r.from(e[t]);
+		}
+		for (let n = 0; n < e.length; ++n) if (a(e[n]) || c(e[n])) {
+			if (n < e.length - 1 && !(o(e[n]) || d(e[n]) || l(e[n]))) throw new p(`streams[${n}]`, t[n], "must be readable");
+			if (n > 0 && !(s(e[n]) || u(e[n]) || l(e[n]))) throw new p(`streams[${n}]`, t[n], "must be writable");
+		}
+		let g, _, v, y, b;
+		function x(e) {
+			let t = y;
+			y = null, t ? t(e) : e ? b.destroy(e) : !T && !w && b.destroy();
+		}
+		let S = e[0], C = n(e, x), w = !!(s(S) || u(S) || l(S)), T = !!(o(C) || d(C) || l(C));
+		if (b = new r({
+			writableObjectMode: !!(S != null && S.writableObjectMode),
+			readableObjectMode: !!(C != null && C.readableObjectMode),
+			writable: w,
+			readable: T
+		}), w) {
+			if (a(S)) b._write = function(e, t, n) {
+				S.write(e, t) ? n() : g = n;
+			}, b._final = function(e) {
+				S.end(), _ = e;
+			}, S.on("drain", function() {
+				if (g) {
+					let e = g;
+					g = null, e();
+				}
+			});
+			else if (c(S)) {
+				let e = (l(S) ? S.writable : S).getWriter();
+				b._write = async function(t, n, r) {
+					try {
+						await e.ready, e.write(t).catch(() => {}), r();
+					} catch (e) {
+						r(e);
+					}
+				}, b._final = async function(t) {
+					try {
+						await e.ready, e.close().catch(() => {}), _ = t;
+					} catch (e) {
+						t(e);
+					}
+				};
+			}
+			h(l(C) ? C.readable : C, () => {
+				if (_) {
+					let e = _;
+					_ = null, e();
+				}
+			});
+		}
+		if (T) {
+			if (a(C)) C.on("readable", function() {
+				if (v) {
+					let e = v;
+					v = null, e();
+				}
+			}), C.on("end", function() {
+				b.push(null);
+			}), b._read = function() {
+				for (;;) {
+					let e = C.read();
+					if (e === null) {
+						v = b._read;
+						return;
+					}
+					if (!b.push(e)) return;
+				}
+			};
+			else if (c(C)) {
+				let e = (l(C) ? C.readable : C).getReader();
+				b._read = async function() {
+					for (;;) try {
+						let { value: t, done: n } = await e.read();
+						if (!b.push(t)) return;
+						if (n) {
+							b.push(null);
+							return;
+						}
+					} catch {
+						return;
+					}
+				};
+			}
+		}
+		return b._destroy = function(e, t) {
+			!e && y !== null && (e = new f()), v = null, g = null, _ = null, y === null ? t(e) : (y = t, a(C) && i(C, e));
+		}, b;
+	};
+}), Uo = J((e, t) => {
+	X(), $(), Q();
+	var n = globalThis.AbortController || co().AbortController, { codes: { ERR_INVALID_ARG_VALUE: r, ERR_INVALID_ARG_TYPE: i, ERR_MISSING_ARGS: a, ERR_OUT_OF_RANGE: o }, AbortError: s } = so(), { validateAbortSignal: c, validateInteger: l, validateObject: u } = Co(), d = ao().Symbol("kWeak"), f = ao().Symbol("kResistStopPropagation"), { finished: p } = Eo(), m = Ho(), { addAbortSignalNoValidate: h } = ko(), { isWritable: g, isNodeStream: _ } = To(), { deprecate: v } = So(), { ArrayPrototypePush: y, Boolean: b, MathFloor: x, Number: S, NumberIsNaN: C, Promise: w, PromiseReject: T, PromiseResolve: E, PromisePrototypeThen: D, Symbol: O } = ao(), k = O("kEmpty"), A = O("kEof");
+	function j(e, t) {
+		if (t != null && u(t, "options"), t?.signal != null && c(t.signal, "options.signal"), _(e) && !g(e)) throw new r("stream", e, "must be writable");
+		let n = m(this, e);
+		return t != null && t.signal && h(t.signal, n), n;
+	}
+	function M(e, t) {
+		if (typeof e != "function") throw new i("fn", ["Function", "AsyncFunction"], e);
+		t != null && u(t, "options"), t?.signal != null && c(t.signal, "options.signal");
+		let n = 1;
+		t?.concurrency != null && (n = x(t.concurrency));
+		let r = n - 1;
+		return t?.highWaterMark != null && (r = x(t.highWaterMark)), l(n, "options.concurrency", 1), l(r, "options.highWaterMark", 0), r += n, async function* () {
+			let i = So().AbortSignalAny([t?.signal].filter(b)), a = this, o = [], c = { signal: i }, l, u, d = !1, f = 0;
+			function p() {
+				d = !0, m();
+			}
+			function m() {
+				--f, h();
+			}
+			function h() {
+				u && !d && f < n && o.length < r && (u(), u = null);
+			}
+			async function g() {
+				try {
+					for await (let t of a) {
+						if (d) return;
+						if (i.aborted) throw new s();
+						try {
+							if (t = e(t, c), t === k) continue;
+							t = E(t);
+						} catch (e) {
+							t = T(e);
+						}
+						f += 1, D(t, m, p), o.push(t), l &&= (l(), null), !d && (o.length >= r || f >= n) && await new w((e) => {
+							u = e;
+						});
+					}
+					o.push(A);
+				} catch (e) {
+					let t = T(e);
+					D(t, m, p), o.push(t);
+				} finally {
+					d = !0, l &&= (l(), null);
+				}
+			}
+			g();
+			try {
+				for (;;) {
+					for (; o.length > 0;) {
+						let e = await o[0];
+						if (e === A) return;
+						if (i.aborted) throw new s();
+						e !== k && (yield e), o.shift(), h();
+					}
+					await new w((e) => {
+						l = e;
+					});
+				}
+			} finally {
+				d = !0, u &&= (u(), null);
+			}
+		}.call(this);
+	}
+	function N(e = void 0) {
+		return e != null && u(e, "options"), e?.signal != null && c(e.signal, "options.signal"), async function* () {
+			let t = 0;
+			for await (let r of this) {
+				var n;
+				if (e != null && (n = e.signal) != null && n.aborted) throw new s({ cause: e.signal.reason });
+				yield [t++, r];
+			}
+		}.call(this);
+	}
+	async function P(e, t = void 0) {
+		for await (let n of R.call(this, e, t)) return !0;
+		return !1;
+	}
+	async function F(e, t = void 0) {
+		if (typeof e != "function") throw new i("fn", ["Function", "AsyncFunction"], e);
+		return !await P.call(this, async (...t) => !await e(...t), t);
+	}
+	async function I(e, t) {
+		for await (let n of R.call(this, e, t)) return n;
+	}
+	async function L(e, t) {
+		if (typeof e != "function") throw new i("fn", ["Function", "AsyncFunction"], e);
+		async function n(t, n) {
+			return await e(t, n), k;
+		}
+		for await (let e of M.call(this, n, t));
+	}
+	function R(e, t) {
+		if (typeof e != "function") throw new i("fn", ["Function", "AsyncFunction"], e);
+		async function n(t, n) {
+			return await e(t, n) ? t : k;
+		}
+		return M.call(this, n, t);
+	}
+	var z = class extends a {
+		constructor() {
+			super("reduce"), this.message = "Reduce of an empty stream requires an initial value";
+		}
+	};
+	async function ee(e, t, r) {
+		var a;
+		if (typeof e != "function") throw new i("reducer", ["Function", "AsyncFunction"], e);
+		r != null && u(r, "options"), r?.signal != null && c(r.signal, "options.signal");
+		let o = arguments.length > 1;
+		if (r != null && (a = r.signal) != null && a.aborted) {
+			let e = new s(void 0, { cause: r.signal.reason });
+			throw this.once("error", () => {}), await p(this.destroy(e)), e;
+		}
+		let l = new n(), m = l.signal;
+		if (r != null && r.signal) {
+			let e = {
+				once: !0,
+				[d]: this,
+				[f]: !0
+			};
+			r.signal.addEventListener("abort", () => l.abort(), e);
+		}
+		let h = !1;
+		try {
+			for await (let n of this) {
+				var g;
+				if (h = !0, r != null && (g = r.signal) != null && g.aborted) throw new s();
+				o ? t = await e(t, n, { signal: m }) : (t = n, o = !0);
+			}
+			if (!h && !o) throw new z();
+		} finally {
+			l.abort();
+		}
+		return t;
+	}
+	async function B(e) {
+		e != null && u(e, "options"), e?.signal != null && c(e.signal, "options.signal");
+		let t = [];
+		for await (let r of this) {
+			var n;
+			if (e != null && (n = e.signal) != null && n.aborted) throw new s(void 0, { cause: e.signal.reason });
+			y(t, r);
+		}
+		return t;
+	}
+	function V(e, t) {
+		let n = M.call(this, e, t);
+		return async function* () {
+			for await (let e of n) yield* e;
+		}.call(this);
+	}
+	function te(e) {
+		if (e = S(e), C(e)) return 0;
+		if (e < 0) throw new o("number", ">= 0", e);
+		return e;
+	}
+	function H(e, t = void 0) {
+		return t != null && u(t, "options"), t?.signal != null && c(t.signal, "options.signal"), e = te(e), async function* () {
+			var n;
+			if (t != null && (n = t.signal) != null && n.aborted) throw new s();
+			for await (let n of this) {
+				var r;
+				if (t != null && (r = t.signal) != null && r.aborted) throw new s();
+				e-- <= 0 && (yield n);
+			}
+		}.call(this);
+	}
+	function ne(e, t = void 0) {
+		return t != null && u(t, "options"), t?.signal != null && c(t.signal, "options.signal"), e = te(e), async function* () {
+			var n;
+			if (t != null && (n = t.signal) != null && n.aborted) throw new s();
+			for await (let n of this) {
+				var r;
+				if (t != null && (r = t.signal) != null && r.aborted) throw new s();
+				if (e-- > 0 && (yield n), e <= 0) return;
+			}
+		}.call(this);
+	}
+	t.exports.streamReturningOperators = {
+		asIndexedPairs: v(N, "readable.asIndexedPairs will be removed in a future version."),
+		drop: H,
+		filter: R,
+		flatMap: V,
+		map: M,
+		take: ne,
+		compose: j
+	}, t.exports.promiseReturningOperators = {
+		every: F,
+		forEach: L,
+		reduce: ee,
+		toArray: B,
+		some: P,
+		find: I
+	};
+}), Wo = J((e, t) => {
+	X(), $(), Q();
+	var { ArrayPrototypePop: n, Promise: r } = ao(), { isIterable: i, isNodeStream: a, isWebStream: o } = To(), { pipelineImpl: s } = Vo(), { finished: c } = Eo();
+	Go();
+	function l(...e) {
+		return new r((t, r) => {
+			let c, l, u = e[e.length - 1];
+			if (u && typeof u == "object" && !a(u) && !i(u) && !o(u)) {
+				let t = n(e);
+				c = t.signal, l = t.end;
+			}
+			s(e, (e, n) => {
+				e ? r(e) : t(n);
+			}, {
+				signal: c,
+				end: l
+			});
+		});
+	}
+	t.exports = {
+		finished: c,
+		pipeline: l
+	};
+}), Go = J((e, t) => {
+	X(), $(), Q();
+	var { Buffer: n } = (io(), Y($a)), { ObjectDefineProperty: r, ObjectKeys: i, ReflectApply: a } = ao(), { promisify: { custom: o } } = So(), { streamReturningOperators: s, promiseReturningOperators: c } = Uo(), { codes: { ERR_ILLEGAL_CONSTRUCTOR: l } } = so(), u = Ho(), { setDefaultHighWaterMark: d, getDefaultHighWaterMark: f } = jo(), { pipeline: p } = Vo(), { destroyer: m } = Do(), h = Eo(), g = Wo(), _ = To(), v = t.exports = Oo().Stream;
+	v.isDestroyed = _.isDestroyed, v.isDisturbed = _.isDisturbed, v.isErrored = _.isErrored, v.isReadable = _.isReadable, v.isWritable = _.isWritable, v.Readable = Fo();
+	for (let e of i(s)) {
+		let t = function(...e) {
+			if (new.target) throw l();
+			return v.Readable.from(a(n, this, e));
+		}, n = s[e];
+		r(t, "name", {
+			__proto__: null,
+			value: n.name
+		}), r(t, "length", {
+			__proto__: null,
+			value: n.length
+		}), r(v.Readable.prototype, e, {
+			__proto__: null,
+			value: t,
+			enumerable: !1,
+			configurable: !0,
+			writable: !0
+		});
+	}
+	for (let e of i(c)) {
+		let t = function(...e) {
+			if (new.target) throw l();
+			return a(n, this, e);
+		}, n = c[e];
+		r(t, "name", {
+			__proto__: null,
+			value: n.name
+		}), r(t, "length", {
+			__proto__: null,
+			value: n.length
+		}), r(v.Readable.prototype, e, {
+			__proto__: null,
+			value: t,
+			enumerable: !1,
+			configurable: !0,
+			writable: !0
+		});
+	}
+	v.Writable = Io(), v.Duplex = Ro(), v.Transform = zo(), v.PassThrough = Bo(), v.pipeline = p;
+	var { addAbortSignal: y } = ko();
+	v.addAbortSignal = y, v.finished = h, v.destroy = m, v.compose = u, v.setDefaultHighWaterMark = d, v.getDefaultHighWaterMark = f, r(v, "promises", {
+		__proto__: null,
+		configurable: !0,
+		enumerable: !0,
+		get() {
+			return g;
+		}
+	}), r(p, o, {
+		__proto__: null,
+		enumerable: !0,
+		get() {
+			return g.pipeline;
+		}
+	}), r(h, o, {
+		__proto__: null,
+		enumerable: !0,
+		get() {
+			return g.finished;
+		}
+	}), v.Stream = v, v._isUint8Array = function(e) {
+		return e instanceof Uint8Array;
+	}, v._uint8ArrayToBuffer = function(e) {
+		return n.from(e.buffer, e.byteOffset, e.byteLength);
+	};
+}), Ko = J((e, t) => {
+	X(), $(), Q();
+	var n = Go(), r = Wo(), i = n.Readable.destroy;
+	t.exports = n.Readable, t.exports._uint8ArrayToBuffer = n._uint8ArrayToBuffer, t.exports._isUint8Array = n._isUint8Array, t.exports.isDisturbed = n.isDisturbed, t.exports.isErrored = n.isErrored, t.exports.isReadable = n.isReadable, t.exports.Readable = n.Readable, t.exports.Writable = n.Writable, t.exports.Duplex = n.Duplex, t.exports.Transform = n.Transform, t.exports.PassThrough = n.PassThrough, t.exports.addAbortSignal = n.addAbortSignal, t.exports.finished = n.finished, t.exports.destroy = n.destroy, t.exports.destroy = i, t.exports.pipeline = n.pipeline, t.exports.compose = n.compose, Object.defineProperty(n, "promises", {
+		configurable: !0,
+		enumerable: !0,
+		get() {
+			return r;
+		}
+	}), t.exports.Stream = n.Stream, t.exports.default = t.exports;
+}), qo = J((e, t) => {
+	X(), $(), Q(), t.exports = typeof Object.create == "function" ? function(e, t) {
+		t && (e.super_ = t, e.prototype = Object.create(t.prototype, { constructor: {
+			value: e,
+			enumerable: !1,
+			writable: !0,
+			configurable: !0
+		} }));
+	} : function(e, t) {
+		if (t) {
+			e.super_ = t;
+			var n = function() {};
+			n.prototype = t.prototype, e.prototype = new n(), e.prototype.constructor = e;
+		}
+	};
+}), Jo = J((e, t) => {
+	X(), $(), Q();
+	var { Buffer: n } = (io(), Y($a)), r = Symbol.for("BufferList");
+	function i(e) {
+		if (!(this instanceof i)) return new i(e);
+		i._init.call(this, e);
+	}
+	i._init = function(e) {
+		Object.defineProperty(this, r, { value: !0 }), this._bufs = [], this.length = 0, e && this.append(e);
+	}, i.prototype._new = function(e) {
+		return new i(e);
+	}, i.prototype._offset = function(e) {
+		if (e === 0) return [0, 0];
+		let t = 0;
+		for (let n = 0; n < this._bufs.length; n++) {
+			let r = t + this._bufs[n].length;
+			if (e < r || n === this._bufs.length - 1) return [n, e - t];
+			t = r;
+		}
+	}, i.prototype._reverseOffset = function(e) {
+		let t = e[0], n = e[1];
+		for (let e = 0; e < t; e++) n += this._bufs[e].length;
+		return n;
+	}, i.prototype.getBuffers = function() {
+		return this._bufs;
+	}, i.prototype.get = function(e) {
+		if (e > this.length || e < 0) return;
+		let t = this._offset(e);
+		return this._bufs[t[0]][t[1]];
+	}, i.prototype.slice = function(e, t) {
+		return typeof e == "number" && e < 0 && (e += this.length), typeof t == "number" && t < 0 && (t += this.length), this.copy(null, 0, e, t);
+	}, i.prototype.copy = function(e, t, r, i) {
+		if ((typeof r != "number" || r < 0) && (r = 0), (typeof i != "number" || i > this.length) && (i = this.length), r >= this.length || i <= 0) return e || n.alloc(0);
+		let a = !!e, o = this._offset(r), s = i - r, c = s, l = a && t || 0, u = o[1];
+		if (r === 0 && i === this.length) {
+			if (!a) return this._bufs.length === 1 ? this._bufs[0] : n.concat(this._bufs, this.length);
+			for (let t = 0; t < this._bufs.length; t++) this._bufs[t].copy(e, l), l += this._bufs[t].length;
+			return e;
+		}
+		if (c <= this._bufs[o[0]].length - u) return a ? this._bufs[o[0]].copy(e, t, u, u + c) : this._bufs[o[0]].slice(u, u + c);
+		a || (e = n.allocUnsafe(s));
+		for (let t = o[0]; t < this._bufs.length; t++) {
+			let n = this._bufs[t].length - u;
+			if (c > n) this._bufs[t].copy(e, l, u), l += n;
+			else {
+				this._bufs[t].copy(e, l, u, u + c), l += n;
+				break;
+			}
+			c -= n, u &&= 0;
+		}
+		return e.length > l ? e.slice(0, l) : e;
+	}, i.prototype.shallowSlice = function(e, t) {
+		if (e ||= 0, t = typeof t == "number" ? t : this.length, e < 0 && (e += this.length), t < 0 && (t += this.length), e === t) return this._new();
+		let n = this._offset(e), r = this._offset(t), i = this._bufs.slice(n[0], r[0] + 1);
+		return r[1] === 0 ? i.pop() : i[i.length - 1] = i[i.length - 1].slice(0, r[1]), n[1] !== 0 && (i[0] = i[0].slice(n[1])), this._new(i);
+	}, i.prototype.toString = function(e, t, n) {
+		return this.slice(t, n).toString(e);
+	}, i.prototype.consume = function(e) {
+		if (e = Math.trunc(e), Number.isNaN(e) || e <= 0) return this;
+		for (; this._bufs.length;) if (e >= this._bufs[0].length) e -= this._bufs[0].length, this.length -= this._bufs[0].length, this._bufs.shift();
+		else {
+			this._bufs[0] = this._bufs[0].slice(e), this.length -= e;
+			break;
+		}
+		return this;
+	}, i.prototype.duplicate = function() {
+		let e = this._new();
+		for (let t = 0; t < this._bufs.length; t++) e.append(this._bufs[t]);
+		return e;
+	}, i.prototype.append = function(e) {
+		return this._attach(e, i.prototype._appendBuffer);
+	}, i.prototype.prepend = function(e) {
+		return this._attach(e, i.prototype._prependBuffer, !0);
+	}, i.prototype._attach = function(e, t, r) {
+		if (e == null) return this;
+		if (e.buffer) t.call(this, n.from(e.buffer, e.byteOffset, e.byteLength));
+		else if (Array.isArray(e)) {
+			let [n, i] = r ? [e.length - 1, -1] : [0, 1];
+			for (let a = n; a >= 0 && a < e.length; a += i) this._attach(e[a], t, r);
+		} else if (this._isBufferList(e)) {
+			let [n, i] = r ? [e._bufs.length - 1, -1] : [0, 1];
+			for (let a = n; a >= 0 && a < e._bufs.length; a += i) this._attach(e._bufs[a], t, r);
+		} else typeof e == "number" && (e = e.toString()), t.call(this, n.from(e));
+		return this;
+	}, i.prototype._appendBuffer = function(e) {
+		this._bufs.push(e), this.length += e.length;
+	}, i.prototype._prependBuffer = function(e) {
+		this._bufs.unshift(e), this.length += e.length;
+	}, i.prototype.indexOf = function(e, t, r) {
+		if (r === void 0 && typeof t == "string" && (r = t, t = void 0), typeof e == "function" || Array.isArray(e)) throw TypeError("The \"value\" argument must be one of type string, Buffer, BufferList, or Uint8Array.");
+		if (typeof e == "number" ? e = n.from([e]) : typeof e == "string" ? e = n.from(e, r) : this._isBufferList(e) ? e = e.slice() : Array.isArray(e.buffer) ? e = n.from(e.buffer, e.byteOffset, e.byteLength) : n.isBuffer(e) || (e = n.from(e)), t = Number(t || 0), isNaN(t) && (t = 0), t < 0 && (t = this.length + t), t < 0 && (t = 0), e.length === 0) return t > this.length ? this.length : t;
+		let i = this._offset(t), a = i[0], o = i[1];
+		for (; a < this._bufs.length; a++) {
+			let t = this._bufs[a];
+			for (; o < t.length;) if (t.length - o >= e.length) {
+				let n = t.indexOf(e, o);
+				if (n !== -1) return this._reverseOffset([a, n]);
+				o = t.length - e.length + 1;
+			} else {
+				let t = this._reverseOffset([a, o]);
+				if (this._match(t, e)) return t;
+				o++;
+			}
+			o = 0;
+		}
+		return -1;
+	}, i.prototype._match = function(e, t) {
+		if (this.length - e < t.length) return !1;
+		for (let n = 0; n < t.length; n++) if (this.get(e + n) !== t[n]) return !1;
+		return !0;
+	}, (function() {
+		let e = {
+			readDoubleBE: 8,
+			readDoubleLE: 8,
+			readFloatBE: 4,
+			readFloatLE: 4,
+			readBigInt64BE: 8,
+			readBigInt64LE: 8,
+			readBigUInt64BE: 8,
+			readBigUInt64LE: 8,
+			readInt32BE: 4,
+			readInt32LE: 4,
+			readUInt32BE: 4,
+			readUInt32LE: 4,
+			readInt16BE: 2,
+			readInt16LE: 2,
+			readUInt16BE: 2,
+			readUInt16LE: 2,
+			readInt8: 1,
+			readUInt8: 1,
+			readIntBE: null,
+			readIntLE: null,
+			readUIntBE: null,
+			readUIntLE: null
+		};
+		for (let t in e) (function(t) {
+			e[t] === null ? i.prototype[t] = function(e, n) {
+				return this.slice(e, e + n)[t](0, n);
+			} : i.prototype[t] = function(n = 0) {
+				return this.slice(n, n + e[t])[t](0);
+			};
+		})(t);
+	})(), i.prototype._isBufferList = function(e) {
+		return e instanceof i || i.isBufferList(e);
+	}, i.isBufferList = function(e) {
+		return e != null && e[r];
+	}, t.exports = i;
+}), Yo = J((e, t) => {
+	X(), $(), Q();
+	var n = Ko().Duplex, r = qo(), i = Jo();
+	function a(e) {
+		if (!(this instanceof a)) return new a(e);
+		if (typeof e == "function") {
+			this._callback = e;
+			let t = function(e) {
+				this._callback &&= (this._callback(e), null);
+			}.bind(this);
+			this.on("pipe", function(e) {
+				e.on("error", t);
+			}), this.on("unpipe", function(e) {
+				e.removeListener("error", t);
+			}), e = null;
+		}
+		i._init.call(this, e), n.call(this);
+	}
+	r(a, n), Object.assign(a.prototype, i.prototype), a.prototype._new = function(e) {
+		return new a(e);
+	}, a.prototype._write = function(e, t, n) {
+		this._appendBuffer(e), typeof n == "function" && n();
+	}, a.prototype._read = function(e) {
+		if (!this.length) return this.push(null);
+		e = Math.min(e, this.length), this.push(this.slice(0, e)), this.consume(e);
+	}, a.prototype.end = function(e) {
+		n.prototype.end.call(this, e), this._callback &&= (this._callback(null, this.slice()), null);
+	}, a.prototype._destroy = function(e, t) {
+		this._bufs.length = 0, this.length = 0, t(e);
+	}, a.prototype._isBufferList = function(e) {
+		return e instanceof a || e instanceof i || a.isBufferList(e);
+	}, a.isBufferList = i.isBufferList, t.exports = a, t.exports.BufferListStream = a, t.exports.BufferList = i;
+}), Xo = J((e, t) => {
+	X(), $(), Q(), t.exports = class {
+		constructor() {
+			this.cmd = null, this.retain = !1, this.qos = 0, this.dup = !1, this.length = -1, this.topic = null, this.payload = null;
+		}
+	};
+}), Zo = J((e, t) => {
+	X(), $(), Q();
+	var n = t.exports, { Buffer: r } = (io(), Y($a));
+	n.types = {
+		0: "reserved",
+		1: "connect",
+		2: "connack",
+		3: "publish",
+		4: "puback",
+		5: "pubrec",
+		6: "pubrel",
+		7: "pubcomp",
+		8: "subscribe",
+		9: "suback",
+		10: "unsubscribe",
+		11: "unsuback",
+		12: "pingreq",
+		13: "pingresp",
+		14: "disconnect",
+		15: "auth"
+	}, n.requiredHeaderFlags = {
+		1: 0,
+		2: 0,
+		4: 0,
+		5: 0,
+		6: 2,
+		7: 0,
+		8: 2,
+		9: 0,
+		10: 2,
+		11: 0,
+		12: 0,
+		13: 0,
+		14: 0,
+		15: 0
+	}, n.requiredHeaderFlagsErrors = {};
+	for (let e in n.requiredHeaderFlags) {
+		let t = n.requiredHeaderFlags[e];
+		n.requiredHeaderFlagsErrors[e] = "Invalid header flag bits, must be 0x" + t.toString(16) + " for " + n.types[e] + " packet";
+	}
+	n.codes = {};
+	for (let e in n.types) {
+		let t = n.types[e];
+		n.codes[t] = e;
+	}
+	n.CMD_SHIFT = 4, n.CMD_MASK = 240, n.DUP_MASK = 8, n.QOS_MASK = 3, n.QOS_SHIFT = 1, n.RETAIN_MASK = 1, n.VARBYTEINT_MASK = 127, n.VARBYTEINT_FIN_MASK = 128, n.VARBYTEINT_MAX = 268435455, n.SESSIONPRESENT_MASK = 1, n.SESSIONPRESENT_HEADER = r.from([n.SESSIONPRESENT_MASK]), n.CONNACK_HEADER = r.from([n.codes.connack << n.CMD_SHIFT]), n.USERNAME_MASK = 128, n.PASSWORD_MASK = 64, n.WILL_RETAIN_MASK = 32, n.WILL_QOS_MASK = 24, n.WILL_QOS_SHIFT = 3, n.WILL_FLAG_MASK = 4, n.CLEAN_SESSION_MASK = 2, n.CONNECT_HEADER = r.from([n.codes.connect << n.CMD_SHIFT]), n.properties = {
+		sessionExpiryInterval: 17,
+		willDelayInterval: 24,
+		receiveMaximum: 33,
+		maximumPacketSize: 39,
+		topicAliasMaximum: 34,
+		requestResponseInformation: 25,
+		requestProblemInformation: 23,
+		userProperties: 38,
+		authenticationMethod: 21,
+		authenticationData: 22,
+		payloadFormatIndicator: 1,
+		messageExpiryInterval: 2,
+		contentType: 3,
+		responseTopic: 8,
+		correlationData: 9,
+		maximumQoS: 36,
+		retainAvailable: 37,
+		assignedClientIdentifier: 18,
+		reasonString: 31,
+		wildcardSubscriptionAvailable: 40,
+		subscriptionIdentifiersAvailable: 41,
+		sharedSubscriptionAvailable: 42,
+		serverKeepAlive: 19,
+		responseInformation: 26,
+		serverReference: 28,
+		topicAlias: 35,
+		subscriptionIdentifier: 11
+	}, n.propertiesCodes = {};
+	for (let e in n.properties) {
+		let t = n.properties[e];
+		n.propertiesCodes[t] = e;
+	}
+	n.propertiesTypes = {
+		sessionExpiryInterval: "int32",
+		willDelayInterval: "int32",
+		receiveMaximum: "int16",
+		maximumPacketSize: "int32",
+		topicAliasMaximum: "int16",
+		requestResponseInformation: "byte",
+		requestProblemInformation: "byte",
+		userProperties: "pair",
+		authenticationMethod: "string",
+		authenticationData: "binary",
+		payloadFormatIndicator: "byte",
+		messageExpiryInterval: "int32",
+		contentType: "string",
+		responseTopic: "string",
+		correlationData: "binary",
+		maximumQoS: "int8",
+		retainAvailable: "byte",
+		assignedClientIdentifier: "string",
+		reasonString: "string",
+		wildcardSubscriptionAvailable: "byte",
+		subscriptionIdentifiersAvailable: "byte",
+		sharedSubscriptionAvailable: "byte",
+		serverKeepAlive: "int16",
+		responseInformation: "string",
+		serverReference: "string",
+		topicAlias: "int16",
+		subscriptionIdentifier: "var"
+	};
+	function i(e) {
+		return [
+			0,
+			1,
+			2
+		].map((t) => [0, 1].map((i) => [0, 1].map((a) => {
+			let o = r.alloc(1);
+			return o.writeUInt8(n.codes[e] << n.CMD_SHIFT | (i ? n.DUP_MASK : 0) | t << n.QOS_SHIFT | a, 0, !0), o;
+		})));
+	}
+	n.PUBLISH_HEADER = i("publish"), n.SUBSCRIBE_HEADER = i("subscribe"), n.SUBSCRIBE_OPTIONS_QOS_MASK = 3, n.SUBSCRIBE_OPTIONS_NL_MASK = 1, n.SUBSCRIBE_OPTIONS_NL_SHIFT = 2, n.SUBSCRIBE_OPTIONS_RAP_MASK = 1, n.SUBSCRIBE_OPTIONS_RAP_SHIFT = 3, n.SUBSCRIBE_OPTIONS_RH_MASK = 3, n.SUBSCRIBE_OPTIONS_RH_SHIFT = 4, n.SUBSCRIBE_OPTIONS_RH = [
+		0,
+		16,
+		32
+	], n.SUBSCRIBE_OPTIONS_NL = 4, n.SUBSCRIBE_OPTIONS_RAP = 8, n.SUBSCRIBE_OPTIONS_QOS = [
+		0,
+		1,
+		2
+	], n.UNSUBSCRIBE_HEADER = i("unsubscribe"), n.ACKS = {
+		unsuback: i("unsuback"),
+		puback: i("puback"),
+		pubcomp: i("pubcomp"),
+		pubrel: i("pubrel"),
+		pubrec: i("pubrec")
+	}, n.SUBACK_HEADER = r.from([n.codes.suback << n.CMD_SHIFT]), n.VERSION3 = r.from([3]), n.VERSION4 = r.from([4]), n.VERSION5 = r.from([5]), n.VERSION131 = r.from([131]), n.VERSION132 = r.from([132]), n.QOS = [
+		0,
+		1,
+		2
+	].map((e) => r.from([e])), n.EMPTY = {
+		pingreq: r.from([n.codes.pingreq << 4, 0]),
+		pingresp: r.from([n.codes.pingresp << 4, 0]),
+		disconnect: r.from([n.codes.disconnect << 4, 0])
+	}, n.MQTT5_PUBACK_PUBREC_CODES = {
+		0: "Success",
+		16: "No matching subscribers",
+		128: "Unspecified error",
+		131: "Implementation specific error",
+		135: "Not authorized",
+		144: "Topic Name invalid",
+		145: "Packet identifier in use",
+		151: "Quota exceeded",
+		153: "Payload format invalid"
+	}, n.MQTT5_PUBREL_PUBCOMP_CODES = {
+		0: "Success",
+		146: "Packet Identifier not found"
+	}, n.MQTT5_SUBACK_CODES = {
+		0: "Granted QoS 0",
+		1: "Granted QoS 1",
+		2: "Granted QoS 2",
+		128: "Unspecified error",
+		131: "Implementation specific error",
+		135: "Not authorized",
+		143: "Topic Filter invalid",
+		145: "Packet Identifier in use",
+		151: "Quota exceeded",
+		158: "Shared Subscriptions not supported",
+		161: "Subscription Identifiers not supported",
+		162: "Wildcard Subscriptions not supported"
+	}, n.MQTT5_UNSUBACK_CODES = {
+		0: "Success",
+		17: "No subscription existed",
+		128: "Unspecified error",
+		131: "Implementation specific error",
+		135: "Not authorized",
+		143: "Topic Filter invalid",
+		145: "Packet Identifier in use"
+	}, n.MQTT5_DISCONNECT_CODES = {
+		0: "Normal disconnection",
+		4: "Disconnect with Will Message",
+		128: "Unspecified error",
+		129: "Malformed Packet",
+		130: "Protocol Error",
+		131: "Implementation specific error",
+		135: "Not authorized",
+		137: "Server busy",
+		139: "Server shutting down",
+		141: "Keep Alive timeout",
+		142: "Session taken over",
+		143: "Topic Filter invalid",
+		144: "Topic Name invalid",
+		147: "Receive Maximum exceeded",
+		148: "Topic Alias invalid",
+		149: "Packet too large",
+		150: "Message rate too high",
+		151: "Quota exceeded",
+		152: "Administrative action",
+		153: "Payload format invalid",
+		154: "Retain not supported",
+		155: "QoS not supported",
+		156: "Use another server",
+		157: "Server moved",
+		158: "Shared Subscriptions not supported",
+		159: "Connection rate exceeded",
+		160: "Maximum connect time",
+		161: "Subscription Identifiers not supported",
+		162: "Wildcard Subscriptions not supported"
+	}, n.MQTT5_AUTH_CODES = {
+		0: "Success",
+		24: "Continue authentication",
+		25: "Re-authenticate"
+	};
+}), Qo = J((e, t) => {
+	X(), $(), Q();
+	var n = 1e3, r = n * 60, i = r * 60, a = i * 24, o = a * 7, s = a * 365.25;
+	t.exports = function(e, t) {
+		t ||= {};
+		var n = typeof e;
+		if (n === "string" && e.length > 0) return c(e);
+		if (n === "number" && isFinite(e)) return t.long ? u(e) : l(e);
+		throw Error("val is not a non-empty string or a valid number. val=" + JSON.stringify(e));
+	};
+	function c(e) {
+		if (e = String(e), !(e.length > 100)) {
+			var t = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(e);
+			if (t) {
+				var c = parseFloat(t[1]);
+				switch ((t[2] || "ms").toLowerCase()) {
+					case "years":
+					case "year":
+					case "yrs":
+					case "yr":
+					case "y": return c * s;
+					case "weeks":
+					case "week":
+					case "w": return c * o;
+					case "days":
+					case "day":
+					case "d": return c * a;
+					case "hours":
+					case "hour":
+					case "hrs":
+					case "hr":
+					case "h": return c * i;
+					case "minutes":
+					case "minute":
+					case "mins":
+					case "min":
+					case "m": return c * r;
+					case "seconds":
+					case "second":
+					case "secs":
+					case "sec":
+					case "s": return c * n;
+					case "milliseconds":
+					case "millisecond":
+					case "msecs":
+					case "msec":
+					case "ms": return c;
+					default: return;
+				}
+			}
+		}
+	}
+	function l(e) {
+		var t = Math.abs(e);
+		return t >= a ? Math.round(e / a) + "d" : t >= i ? Math.round(e / i) + "h" : t >= r ? Math.round(e / r) + "m" : t >= n ? Math.round(e / n) + "s" : e + "ms";
+	}
+	function u(e) {
+		var t = Math.abs(e);
+		return t >= a ? d(e, t, a, "day") : t >= i ? d(e, t, i, "hour") : t >= r ? d(e, t, r, "minute") : t >= n ? d(e, t, n, "second") : e + " ms";
+	}
+	function d(e, t, n, r) {
+		var i = t >= n * 1.5;
+		return Math.round(e / n) + " " + r + (i ? "s" : "");
+	}
+}), $o = J((e, t) => {
+	X(), $(), Q();
+	function n(e) {
+		n.debug = n, n.default = n, n.coerce = c, n.disable = o, n.enable = i, n.enabled = s, n.humanize = Qo(), n.destroy = l, Object.keys(e).forEach((t) => {
+			n[t] = e[t];
+		}), n.names = [], n.skips = [], n.formatters = {};
+		function t(e) {
+			let t = 0;
+			for (let n = 0; n < e.length; n++) t = (t << 5) - t + e.charCodeAt(n), t |= 0;
+			return n.colors[Math.abs(t) % n.colors.length];
+		}
+		n.selectColor = t;
+		function n(e) {
+			let t, i = null, a, o;
+			function s(...e) {
+				if (!s.enabled) return;
+				let r = s, i = Number(/* @__PURE__ */ new Date());
+				r.diff = i - (t || i), r.prev = t, r.curr = i, t = i, e[0] = n.coerce(e[0]), typeof e[0] != "string" && e.unshift("%O");
+				let a = 0;
+				e[0] = e[0].replace(/%([a-zA-Z%])/g, (t, i) => {
+					if (t === "%%") return "%";
+					a++;
+					let o = n.formatters[i];
+					if (typeof o == "function") {
+						let n = e[a];
+						t = o.call(r, n), e.splice(a, 1), a--;
+					}
+					return t;
+				}), n.formatArgs.call(r, e), (r.log || n.log).apply(r, e);
+			}
+			return s.namespace = e, s.useColors = n.useColors(), s.color = n.selectColor(e), s.extend = r, s.destroy = n.destroy, Object.defineProperty(s, "enabled", {
+				enumerable: !0,
+				configurable: !1,
+				get: () => i === null ? (a !== n.namespaces && (a = n.namespaces, o = n.enabled(e)), o) : i,
+				set: (e) => {
+					i = e;
+				}
+			}), typeof n.init == "function" && n.init(s), s;
+		}
+		function r(e, t) {
+			let r = n(this.namespace + (typeof t > "u" ? ":" : t) + e);
+			return r.log = this.log, r;
+		}
+		function i(e) {
+			n.save(e), n.namespaces = e, n.names = [], n.skips = [];
+			let t = (typeof e == "string" ? e : "").trim().replace(/\s+/g, ",").split(",").filter(Boolean);
+			for (let e of t) e[0] === "-" ? n.skips.push(e.slice(1)) : n.names.push(e);
+		}
+		function a(e, t) {
+			let n = 0, r = 0, i = -1, a = 0;
+			for (; n < e.length;) if (r < t.length && (t[r] === e[n] || t[r] === "*")) t[r] === "*" ? (i = r, a = n, r++) : (n++, r++);
+			else if (i !== -1) r = i + 1, a++, n = a;
+			else return !1;
+			for (; r < t.length && t[r] === "*";) r++;
+			return r === t.length;
+		}
+		function o() {
+			let e = [...n.names, ...n.skips.map((e) => "-" + e)].join(",");
+			return n.enable(""), e;
+		}
+		function s(e) {
+			for (let t of n.skips) if (a(e, t)) return !1;
+			for (let t of n.names) if (a(e, t)) return !0;
+			return !1;
+		}
+		function c(e) {
+			return e instanceof Error ? e.stack || e.message : e;
+		}
+		function l() {
+			console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
+		}
+		return n.enable(n.load()), n;
+	}
+	t.exports = n;
+}), es = J((e, t) => {
+	X(), $(), Q(), e.formatArgs = r, e.save = i, e.load = a, e.useColors = n, e.storage = o(), e.destroy = (() => {
+		let e = !1;
+		return () => {
+			e || (e = !0, console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`."));
+		};
+	})(), e.colors = /* @__PURE__ */ "#0000CC.#0000FF.#0033CC.#0033FF.#0066CC.#0066FF.#0099CC.#0099FF.#00CC00.#00CC33.#00CC66.#00CC99.#00CCCC.#00CCFF.#3300CC.#3300FF.#3333CC.#3333FF.#3366CC.#3366FF.#3399CC.#3399FF.#33CC00.#33CC33.#33CC66.#33CC99.#33CCCC.#33CCFF.#6600CC.#6600FF.#6633CC.#6633FF.#66CC00.#66CC33.#9900CC.#9900FF.#9933CC.#9933FF.#99CC00.#99CC33.#CC0000.#CC0033.#CC0066.#CC0099.#CC00CC.#CC00FF.#CC3300.#CC3333.#CC3366.#CC3399.#CC33CC.#CC33FF.#CC6600.#CC6633.#CC9900.#CC9933.#CCCC00.#CCCC33.#FF0000.#FF0033.#FF0066.#FF0099.#FF00CC.#FF00FF.#FF3300.#FF3333.#FF3366.#FF3399.#FF33CC.#FF33FF.#FF6600.#FF6633.#FF9900.#FF9933.#FFCC00.#FFCC33".split(".");
+	function n() {
+		if (typeof window < "u" && window.process && (window.process.type === "renderer" || window.process.__nwjs)) return !0;
+		if (typeof navigator < "u" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) return !1;
+		let e;
+		return typeof document < "u" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || typeof window < "u" && window.console && (window.console.firebug || window.console.exception && window.console.table) || typeof navigator < "u" && navigator.userAgent && (e = navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/)) && parseInt(e[1], 10) >= 31 || typeof navigator < "u" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+	}
+	function r(e) {
+		if (e[0] = (this.useColors ? "%c" : "") + this.namespace + (this.useColors ? " %c" : " ") + e[0] + (this.useColors ? "%c " : " ") + "+" + t.exports.humanize(this.diff), !this.useColors) return;
+		let n = "color: " + this.color;
+		e.splice(1, 0, n, "color: inherit");
+		let r = 0, i = 0;
+		e[0].replace(/%[a-zA-Z%]/g, (e) => {
+			e !== "%%" && (r++, e === "%c" && (i = r));
+		}), e.splice(i, 0, n);
+	}
+	e.log = console.debug || console.log || (() => {});
+	function i(t) {
+		try {
+			t ? e.storage.setItem("debug", t) : e.storage.removeItem("debug");
+		} catch {}
+	}
+	function a() {
+		let t;
+		try {
+			t = e.storage.getItem("debug") || e.storage.getItem("DEBUG");
+		} catch {}
+		return !t && typeof Z < "u" && "env" in Z && (t = Z.env.DEBUG), t;
+	}
+	function o() {
+		try {
+			return localStorage;
+		} catch {}
+	}
+	t.exports = $o()(e);
+	var { formatters: s } = t.exports;
+	s.j = function(e) {
+		try {
+			return JSON.stringify(e);
+		} catch (e) {
+			return "[UnexpectedJSONParseError]: " + e.message;
+		}
+	};
+}), ts = J((e, t) => {
+	X(), $(), Q();
+	var n = Yo(), { EventEmitter: r } = (xo(), Y(lo)), i = Xo(), a = Zo(), o = es()("mqtt-packet:parser");
+	t.exports = class e extends r {
+		constructor() {
+			super(), this.parser = this.constructor.parser;
+		}
+		static parser(t) {
+			return this instanceof e ? (this.settings = t || {}, this._states = [
+				"_parseHeader",
+				"_parseLength",
+				"_parsePayload",
+				"_newPacket"
+			], this._resetState(), this) : new e().parser(t);
+		}
+		_resetState() {
+			o("_resetState: resetting packet, error, _list, and _stateCounter"), this.packet = new i(), this.error = null, this._list = n(), this._stateCounter = 0;
+		}
+		parse(e) {
+			for (this.error && this._resetState(), this._list.append(e), o("parse: current state: %s", this._states[this._stateCounter]); (this.packet.length !== -1 || this._list.length > 0) && this[this._states[this._stateCounter]]() && !this.error;) this._stateCounter++, o("parse: state complete. _stateCounter is now: %d", this._stateCounter), o("parse: packet.length: %d, buffer list length: %d", this.packet.length, this._list.length), this._stateCounter >= this._states.length && (this._stateCounter = 0);
+			return o("parse: exited while loop. packet: %d, buffer list length: %d", this.packet.length, this._list.length), this._list.length;
+		}
+		_parseHeader() {
+			let e = this._list.readUInt8(0), t = e >> a.CMD_SHIFT;
+			this.packet.cmd = a.types[t];
+			let n = e & 15, r = a.requiredHeaderFlags[t];
+			return r != null && n !== r ? this._emitError(Error(a.requiredHeaderFlagsErrors[t])) : (this.packet.retain = (e & a.RETAIN_MASK) !== 0, this.packet.qos = e >> a.QOS_SHIFT & a.QOS_MASK, this.packet.qos > 2 ? this._emitError(/* @__PURE__ */ Error("Packet must not have both QoS bits set to 1")) : (this.packet.dup = (e & a.DUP_MASK) !== 0, o("_parseHeader: packet: %o", this.packet), this._list.consume(1), !0));
+		}
+		_parseLength() {
+			let e = this._parseVarByteNum(!0);
+			return e && (this.packet.length = e.value, this._list.consume(e.bytes)), o("_parseLength %d", e.value), !!e;
+		}
+		_parsePayload() {
+			o("_parsePayload: payload %O", this._list);
+			let e = !1;
+			if (this.packet.length === 0 || this._list.length >= this.packet.length) {
+				switch (this._pos = 0, this.packet.cmd) {
+					case "connect":
+						this._parseConnect();
+						break;
+					case "connack":
+						this._parseConnack();
+						break;
+					case "publish":
+						this._parsePublish();
+						break;
+					case "puback":
+					case "pubrec":
+					case "pubrel":
+					case "pubcomp":
+						this._parseConfirmation();
+						break;
+					case "subscribe":
+						this._parseSubscribe();
+						break;
+					case "suback":
+						this._parseSuback();
+						break;
+					case "unsubscribe":
+						this._parseUnsubscribe();
+						break;
+					case "unsuback":
+						this._parseUnsuback();
+						break;
+					case "pingreq":
+					case "pingresp": break;
+					case "disconnect":
+						this._parseDisconnect();
+						break;
+					case "auth":
+						this._parseAuth();
+						break;
+					default: this._emitError(/* @__PURE__ */ Error("Not supported"));
+				}
+				e = !0;
+			}
+			return o("_parsePayload complete result: %s", e), e;
+		}
+		_parseConnect() {
+			o("_parseConnect");
+			let e, t, n, r, i = {}, s = this.packet, c = this._parseString();
+			if (c === null) return this._emitError(/* @__PURE__ */ Error("Cannot parse protocolId"));
+			if (c !== "MQTT" && c !== "MQIsdp") return this._emitError(/* @__PURE__ */ Error("Invalid protocolId"));
+			if (s.protocolId = c, this._pos >= this._list.length) return this._emitError(/* @__PURE__ */ Error("Packet too short"));
+			if (s.protocolVersion = this._list.readUInt8(this._pos), s.protocolVersion >= 128 && (s.bridgeMode = !0, s.protocolVersion -= 128), s.protocolVersion !== 3 && s.protocolVersion !== 4 && s.protocolVersion !== 5) return this._emitError(/* @__PURE__ */ Error("Invalid protocol version"));
+			if (this._pos++, this._pos >= this._list.length) return this._emitError(/* @__PURE__ */ Error("Packet too short"));
+			if (this._list.readUInt8(this._pos) & 1) return this._emitError(/* @__PURE__ */ Error("Connect flag bit 0 must be 0, but got 1"));
+			i.username = this._list.readUInt8(this._pos) & a.USERNAME_MASK, i.password = this._list.readUInt8(this._pos) & a.PASSWORD_MASK, i.will = this._list.readUInt8(this._pos) & a.WILL_FLAG_MASK;
+			let l = !!(this._list.readUInt8(this._pos) & a.WILL_RETAIN_MASK), u = (this._list.readUInt8(this._pos) & a.WILL_QOS_MASK) >> a.WILL_QOS_SHIFT;
+			if (i.will) s.will = {}, s.will.retain = l, s.will.qos = u;
+			else {
+				if (l) return this._emitError(/* @__PURE__ */ Error("Will Retain Flag must be set to zero when Will Flag is set to 0"));
+				if (u) return this._emitError(/* @__PURE__ */ Error("Will QoS must be set to zero when Will Flag is set to 0"));
+			}
+			if (s.clean = (this._list.readUInt8(this._pos) & a.CLEAN_SESSION_MASK) !== 0, this._pos++, s.keepalive = this._parseNum(), s.keepalive === -1) return this._emitError(/* @__PURE__ */ Error("Packet too short"));
+			if (s.protocolVersion === 5) {
+				let e = this._parseProperties();
+				Object.getOwnPropertyNames(e).length && (s.properties = e);
+			}
+			let d = this._parseString();
+			if (d === null) return this._emitError(/* @__PURE__ */ Error("Packet too short"));
+			if (s.clientId = d, o("_parseConnect: packet.clientId: %s", s.clientId), i.will) {
+				if (s.protocolVersion === 5) {
+					let e = this._parseProperties();
+					Object.getOwnPropertyNames(e).length && (s.will.properties = e);
+				}
+				if (e = this._parseString(), e === null) return this._emitError(/* @__PURE__ */ Error("Cannot parse will topic"));
+				if (s.will.topic = e, o("_parseConnect: packet.will.topic: %s", s.will.topic), t = this._parseBuffer(), t === null) return this._emitError(/* @__PURE__ */ Error("Cannot parse will payload"));
+				s.will.payload = t, o("_parseConnect: packet.will.paylaod: %s", s.will.payload);
+			}
+			if (i.username) {
+				if (r = this._parseString(), r === null) return this._emitError(/* @__PURE__ */ Error("Cannot parse username"));
+				s.username = r, o("_parseConnect: packet.username: %s", s.username);
+			}
+			if (i.password) {
+				if (n = this._parseBuffer(), n === null) return this._emitError(/* @__PURE__ */ Error("Cannot parse password"));
+				s.password = n;
+			}
+			return this.settings = s, o("_parseConnect: complete"), s;
+		}
+		_parseConnack() {
+			o("_parseConnack");
+			let e = this.packet;
+			if (this._list.length < 1) return null;
+			let t = this._list.readUInt8(this._pos++);
+			if (t > 1) return this._emitError(/* @__PURE__ */ Error("Invalid connack flags, bits 7-1 must be set to 0"));
+			if (e.sessionPresent = !!(t & a.SESSIONPRESENT_MASK), this.settings.protocolVersion === 5) e.reasonCode = this._list.length >= 2 ? this._list.readUInt8(this._pos++) : 0;
+			else {
+				if (this._list.length < 2) return null;
+				e.returnCode = this._list.readUInt8(this._pos++);
+			}
+			if (e.returnCode === -1 || e.reasonCode === -1) return this._emitError(/* @__PURE__ */ Error("Cannot parse return code"));
+			if (this.settings.protocolVersion === 5) {
+				let t = this._parseProperties();
+				Object.getOwnPropertyNames(t).length && (e.properties = t);
+			}
+			o("_parseConnack: complete");
+		}
+		_parsePublish() {
+			o("_parsePublish");
+			let e = this.packet;
+			if (e.topic = this._parseString(), e.topic === null) return this._emitError(/* @__PURE__ */ Error("Cannot parse topic"));
+			if (!(e.qos > 0 && !this._parseMessageId())) {
+				if (this.settings.protocolVersion === 5) {
+					let t = this._parseProperties();
+					Object.getOwnPropertyNames(t).length && (e.properties = t);
+				}
+				e.payload = this._list.slice(this._pos, e.length), o("_parsePublish: payload from buffer list: %o", e.payload);
+			}
+		}
+		_parseSubscribe() {
+			o("_parseSubscribe");
+			let e = this.packet, t, n, r, i, s, c, l;
+			if (e.subscriptions = [], this._parseMessageId()) {
+				if (this.settings.protocolVersion === 5) {
+					let t = this._parseProperties();
+					Object.getOwnPropertyNames(t).length && (e.properties = t);
+				}
+				if (e.length <= 0) return this._emitError(/* @__PURE__ */ Error("Malformed subscribe, no payload specified"));
+				for (; this._pos < e.length;) {
+					if (t = this._parseString(), t === null) return this._emitError(/* @__PURE__ */ Error("Cannot parse topic"));
+					if (this._pos >= e.length) return this._emitError(/* @__PURE__ */ Error("Malformed Subscribe Payload"));
+					if (n = this._parseByte(), this.settings.protocolVersion === 5) {
+						if (n & 192) return this._emitError(/* @__PURE__ */ Error("Invalid subscribe topic flag bits, bits 7-6 must be 0"));
+					} else if (n & 252) return this._emitError(/* @__PURE__ */ Error("Invalid subscribe topic flag bits, bits 7-2 must be 0"));
+					if (r = n & a.SUBSCRIBE_OPTIONS_QOS_MASK, r > 2) return this._emitError(/* @__PURE__ */ Error("Invalid subscribe QoS, must be <= 2"));
+					if (c = (n >> a.SUBSCRIBE_OPTIONS_NL_SHIFT & a.SUBSCRIBE_OPTIONS_NL_MASK) !== 0, s = (n >> a.SUBSCRIBE_OPTIONS_RAP_SHIFT & a.SUBSCRIBE_OPTIONS_RAP_MASK) !== 0, i = n >> a.SUBSCRIBE_OPTIONS_RH_SHIFT & a.SUBSCRIBE_OPTIONS_RH_MASK, i > 2) return this._emitError(/* @__PURE__ */ Error("Invalid retain handling, must be <= 2"));
+					l = {
+						topic: t,
+						qos: r
+					}, this.settings.protocolVersion === 5 ? (l.nl = c, l.rap = s, l.rh = i) : this.settings.bridgeMode && (l.rh = 0, l.rap = !0, l.nl = !0), o("_parseSubscribe: push subscription `%s` to subscription", l), e.subscriptions.push(l);
+				}
+			}
+		}
+		_parseSuback() {
+			o("_parseSuback");
+			let e = this.packet;
+			if (this.packet.granted = [], this._parseMessageId()) {
+				if (this.settings.protocolVersion === 5) {
+					let t = this._parseProperties();
+					Object.getOwnPropertyNames(t).length && (e.properties = t);
+				}
+				if (e.length <= 0) return this._emitError(/* @__PURE__ */ Error("Malformed suback, no payload specified"));
+				for (; this._pos < this.packet.length;) {
+					let e = this._list.readUInt8(this._pos++);
+					if (this.settings.protocolVersion === 5) {
+						if (!a.MQTT5_SUBACK_CODES[e]) return this._emitError(/* @__PURE__ */ Error("Invalid suback code"));
+					} else if (e > 2 && e !== 128) return this._emitError(/* @__PURE__ */ Error("Invalid suback QoS, must be 0, 1, 2 or 128"));
+					this.packet.granted.push(e);
+				}
+			}
+		}
+		_parseUnsubscribe() {
+			o("_parseUnsubscribe");
+			let e = this.packet;
+			if (e.unsubscriptions = [], this._parseMessageId()) {
+				if (this.settings.protocolVersion === 5) {
+					let t = this._parseProperties();
+					Object.getOwnPropertyNames(t).length && (e.properties = t);
+				}
+				if (e.length <= 0) return this._emitError(/* @__PURE__ */ Error("Malformed unsubscribe, no payload specified"));
+				for (; this._pos < e.length;) {
+					let t = this._parseString();
+					if (t === null) return this._emitError(/* @__PURE__ */ Error("Cannot parse topic"));
+					o("_parseUnsubscribe: push topic `%s` to unsubscriptions", t), e.unsubscriptions.push(t);
+				}
+			}
+		}
+		_parseUnsuback() {
+			o("_parseUnsuback");
+			let e = this.packet;
+			if (!this._parseMessageId()) return this._emitError(/* @__PURE__ */ Error("Cannot parse messageId"));
+			if ((this.settings.protocolVersion === 3 || this.settings.protocolVersion === 4) && e.length !== 2) return this._emitError(/* @__PURE__ */ Error("Malformed unsuback, payload length must be 2"));
+			if (e.length <= 0) return this._emitError(/* @__PURE__ */ Error("Malformed unsuback, no payload specified"));
+			if (this.settings.protocolVersion === 5) {
+				let t = this._parseProperties();
+				for (Object.getOwnPropertyNames(t).length && (e.properties = t), e.granted = []; this._pos < this.packet.length;) {
+					let e = this._list.readUInt8(this._pos++);
+					if (!a.MQTT5_UNSUBACK_CODES[e]) return this._emitError(/* @__PURE__ */ Error("Invalid unsuback code"));
+					this.packet.granted.push(e);
+				}
+			}
+		}
+		_parseConfirmation() {
+			o("_parseConfirmation: packet.cmd: `%s`", this.packet.cmd);
+			let e = this.packet;
+			if (this._parseMessageId(), this.settings.protocolVersion === 5) {
+				if (e.length > 2) {
+					switch (e.reasonCode = this._parseByte(), this.packet.cmd) {
+						case "puback":
+						case "pubrec":
+							if (!a.MQTT5_PUBACK_PUBREC_CODES[e.reasonCode]) return this._emitError(/* @__PURE__ */ Error("Invalid " + this.packet.cmd + " reason code"));
+							break;
+						case "pubrel":
+						case "pubcomp": if (!a.MQTT5_PUBREL_PUBCOMP_CODES[e.reasonCode]) return this._emitError(/* @__PURE__ */ Error("Invalid " + this.packet.cmd + " reason code"));
+					}
+					o("_parseConfirmation: packet.reasonCode `%d`", e.reasonCode);
+				} else e.reasonCode = 0;
+				if (e.length > 3) {
+					let t = this._parseProperties();
+					Object.getOwnPropertyNames(t).length && (e.properties = t);
+				}
+			}
+			return !0;
+		}
+		_parseDisconnect() {
+			let e = this.packet;
+			if (o("_parseDisconnect"), this.settings.protocolVersion === 5) {
+				this._list.length > 0 ? (e.reasonCode = this._parseByte(), a.MQTT5_DISCONNECT_CODES[e.reasonCode] || this._emitError(/* @__PURE__ */ Error("Invalid disconnect reason code"))) : e.reasonCode = 0;
+				let t = this._parseProperties();
+				Object.getOwnPropertyNames(t).length && (e.properties = t);
+			}
+			return o("_parseDisconnect result: true"), !0;
+		}
+		_parseAuth() {
+			o("_parseAuth");
+			let e = this.packet;
+			if (this.settings.protocolVersion !== 5) return this._emitError(/* @__PURE__ */ Error("Not supported auth packet for this version MQTT"));
+			if (e.reasonCode = this._parseByte(), !a.MQTT5_AUTH_CODES[e.reasonCode]) return this._emitError(/* @__PURE__ */ Error("Invalid auth reason code"));
+			let t = this._parseProperties();
+			return Object.getOwnPropertyNames(t).length && (e.properties = t), o("_parseAuth: result: true"), !0;
+		}
+		_parseMessageId() {
+			let e = this.packet;
+			return e.messageId = this._parseNum(), e.messageId === null ? (this._emitError(/* @__PURE__ */ Error("Cannot parse messageId")), !1) : (o("_parseMessageId: packet.messageId %d", e.messageId), !0);
+		}
+		_parseString(e) {
+			let t = this._parseNum(), n = t + this._pos;
+			if (t === -1 || n > this._list.length || n > this.packet.length) return null;
+			let r = this._list.toString("utf8", this._pos, n);
+			return this._pos += t, o("_parseString: result: %s", r), r;
+		}
+		_parseStringPair() {
+			return o("_parseStringPair"), {
+				name: this._parseString(),
+				value: this._parseString()
+			};
+		}
+		_parseBuffer() {
+			let e = this._parseNum(), t = e + this._pos;
+			if (e === -1 || t > this._list.length || t > this.packet.length) return null;
+			let n = this._list.slice(this._pos, t);
+			return this._pos += e, o("_parseBuffer: result: %o", n), n;
+		}
+		_parseNum() {
+			if (this._list.length - this._pos < 2) return -1;
+			let e = this._list.readUInt16BE(this._pos);
+			return this._pos += 2, o("_parseNum: result: %s", e), e;
+		}
+		_parse4ByteNum() {
+			if (this._list.length - this._pos < 4) return -1;
+			let e = this._list.readUInt32BE(this._pos);
+			return this._pos += 4, o("_parse4ByteNum: result: %s", e), e;
+		}
+		_parseVarByteNum(e) {
+			o("_parseVarByteNum");
+			let t = 0, n = 1, r = 0, i = !1, s, c = this._pos ? this._pos : 0;
+			for (; t < 4 && c + t < this._list.length;) {
+				if (s = this._list.readUInt8(c + t++), r += n * (s & a.VARBYTEINT_MASK), n *= 128, (s & a.VARBYTEINT_FIN_MASK) === 0) {
+					i = !0;
+					break;
+				}
+				if (this._list.length <= t) break;
+			}
+			return !i && t === 4 && this._list.length >= t && this._emitError(/* @__PURE__ */ Error("Invalid variable byte integer")), c && (this._pos += t), i = i ? e ? {
+				bytes: t,
+				value: r
+			} : r : !1, o("_parseVarByteNum: result: %o", i), i;
+		}
+		_parseByte() {
+			let e;
+			return this._pos < this._list.length && (e = this._list.readUInt8(this._pos), this._pos++), o("_parseByte: result: %o", e), e;
+		}
+		_parseByType(e) {
+			switch (o("_parseByType: type: %s", e), e) {
+				case "byte": return this._parseByte() !== 0;
+				case "int8": return this._parseByte();
+				case "int16": return this._parseNum();
+				case "int32": return this._parse4ByteNum();
+				case "var": return this._parseVarByteNum();
+				case "string": return this._parseString();
+				case "pair": return this._parseStringPair();
+				case "binary": return this._parseBuffer();
+			}
+		}
+		_parseProperties() {
+			o("_parseProperties");
+			let e = this._parseVarByteNum(), t = this._pos + e, n = {};
+			for (; this._pos < t;) {
+				let e = this._parseByte();
+				if (!e) return this._emitError(/* @__PURE__ */ Error("Cannot parse property code type")), !1;
+				let t = a.propertiesCodes[e];
+				if (!t) return this._emitError(/* @__PURE__ */ Error("Unknown property")), !1;
+				if (t === "userProperties") {
+					n[t] || (n[t] = Object.create(null));
+					let e = this._parseByType(a.propertiesTypes[t]);
+					if (n[t][e.name]) {
+						if (Array.isArray(n[t][e.name])) n[t][e.name].push(e.value);
+						else {
+							let r = n[t][e.name];
+							n[t][e.name] = [r], n[t][e.name].push(e.value);
+						}
+					} else n[t][e.name] = e.value;
+					continue;
+				}
+				n[t] ? (Array.isArray(n[t]) || (n[t] = [n[t]]), n[t].push(this._parseByType(a.propertiesTypes[t]))) : n[t] = this._parseByType(a.propertiesTypes[t]);
+			}
+			return n;
+		}
+		_newPacket() {
+			return o("_newPacket"), this.packet && (this._list.consume(this.packet.length), o("_newPacket: parser emit packet: packet.cmd: %s, packet.payload: %s, packet.length: %d", this.packet.cmd, this.packet.payload, this.packet.length), this.emit("packet", this.packet)), o("_newPacket: new packet"), this.packet = new i(), this._pos = 0, !0;
+		}
+		_emitError(e) {
+			o("_emitError", e), this.error = e, this.emit("error", e);
+		}
+	};
+}), ns = J((e, t) => {
+	X(), $(), Q();
+	var { Buffer: n } = (io(), Y($a)), r = 65536, i = {}, a = n.isBuffer(n.from([1, 2]).subarray(0, 1));
+	function o(e) {
+		let t = n.allocUnsafe(2);
+		return t.writeUInt8(e >> 8, 0), t.writeUInt8(e & 255, 1), t;
+	}
+	function s() {
+		for (let e = 0; e < r; e++) i[e] = o(e);
+	}
+	function c(e) {
+		let t = 0, r = 0, i = n.allocUnsafe(4);
+		do
+			t = e % 128 | 0, e = e / 128 | 0, e > 0 && (t |= 128), i.writeUInt8(t, r++);
+		while (e > 0 && r < 4);
+		return e > 0 && (r = 0), a ? i.subarray(0, r) : i.slice(0, r);
+	}
+	function l(e) {
+		let t = n.allocUnsafe(4);
+		return t.writeUInt32BE(e, 0), t;
+	}
+	t.exports = {
+		cache: i,
+		generateCache: s,
+		generateNumber: o,
+		genBufVariableByteInt: c,
+		generate4ByteBuffer: l
+	};
+}), rs = J((e, t) => {
+	X(), $(), Q(), t.exports = typeof Z > "u" || !Z.version || Z.version.indexOf("v0.") === 0 || Z.version.indexOf("v1.") === 0 && Z.version.indexOf("v1.8.") !== 0 ? { nextTick: n } : Z;
+	function n(e, t, n, r) {
+		if (typeof e != "function") throw TypeError("\"callback\" argument must be a function");
+		var i = arguments.length, a, o;
+		switch (i) {
+			case 0:
+			case 1: return Z.nextTick(e);
+			case 2: return Z.nextTick(function() {
+				e.call(null, t);
+			});
+			case 3: return Z.nextTick(function() {
+				e.call(null, t, n);
+			});
+			case 4: return Z.nextTick(function() {
+				e.call(null, t, n, r);
+			});
+			default:
+				for (a = Array(i - 1), o = 0; o < a.length;) a[o++] = arguments[o];
+				return Z.nextTick(function() {
+					e.apply(null, a);
+				});
+		}
+	}
+}), is = J((e, t) => {
+	X(), $(), Q();
+	var n = Zo(), { Buffer: r } = (io(), Y($a)), i = r.allocUnsafe(0), a = r.from([0]), o = ns(), s = rs().nextTick, c = es()("mqtt-packet:writeToStream"), l = o.cache, u = o.generateNumber, d = o.generateCache, f = o.genBufVariableByteInt, p = o.generate4ByteBuffer, m = N, h = !0;
+	function g(e, t, n) {
+		switch (c("generate called"), t.cork && (t.cork(), s(_, t)), h && (h = !1, d()), c("generate: packet.cmd: %s", e.cmd), e.cmd) {
+			case "connect": return v(e, t, n);
+			case "connack": return y(e, t, n);
+			case "publish": return b(e, t, n);
+			case "puback":
+			case "pubrec":
+			case "pubrel":
+			case "pubcomp": return x(e, t, n);
+			case "subscribe": return S(e, t, n);
+			case "suback": return C(e, t, n);
+			case "unsubscribe": return w(e, t, n);
+			case "unsuback": return T(e, t, n);
+			case "pingreq":
+			case "pingresp": return E(e, t, n);
+			case "disconnect": return D(e, t, n);
+			case "auth": return O(e, t, n);
+			default: return t.destroy(/* @__PURE__ */ Error("Unknown command")), !1;
+		}
+	}
+	Object.defineProperty(g, "cacheNumbers", {
+		get() {
+			return m === N;
+		},
+		set(e) {
+			e ? ((!l || Object.keys(l).length === 0) && (h = !0), m = N) : (h = !1, m = P);
+		}
+	});
+	function _(e) {
+		e.uncork();
+	}
+	function v(e, t, i) {
+		let a = e || {}, o = a.protocolId || "MQTT", s = a.protocolVersion || 4, c = a.will, l = a.clean, u = a.keepalive || 0, d = a.clientId || "", f = a.username, p = a.password, h = a.properties;
+		l === void 0 && (l = !0);
+		let g = 0;
+		if (!o || typeof o != "string" && !r.isBuffer(o)) return t.destroy(/* @__PURE__ */ Error("Invalid protocolId")), !1;
+		if (g += o.length + 2, s !== 3 && s !== 4 && s !== 5) return t.destroy(/* @__PURE__ */ Error("Invalid protocol version")), !1;
+		if (g += 1, (typeof d == "string" || r.isBuffer(d)) && (d || s >= 4) && (d || l)) g += r.byteLength(d) + 2;
+		else {
+			if (s < 4) return t.destroy(/* @__PURE__ */ Error("clientId must be supplied before 3.1.1")), !1;
+			if (l * 1 == 0) return t.destroy(/* @__PURE__ */ Error("clientId must be given if cleanSession set to 0")), !1;
+		}
+		if (typeof u != "number" || u < 0 || u > 65535 || u % 1 != 0) return t.destroy(/* @__PURE__ */ Error("Invalid keepalive")), !1;
+		g += 2, g += 1;
+		let _, v;
+		if (s === 5) {
+			if (_ = L(t, h), !_) return !1;
+			g += _.length;
+		}
+		if (c) {
+			if (typeof c != "object") return t.destroy(/* @__PURE__ */ Error("Invalid will")), !1;
+			if (!c.topic || typeof c.topic != "string") return t.destroy(/* @__PURE__ */ Error("Invalid will topic")), !1;
+			if (g += r.byteLength(c.topic) + 2, g += 2, c.payload) {
+				if (c.payload.length >= 0) typeof c.payload == "string" ? g += r.byteLength(c.payload) : g += c.payload.length;
+				else return t.destroy(/* @__PURE__ */ Error("Invalid will payload")), !1;
+			}
+			if (v = {}, s === 5) {
+				if (v = L(t, c.properties), !v) return !1;
+				g += v.length;
+			}
+		}
+		let y = !1;
+		if (f != null) {
+			if (V(f)) y = !0, g += r.byteLength(f) + 2;
+			else return t.destroy(/* @__PURE__ */ Error("Invalid username")), !1;
+		}
+		if (p != null) {
+			if (!y) return t.destroy(/* @__PURE__ */ Error("Username is required to use password")), !1;
+			if (V(p)) g += B(p) + 2;
+			else return t.destroy(/* @__PURE__ */ Error("Invalid password")), !1;
+		}
+		t.write(n.CONNECT_HEADER), A(t, g), I(t, o), a.bridgeMode && (s += 128), t.write(s === 131 ? n.VERSION131 : s === 132 ? n.VERSION132 : s === 4 ? n.VERSION4 : s === 5 ? n.VERSION5 : n.VERSION3);
+		let b = 0;
+		return b |= f == null ? 0 : n.USERNAME_MASK, b |= p == null ? 0 : n.PASSWORD_MASK, b |= c && c.retain ? n.WILL_RETAIN_MASK : 0, b |= c && c.qos ? c.qos << n.WILL_QOS_SHIFT : 0, b |= c ? n.WILL_FLAG_MASK : 0, b |= l ? n.CLEAN_SESSION_MASK : 0, t.write(r.from([b])), m(t, u), s === 5 && _.write(), I(t, d), c && (s === 5 && v.write(), j(t, c.topic), I(t, c.payload)), f != null && I(t, f), p != null && I(t, p), !0;
+	}
+	function y(e, t, i) {
+		let o = i ? i.protocolVersion : 4, s = e || {}, c = o === 5 ? s.reasonCode : s.returnCode, l = s.properties, u = 2;
+		if (typeof c != "number") return t.destroy(/* @__PURE__ */ Error("Invalid return code")), !1;
+		let d = null;
+		if (o === 5) {
+			if (d = L(t, l), !d) return !1;
+			u += d.length;
+		}
+		return t.write(n.CONNACK_HEADER), A(t, u), t.write(s.sessionPresent ? n.SESSIONPRESENT_HEADER : a), t.write(r.from([c])), d?.write(), !0;
+	}
+	function b(e, t, a) {
+		c("publish: packet: %o", e);
+		let o = a ? a.protocolVersion : 4, s = e || {}, l = s.qos || 0, u = s.retain ? n.RETAIN_MASK : 0, d = s.topic, f = s.payload || i, p = s.messageId, h = s.properties, g = 0;
+		if (typeof d == "string") g += r.byteLength(d) + 2;
+		else if (r.isBuffer(d)) g += d.length + 2;
+		else return t.destroy(/* @__PURE__ */ Error("Invalid topic")), !1;
+		if (r.isBuffer(f) ? g += f.length : g += r.byteLength(f), l && typeof p != "number") return t.destroy(/* @__PURE__ */ Error("Invalid messageId")), !1;
+		l && (g += 2);
+		let _ = null;
+		if (o === 5) {
+			if (_ = L(t, h), !_) return !1;
+			g += _.length;
+		}
+		return t.write(n.PUBLISH_HEADER[l][+!!s.dup][+!!u]), A(t, g), m(t, B(d)), t.write(d), l > 0 && m(t, p), _?.write(), c("publish: payload: %o", f), t.write(f);
+	}
+	function x(e, t, i) {
+		let a = i ? i.protocolVersion : 4, o = e || {}, s = o.cmd || "puback", c = o.messageId, l = o.dup && s === "pubrel" ? n.DUP_MASK : 0, u = 0, d = o.reasonCode, f = o.properties, p = a === 5 ? 3 : 2;
+		if (s === "pubrel" && (u = 1), typeof c != "number") return t.destroy(/* @__PURE__ */ Error("Invalid messageId")), !1;
+		let h = null;
+		if (a === 5 && typeof f == "object") {
+			if (h = R(t, f, i, p), !h) return !1;
+			p += h.length;
+		}
+		return t.write(n.ACKS[s][u][l][0]), p === 3 && (p += d === 0 ? -1 : 1), A(t, p), m(t, c), a === 5 && p !== 2 && t.write(r.from([d])), h === null ? p === 4 && t.write(r.from([0])) : h.write(), !0;
+	}
+	function S(e, t, i) {
+		c("subscribe: packet: ");
+		let a = i ? i.protocolVersion : 4, o = e || {}, s = o.dup ? n.DUP_MASK : 0, l = o.messageId, u = o.subscriptions, d = o.properties, f = 0;
+		if (typeof l != "number") return t.destroy(/* @__PURE__ */ Error("Invalid messageId")), !1;
+		f += 2;
+		let p = null;
+		if (a === 5) {
+			if (p = L(t, d), !p) return !1;
+			f += p.length;
+		}
+		if (typeof u == "object" && u.length) for (let e = 0; e < u.length; e += 1) {
+			let n = u[e].topic, i = u[e].qos;
+			if (typeof n != "string") return t.destroy(/* @__PURE__ */ Error("Invalid subscriptions - invalid topic")), !1;
+			if (typeof i != "number") return t.destroy(/* @__PURE__ */ Error("Invalid subscriptions - invalid qos")), !1;
+			if (a === 5) {
+				if (typeof (u[e].nl || !1) != "boolean") return t.destroy(/* @__PURE__ */ Error("Invalid subscriptions - invalid No Local")), !1;
+				if (typeof (u[e].rap || !1) != "boolean") return t.destroy(/* @__PURE__ */ Error("Invalid subscriptions - invalid Retain as Published")), !1;
+				let n = u[e].rh || 0;
+				if (typeof n != "number" || n > 2) return t.destroy(/* @__PURE__ */ Error("Invalid subscriptions - invalid Retain Handling")), !1;
+			}
+			f += r.byteLength(n) + 2 + 1;
+		}
+		else return t.destroy(/* @__PURE__ */ Error("Invalid subscriptions")), !1;
+		c("subscribe: writing to stream: %o", n.SUBSCRIBE_HEADER), t.write(n.SUBSCRIBE_HEADER[1][+!!s][0]), A(t, f), m(t, l), p !== null && p.write();
+		let h = !0;
+		for (let e of u) {
+			let i = e.topic, o = e.qos, s = +e.nl, c = +e.rap, l = e.rh, u;
+			j(t, i), u = n.SUBSCRIBE_OPTIONS_QOS[o], a === 5 && (u |= s ? n.SUBSCRIBE_OPTIONS_NL : 0, u |= c ? n.SUBSCRIBE_OPTIONS_RAP : 0, u |= l ? n.SUBSCRIBE_OPTIONS_RH[l] : 0), h = t.write(r.from([u]));
+		}
+		return h;
+	}
+	function C(e, t, i) {
+		let a = i ? i.protocolVersion : 4, o = e || {}, s = o.messageId, c = o.granted, l = o.properties, u = 0;
+		if (typeof s != "number") return t.destroy(/* @__PURE__ */ Error("Invalid messageId")), !1;
+		if (u += 2, typeof c == "object" && c.length) for (let e = 0; e < c.length; e += 1) {
+			if (typeof c[e] != "number") return t.destroy(/* @__PURE__ */ Error("Invalid qos vector")), !1;
+			u += 1;
+		}
+		else return t.destroy(/* @__PURE__ */ Error("Invalid qos vector")), !1;
+		let d = null;
+		if (a === 5) {
+			if (d = R(t, l, i, u), !d) return !1;
+			u += d.length;
+		}
+		return t.write(n.SUBACK_HEADER), A(t, u), m(t, s), d !== null && d.write(), t.write(r.from(c));
+	}
+	function w(e, t, i) {
+		let a = i ? i.protocolVersion : 4, o = e || {}, s = o.messageId, c = o.dup ? n.DUP_MASK : 0, l = o.unsubscriptions, u = o.properties, d = 0;
+		if (typeof s != "number") return t.destroy(/* @__PURE__ */ Error("Invalid messageId")), !1;
+		if (d += 2, typeof l == "object" && l.length) for (let e = 0; e < l.length; e += 1) {
+			if (typeof l[e] != "string") return t.destroy(/* @__PURE__ */ Error("Invalid unsubscriptions")), !1;
+			d += r.byteLength(l[e]) + 2;
+		}
+		else return t.destroy(/* @__PURE__ */ Error("Invalid unsubscriptions")), !1;
+		let f = null;
+		if (a === 5) {
+			if (f = L(t, u), !f) return !1;
+			d += f.length;
+		}
+		t.write(n.UNSUBSCRIBE_HEADER[1][+!!c][0]), A(t, d), m(t, s), f !== null && f.write();
+		let p = !0;
+		for (let e = 0; e < l.length; e++) p = j(t, l[e]);
+		return p;
+	}
+	function T(e, t, i) {
+		let a = i ? i.protocolVersion : 4, o = e || {}, s = o.messageId, c = o.dup ? n.DUP_MASK : 0, l = o.granted, u = o.properties, d = o.cmd, f = 2;
+		if (typeof s != "number") return t.destroy(/* @__PURE__ */ Error("Invalid messageId")), !1;
+		if (a === 5) {
+			if (typeof l == "object" && l.length) for (let e = 0; e < l.length; e += 1) {
+				if (typeof l[e] != "number") return t.destroy(/* @__PURE__ */ Error("Invalid qos vector")), !1;
+				f += 1;
+			}
+			else return t.destroy(/* @__PURE__ */ Error("Invalid qos vector")), !1;
+		}
+		let p = null;
+		if (a === 5) {
+			if (p = R(t, u, i, f), !p) return !1;
+			f += p.length;
+		}
+		return t.write(n.ACKS[d][0][c][0]), A(t, f), m(t, s), p !== null && p.write(), a === 5 && t.write(r.from(l)), !0;
+	}
+	function E(e, t, r) {
+		return t.write(n.EMPTY[e.cmd]);
+	}
+	function D(e, t, i) {
+		let a = i ? i.protocolVersion : 4, o = e || {}, s = o.reasonCode, c = o.properties, l = +(a === 5), u = null;
+		if (a === 5) {
+			if (u = R(t, c, i, l), !u) return !1;
+			l += u.length;
+		}
+		return t.write(r.from([n.codes.disconnect << 4])), A(t, l), a === 5 && t.write(r.from([s])), u !== null && u.write(), !0;
+	}
+	function O(e, t, i) {
+		let a = i ? i.protocolVersion : 4, o = e || {}, s = o.reasonCode, c = o.properties, l = +(a === 5);
+		a !== 5 && t.destroy(/* @__PURE__ */ Error("Invalid mqtt version for auth packet"));
+		let u = R(t, c, i, l);
+		return u ? (l += u.length, t.write(r.from([n.codes.auth << 4])), A(t, l), t.write(r.from([s])), u !== null && u.write(), !0) : !1;
+	}
+	var k = {};
+	function A(e, t) {
+		if (t > n.VARBYTEINT_MAX) return e.destroy(/* @__PURE__ */ Error(`Invalid variable byte integer: ${t}`)), !1;
+		let r = k[t];
+		return r || (r = f(t), t < 16384 && (k[t] = r)), c("writeVarByteInt: writing to stream: %o", r), e.write(r);
+	}
+	function j(e, t) {
+		let n = r.byteLength(t);
+		return m(e, n), c("writeString: %s", t), e.write(t, "utf8");
+	}
+	function M(e, t, n) {
+		j(e, t), j(e, n);
+	}
+	function N(e, t) {
+		return c("writeNumberCached: number: %d", t), c("writeNumberCached: %o", l[t]), e.write(l[t]);
+	}
+	function P(e, t) {
+		let n = u(t);
+		return c("writeNumberGenerated: %o", n), e.write(n);
+	}
+	function F(e, t) {
+		let n = p(t);
+		return c("write4ByteNumber: %o", n), e.write(n);
+	}
+	function I(e, t) {
+		typeof t == "string" ? j(e, t) : t ? (m(e, t.length), e.write(t)) : m(e, 0);
+	}
+	function L(e, t) {
+		if (typeof t != "object" || t.length != null) return {
+			length: 1,
+			write() {
+				ee(e, {}, 0);
+			}
+		};
+		let i = 0;
+		function a(t, i) {
+			let a = n.propertiesTypes[t], o = 0;
+			switch (a) {
+				case "byte":
+					if (typeof i != "boolean") return e.destroy(/* @__PURE__ */ Error(`Invalid ${t}: ${i}`)), !1;
+					o += 2;
+					break;
+				case "int8":
+					if (typeof i != "number" || i < 0 || i > 255) return e.destroy(/* @__PURE__ */ Error(`Invalid ${t}: ${i}`)), !1;
+					o += 2;
+					break;
+				case "binary":
+					if (i && i === null) return e.destroy(/* @__PURE__ */ Error(`Invalid ${t}: ${i}`)), !1;
+					o += 1 + r.byteLength(i) + 2;
+					break;
+				case "int16":
+					if (typeof i != "number" || i < 0 || i > 65535) return e.destroy(/* @__PURE__ */ Error(`Invalid ${t}: ${i}`)), !1;
+					o += 3;
+					break;
+				case "int32":
+					if (typeof i != "number" || i < 0 || i > 4294967295) return e.destroy(/* @__PURE__ */ Error(`Invalid ${t}: ${i}`)), !1;
+					o += 5;
+					break;
+				case "var":
+					if (typeof i != "number" || i < 0 || i > 268435455) return e.destroy(/* @__PURE__ */ Error(`Invalid ${t}: ${i}`)), !1;
+					o += 1 + r.byteLength(f(i));
+					break;
+				case "string":
+					if (typeof i != "string") return e.destroy(/* @__PURE__ */ Error(`Invalid ${t}: ${i}`)), !1;
+					o += 3 + r.byteLength(i.toString());
+					break;
+				case "pair":
+					if (typeof i != "object") return e.destroy(/* @__PURE__ */ Error(`Invalid ${t}: ${i}`)), !1;
+					o += Object.getOwnPropertyNames(i).reduce((e, t) => {
+						let n = i[t];
+						return e += Array.isArray(n) ? n.reduce((e, n) => (e += 3 + r.byteLength(t.toString()) + 2 + r.byteLength(n.toString()), e), 0) : 3 + r.byteLength(t.toString()) + 2 + r.byteLength(i[t].toString()), e;
+					}, 0);
+					break;
+				default: return e.destroy(/* @__PURE__ */ Error(`Invalid property ${t}: ${i}`)), !1;
+			}
+			return o;
+		}
+		if (t) for (let e in t) {
+			let n = 0, r = 0, o = t[e];
+			if (o !== void 0) {
+				if (Array.isArray(o)) for (let t = 0; t < o.length; t++) {
+					if (r = a(e, o[t]), !r) return !1;
+					n += r;
+				}
+				else {
+					if (r = a(e, o), !r) return !1;
+					n = r;
+				}
+				if (!n) return !1;
+				i += n;
+			}
+		}
+		return {
+			length: r.byteLength(f(i)) + i,
+			write() {
+				ee(e, t, i);
+			}
+		};
+	}
+	function R(e, t, n, r) {
+		let i = ["reasonString", "userProperties"], a = n && n.properties && n.properties.maximumPacketSize ? n.properties.maximumPacketSize : 0, o = L(e, t);
+		if (a) for (; r + o.length > a;) {
+			let n = i.shift();
+			if (n && t[n]) delete t[n], o = L(e, t);
+			else return !1;
+		}
+		return o;
+	}
+	function z(e, t, i) {
+		switch (n.propertiesTypes[t]) {
+			case "byte":
+				e.write(r.from([n.properties[t]])), e.write(r.from([+i]));
+				break;
+			case "int8":
+				e.write(r.from([n.properties[t]])), e.write(r.from([i]));
+				break;
+			case "binary":
+				e.write(r.from([n.properties[t]])), I(e, i);
+				break;
+			case "int16":
+				e.write(r.from([n.properties[t]])), m(e, i);
+				break;
+			case "int32":
+				e.write(r.from([n.properties[t]])), F(e, i);
+				break;
+			case "var":
+				e.write(r.from([n.properties[t]])), A(e, i);
+				break;
+			case "string":
+				e.write(r.from([n.properties[t]])), j(e, i);
+				break;
+			case "pair":
+				Object.getOwnPropertyNames(i).forEach((a) => {
+					let o = i[a];
+					Array.isArray(o) ? o.forEach((i) => {
+						e.write(r.from([n.properties[t]])), M(e, a.toString(), i.toString());
+					}) : (e.write(r.from([n.properties[t]])), M(e, a.toString(), o.toString()));
+				});
+				break;
+			default: return e.destroy(/* @__PURE__ */ Error(`Invalid property ${t} value: ${i}`)), !1;
+		}
+	}
+	function ee(e, t, n) {
+		A(e, n);
+		for (let n in t) if (Object.prototype.hasOwnProperty.call(t, n) && t[n] != null) {
+			let r = t[n];
+			if (Array.isArray(r)) for (let t = 0; t < r.length; t++) z(e, n, r[t]);
+			else z(e, n, r);
+		}
+	}
+	function B(e) {
+		return e ? e instanceof r ? e.length : r.byteLength(e) : 0;
+	}
+	function V(e) {
+		return typeof e == "string" || e instanceof r;
+	}
+	t.exports = g;
+}), as = J((e, t) => {
+	X(), $(), Q();
+	var n = is(), { EventEmitter: r } = (xo(), Y(lo)), { Buffer: i } = (io(), Y($a));
+	function a(e, t) {
+		let r = new o();
+		return n(e, r, t), r.concat();
+	}
+	var o = class extends r {
+		constructor() {
+			super(), this._array = Array(20), this._i = 0;
+		}
+		write(e) {
+			return this._array[this._i++] = e, !0;
+		}
+		concat() {
+			let e = 0, t = Array(this._array.length), n = this._array, r = 0, a = 0;
+			for (; a < n.length && n[a] !== void 0; a++) typeof n[a] == "string" ? t[a] = i.byteLength(n[a]) : t[a] = n[a].length, e += t[a];
+			let o = i.allocUnsafe(e);
+			for (a = 0; a < n.length && n[a] !== void 0; a++) typeof n[a] == "string" ? (o.write(n[a], r), r += t[a]) : (n[a].copy(o, r), r += t[a]);
+			return o;
+		}
+		destroy(e) {
+			e && this.emit("error", e);
+		}
+	};
+	t.exports = a;
+}), os = J((e) => {
+	X(), $(), Q(), e.parser = ts().parser, e.generate = as(), e.writeToStream = is();
+}), ss = J((e, t) => {
+	X(), $(), Q(), t.exports = r;
+	function n(e) {
+		return e instanceof to ? to.from(e) : new e.constructor(e.buffer.slice(), e.byteOffset, e.length);
+	}
+	function r(e) {
+		if (e ||= {}, e.circles) return i(e);
+		let t = /* @__PURE__ */ new Map();
+		if (t.set(Date, (e) => new Date(e)), t.set(Map, (e, t) => new Map(a(Array.from(e), t))), t.set(Set, (e, t) => new Set(a(Array.from(e), t))), e.constructorHandlers) for (let n of e.constructorHandlers) t.set(n[0], n[1]);
+		let r = null;
+		return e.proto ? s : o;
+		function a(e, i) {
+			let a = Object.keys(e), o = Array(a.length);
+			for (let s = 0; s < a.length; s++) {
+				let c = a[s], l = e[c];
+				o[c] = typeof l != "object" || !l ? l : l.constructor !== Object && (r = t.get(l.constructor)) ? r(l, i) : ArrayBuffer.isView(l) ? n(l) : i(l);
+			}
+			return o;
+		}
+		function o(e) {
+			if (typeof e != "object" || !e) return e;
+			if (Array.isArray(e)) return a(e, o);
+			if (e.constructor !== Object && (r = t.get(e.constructor))) return r(e, o);
+			let i = {};
+			for (let a in e) {
+				if (Object.hasOwnProperty.call(e, a) === !1) continue;
+				let s = e[a];
+				i[a] = typeof s != "object" || !s ? s : s.constructor !== Object && (r = t.get(s.constructor)) ? r(s, o) : ArrayBuffer.isView(s) ? n(s) : o(s);
+			}
+			return i;
+		}
+		function s(e) {
+			if (typeof e != "object" || !e) return e;
+			if (Array.isArray(e)) return a(e, s);
+			if (e.constructor !== Object && (r = t.get(e.constructor))) return r(e, s);
+			let i = {};
+			for (let a in e) {
+				let o = e[a];
+				i[a] = typeof o != "object" || !o ? o : o.constructor !== Object && (r = t.get(o.constructor)) ? r(o, s) : ArrayBuffer.isView(o) ? n(o) : s(o);
+			}
+			return i;
+		}
+	}
+	function i(e) {
+		let t = [], r = [], i = /* @__PURE__ */ new Map();
+		if (i.set(Date, (e) => new Date(e)), i.set(Map, (e, t) => new Map(o(Array.from(e), t))), i.set(Set, (e, t) => new Set(o(Array.from(e), t))), e.constructorHandlers) for (let t of e.constructorHandlers) i.set(t[0], t[1]);
+		let a = null;
+		return e.proto ? c : s;
+		function o(e, o) {
+			let s = Object.keys(e), c = Array(s.length);
+			for (let l = 0; l < s.length; l++) {
+				let u = s[l], d = e[u];
+				if (typeof d != "object" || !d) c[u] = d;
+				else if (d.constructor !== Object && (a = i.get(d.constructor))) c[u] = a(d, o);
+				else if (ArrayBuffer.isView(d)) c[u] = n(d);
+				else {
+					let e = t.indexOf(d);
+					c[u] = e === -1 ? o(d) : r[e];
+				}
+			}
+			return c;
+		}
+		function s(e) {
+			if (typeof e != "object" || !e) return e;
+			if (Array.isArray(e)) return o(e, s);
+			if (e.constructor !== Object && (a = i.get(e.constructor))) return a(e, s);
+			let c = {};
+			t.push(e), r.push(c);
+			for (let o in e) {
+				if (Object.hasOwnProperty.call(e, o) === !1) continue;
+				let l = e[o];
+				if (typeof l != "object" || !l) c[o] = l;
+				else if (l.constructor !== Object && (a = i.get(l.constructor))) c[o] = a(l, s);
+				else if (ArrayBuffer.isView(l)) c[o] = n(l);
+				else {
+					let e = t.indexOf(l);
+					c[o] = e === -1 ? s(l) : r[e];
+				}
+			}
+			return t.pop(), r.pop(), c;
+		}
+		function c(e) {
+			if (typeof e != "object" || !e) return e;
+			if (Array.isArray(e)) return o(e, c);
+			if (e.constructor !== Object && (a = i.get(e.constructor))) return a(e, c);
+			let s = {};
+			t.push(e), r.push(s);
+			for (let o in e) {
+				let l = e[o];
+				if (typeof l != "object" || !l) s[o] = l;
+				else if (l.constructor !== Object && (a = i.get(l.constructor))) s[o] = a(l, c);
+				else if (ArrayBuffer.isView(l)) s[o] = n(l);
+				else {
+					let e = t.indexOf(l);
+					s[o] = e === -1 ? c(l) : r[e];
+				}
+			}
+			return t.pop(), r.pop(), s;
+		}
+	}
+}), cs = J((e, t) => {
+	X(), $(), Q(), t.exports = ss()();
+}), ls = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.validateTopic = t, e.validateTopics = n;
+	function t(e) {
+		let t = e.split("/");
+		for (let e = 0; e < t.length; e++) if (t[e] !== "+") {
+			if (t[e] === "#") return e === t.length - 1;
+			if (t[e].indexOf("+") !== -1 || t[e].indexOf("#") !== -1) return !1;
+		}
+		return !0;
+	}
+	function n(e) {
+		if (e.length === 0) return "empty_topic_list";
+		for (let n = 0; n < e.length; n++) if (!t(e[n])) return e[n];
+		return null;
+	}
+}), us = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 });
+	var t = Ko(), n = { objectMode: !0 }, r = { clean: !0 };
+	e.default = class {
+		options;
+		_inflights;
+		constructor(e) {
+			this.options = e || {}, this.options = {
+				...r,
+				...e
+			}, this._inflights = /* @__PURE__ */ new Map();
+		}
+		put(e, t) {
+			return this._inflights.set(e.messageId, e), t && t(), this;
+		}
+		createStream() {
+			let e = new t.Readable(n), r = [], i = !1, a = 0;
+			return this._inflights.forEach((e, t) => {
+				r.push(e);
+			}), e._read = () => {
+				!i && a < r.length ? e.push(r[a++]) : e.push(null);
+			}, e.destroy = (t) => {
+				if (!i) return i = !0, setTimeout(() => {
+					e.emit("close");
+				}, 0), e;
+			}, e;
+		}
+		del(e, t) {
+			let n = this._inflights.get(e.messageId);
+			return n ? (this._inflights.delete(e.messageId), t(null, n)) : t && t(/* @__PURE__ */ Error("missing packet")), this;
+		}
+		get(e, t) {
+			let n = this._inflights.get(e.messageId);
+			return n ? t(null, n) : t && t(/* @__PURE__ */ Error("missing packet")), this;
+		}
+		close(e) {
+			this.options.clean && (this._inflights = null), e && e();
+		}
+	};
+}), ds = J((e, t) => {
+	t.exports = { version: "5.16.0" };
+}), fs = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.MQTTJS_VERSION = e.nextTick = e.ErrorWithSubackPacket = e.ErrorWithReasonCode = void 0, e.applyMixin = t, e.ErrorWithReasonCode = class e extends Error {
+		code;
+		constructor(t, n) {
+			super(t), this.code = n, Object.setPrototypeOf(this, e.prototype), Object.getPrototypeOf(this).name = "ErrorWithReasonCode";
+		}
+	}, e.ErrorWithSubackPacket = class e extends Error {
+		packet;
+		constructor(t, n) {
+			super(t), this.packet = n, Object.setPrototypeOf(this, e.prototype), Object.getPrototypeOf(this).name = "ErrorWithSubackPacket";
+		}
+	};
+	function t(e, t, n = !1) {
+		let r = [t];
+		for (;;) {
+			let e = r[0], t = Object.getPrototypeOf(e);
+			if (t?.prototype) r.unshift(t);
+			else break;
+		}
+		for (let t of r) for (let r of Object.getOwnPropertyNames(t.prototype)) (n || r !== "constructor") && Object.defineProperty(e.prototype, r, Object.getOwnPropertyDescriptor(t.prototype, r) ?? Object.create(null));
+	}
+	e.nextTick = typeof Z?.nextTick == "function" ? Z.nextTick : (e) => {
+		setTimeout(e, 0);
+	}, e.MQTTJS_VERSION = ds().version;
+}), ps = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 });
+	var t = fs(), n = [
+		0,
+		16,
+		128,
+		131,
+		135,
+		144,
+		145,
+		151,
+		153
+	], r = 148, i = 130, a = (e, n, i, a, o = r) => {
+		a?.discardParsedPackets(), (!a || a.isCurrent()) && e._cleanUp(!0), i(), e.emit("error", new t.ErrorWithReasonCode(n, o));
+	}, o = (e, t, n) => {
+		n(), e.emit("error", t);
+	};
+	e.default = (e, t, r, s) => {
+		e.log("handlePublish: packet %o", t), r = typeof r < "u" ? r : e.noop;
+		let c = t.topic.toString(), l = t.payload, { qos: u } = t, { messageId: d } = t, { options: f } = e;
+		if (e.options.protocolVersion === 5) {
+			let n;
+			if (t.properties && (n = t.properties.topicAlias), typeof n < "u") {
+				let t = e.topicAliasRecv;
+				if (!t) {
+					e.log("handlePublish :: received unexpected topic alias. alias: %d", n), a(e, "Received a PUBLISH Topic Alias but no Topic Alias Maximum was advertised", r, s);
+					return;
+				}
+				if (c.length === 0) {
+					if (n > 0 && n <= 65535) {
+						let o = t.getTopicByAlias(n);
+						if (o) c = o, e.log("handlePublish :: topic complemented by alias. topic: %s - alias: %d", c, n);
+						else {
+							e.log("handlePublish :: unregistered topic alias. alias: %d", n), a(e, "Received unregistered Topic Alias", r, s, i);
+							return;
+						}
+					} else {
+						e.log("handlePublish :: topic alias out of range. alias: %d", n), a(e, `Received Topic Alias ${n} is outside the valid range 1-65535`, r, s);
+						return;
+					}
+				} else if (t.put(c, n)) e.log("handlePublish :: registered topic: %s - alias: %d", c, n);
+				else {
+					e.log("handlePublish :: topic alias outside the advertised maximum. alias: %d - max: %d", n, t.max), a(e, `Received Topic Alias ${n} is outside the advertised Topic Alias Maximum range 1-${t.max}`, r, s);
+					return;
+				}
+			}
+		}
+		switch (e.log("handlePublish: qos %d", u), u) {
+			case 2:
+				f.customHandleAcks(c, l, t, (i, a) => {
+					if (typeof i == "number" && (a = i, i = null), i) return o(e, i, r);
+					if (n.indexOf(a) === -1) return o(e, /* @__PURE__ */ Error("Wrong reason code for pubrec"), r);
+					if (a) e._sendPacket({
+						cmd: "pubrec",
+						messageId: d,
+						reasonCode: a
+					}, r);
+					else {
+						if (!e._trackIncomingQoS2Publish(d, r, s)) return;
+						e.incomingStore.put(t, () => {
+							e._sendPacket({
+								cmd: "pubrec",
+								messageId: d
+							}, r);
+						});
+					}
+				});
+				break;
+			case 1:
+				f.customHandleAcks(c, l, t, (i, a) => {
+					if (typeof i == "number" && (a = i, i = null), i) return o(e, i, r);
+					if (n.indexOf(a) === -1) return o(e, /* @__PURE__ */ Error("Wrong reason code for puback"), r);
+					a || e.emit("message", c, l, t), e.handleMessage(t, (t) => {
+						if (t) return r && r(t);
+						e._sendPacket({
+							cmd: "puback",
+							messageId: d,
+							reasonCode: a
+						}, r);
+					});
+				});
+				break;
+			case 0:
+				e.emit("message", c, l, t), e.handleMessage(t, r);
+				break;
+			default: e.log("handlePublish: unknown QoS. Doing nothing.");
+		}
+	};
+}), ms = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 });
+	var t = fs(), n = 130, r = (e, t, n) => {
+		e.log("handleAuth :: %s", t.message), n?.discardParsedPackets(), (!n || n.isCurrent()) && e._cleanUp(!0), e.emit("error", t);
+	};
+	e.default = (e, i, a) => {
+		let { options: o } = e, s = o.protocolVersion, c = s === 5 ? i.reasonCode : i.returnCode;
+		if (s !== 5) {
+			r(e, new t.ErrorWithReasonCode(`Protocol error: Auth packets are only supported in MQTT 5. Your version:${s}`, n), a);
+			return;
+		}
+		let l = e._authenticationMethod;
+		if (!l) {
+			r(e, new t.ErrorWithReasonCode("Protocol error: Auth packet received but enhanced authentication was not requested", n), a);
+			return;
+		}
+		if (i.properties?.authenticationMethod !== l) {
+			r(e, new t.ErrorWithReasonCode(`Protocol error: Auth packet Authentication Method does not match the "${l}" sent in CONNECT`, n), a);
+			return;
+		}
+		e.handleAuth(i, (i, o) => {
+			if (i) {
+				r(e, i, a);
+				return;
+			}
+			if (c === 0) {
+				e.log("handleAuth :: authentication exchange completed successfully");
+				return;
+			}
+			if (c === 24) {
+				if (!o) {
+					r(e, new t.ErrorWithReasonCode("Protocol error: No auth packet to continue the authentication exchange", n), a);
+					return;
+				}
+				e.reconnecting = !1, e._sendPacket(o);
+				return;
+			}
+			r(e, new t.ErrorWithReasonCode(`Protocol error: Auth packet reason code ${c} is not one a broker may send`, n), a);
+		});
+	};
+}), hs = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.ReasonCodes = void 0;
+	var t = fs();
+	e.ReasonCodes = {
+		0: "",
+		1: "Unacceptable protocol version",
+		2: "Identifier rejected",
+		3: "Server unavailable",
+		4: "Bad username or password",
+		5: "Not authorized",
+		16: "No matching subscribers",
+		17: "No subscription existed",
+		128: "Unspecified error",
+		129: "Malformed Packet",
+		130: "Protocol Error",
+		131: "Implementation specific error",
+		132: "Unsupported Protocol Version",
+		133: "Client Identifier not valid",
+		134: "Bad User Name or Password",
+		135: "Not authorized",
+		136: "Server unavailable",
+		137: "Server busy",
+		138: "Banned",
+		139: "Server shutting down",
+		140: "Bad authentication method",
+		141: "Keep Alive timeout",
+		142: "Session taken over",
+		143: "Topic Filter invalid",
+		144: "Topic Name invalid",
+		145: "Packet identifier in use",
+		146: "Packet Identifier not found",
+		147: "Receive Maximum exceeded",
+		148: "Topic Alias invalid",
+		149: "Packet too large",
+		150: "Message rate too high",
+		151: "Quota exceeded",
+		152: "Administrative action",
+		153: "Payload format invalid",
+		154: "Retain not supported",
+		155: "QoS not supported",
+		156: "Use another server",
+		157: "Server moved",
+		158: "Shared Subscriptions not supported",
+		159: "Connection rate exceeded",
+		160: "Maximum connect time",
+		161: "Subscription Identifiers not supported",
+		162: "Wildcard Subscriptions not supported"
+	};
+	var n = {
+		publish: [
+			"puback",
+			"pubrec",
+			"pubcomp"
+		],
+		pubrel: ["pubcomp"],
+		subscribe: ["suback"],
+		unsubscribe: ["unsuback"]
+	};
+	e.default = (r, i) => {
+		let { messageId: a } = i, o = i.cmd, s = null, c = r.outgoing[a], l = c ? c.cb : null, u = null;
+		if (!l) {
+			r.log("_handleAck :: Server sent an ack in error. Ignoring.");
+			return;
+		}
+		if (!n[c.cmd]?.includes(o)) {
+			r.log("_handleAck :: %s does not answer the pending %s on message id %d. Ignoring.", o, c.cmd, a), r.emit("error", /* @__PURE__ */ Error(`Protocol error: ${o} does not answer the ${c.cmd} pending on message id ${a}`));
+			return;
+		}
+		switch (r.log("_handleAck :: packet type", o), o) {
+			case "pubcomp":
+			case "puback": {
+				let n = i.reasonCode;
+				n && n > 0 && n !== 16 ? (u = new t.ErrorWithReasonCode(`Publish error: ${e.ReasonCodes[n]}`, n), r._removeOutgoingAndStoreMessage(a, () => {
+					l(u, i);
+				})) : r._removeOutgoingAndStoreMessage(a, l);
+				break;
+			}
+			case "pubrec": {
+				s = {
+					cmd: "pubrel",
+					qos: 2,
+					messageId: a
+				};
+				let n = i.reasonCode;
+				n && n > 0 && n !== 16 ? (u = new t.ErrorWithReasonCode(`Publish error: ${e.ReasonCodes[n]}`, n), r._removeOutgoingAndStoreMessage(a, () => {
+					l(u, i);
+				})) : r._sendPacket(s);
+				break;
+			}
+			case "suback": {
+				delete r.outgoing[a], r.messageIdProvider.deallocate(a);
+				let t = i.granted;
+				for (let n = 0; n < t.length; n++) {
+					let i = t[n];
+					if (i & 128) {
+						u = /* @__PURE__ */ Error(`Subscribe error: ${e.ReasonCodes[i]}`), u.code = i;
+						let t = r.messageIdToTopic[a];
+						t && t.forEach((e) => {
+							delete r._resubscribeTopics[e];
+						});
+					}
+				}
+				delete r.messageIdToTopic[a], r._invokeStoreProcessingQueue(), l(u, i);
+				break;
+			}
+			case "unsuback":
+				delete r.outgoing[a], r.messageIdProvider.deallocate(a), r._invokeStoreProcessingQueue(), l(null, i);
+				break;
+			default: r.emit("error", /* @__PURE__ */ Error("unrecognized packet type"));
+		}
+		r.disconnecting && Object.keys(r.outgoing).length === 0 && r.emit("outgoingEmpty");
+	};
+}), gs = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.LRUCache = void 0;
+	var t = typeof performance == "object" && performance && typeof performance.now == "function" ? performance : Date, n = /* @__PURE__ */ new Set(), r = typeof Z == "object" && Z ? Z : {}, i = (e, t, n, i) => {
+		typeof r.emitWarning == "function" ? r.emitWarning(e, t, n, i) : console.error(`[${n}] ${t}: ${e}`);
+	}, a = globalThis.AbortController, o = globalThis.AbortSignal;
+	if (typeof a > "u") {
+		o = class {
+			onabort;
+			_onabort = [];
+			reason;
+			aborted = !1;
+			addEventListener(e, t) {
+				this._onabort.push(t);
+			}
+		}, a = class {
+			constructor() {
+				t();
+			}
+			signal = new o();
+			abort(e) {
+				if (!this.signal.aborted) {
+					this.signal.reason = e, this.signal.aborted = !0;
+					for (let t of this.signal._onabort) t(e);
+					this.signal.onabort?.(e);
+				}
+			}
+		};
+		let e = r.env?.LRU_CACHE_IGNORE_AC_WARNING !== "1", t = () => {
+			e && (e = !1, i("AbortController is not defined. If using lru-cache in node 14, load an AbortController polyfill from the `node-abort-controller` package. A minimal polyfill is provided for use by LRUCache.fetch(), but it should not be relied upon in other contexts (eg, passing it to other APIs that use AbortController/AbortSignal might have undesirable effects). You may disable this with LRU_CACHE_IGNORE_AC_WARNING=1 in the env.", "NO_ABORT_CONTROLLER", "ENOTSUP", t));
+		};
+	}
+	var s = (e) => !n.has(e), c = (e) => e && e === Math.floor(e) && e > 0 && isFinite(e), l = (e) => c(e) ? e <= 256 ? Uint8Array : e <= 2 ** 16 ? Uint16Array : e <= 2 ** 32 ? Uint32Array : e <= 2 ** 53 - 1 ? u : null : null, u = class extends Array {
+		constructor(e) {
+			super(e), this.fill(0);
+		}
+	}, d = class e {
+		heap;
+		length;
+		static #e = !1;
+		static create(t) {
+			let n = l(t);
+			if (!n) return [];
+			e.#e = !0;
+			let r = new e(t, n);
+			return e.#e = !1, r;
+		}
+		constructor(t, n) {
+			if (!e.#e) throw TypeError("instantiate Stack using Stack.create(n)");
+			this.heap = new n(t), this.length = 0;
+		}
+		push(e) {
+			this.heap[this.length++] = e;
+		}
+		pop() {
+			return this.heap[--this.length];
+		}
+	};
+	e.LRUCache = class e {
+		#e;
+		#t;
+		#n;
+		#r;
+		#i;
+		#a;
+		ttl;
+		ttlResolution;
+		ttlAutopurge;
+		updateAgeOnGet;
+		updateAgeOnHas;
+		allowStale;
+		noDisposeOnSet;
+		noUpdateTTL;
+		maxEntrySize;
+		sizeCalculation;
+		noDeleteOnFetchRejection;
+		noDeleteOnStaleGet;
+		allowStaleOnFetchAbort;
+		allowStaleOnFetchRejection;
+		ignoreFetchAbort;
+		#o;
+		#s;
+		#c;
+		#l;
+		#u;
+		#d;
+		#f;
+		#p;
+		#m;
+		#h;
+		#g;
+		#_;
+		#v;
+		#y;
+		#b;
+		#x;
+		#S;
+		static unsafeExposeInternals(e) {
+			return {
+				starts: e.#v,
+				ttls: e.#y,
+				sizes: e.#_,
+				keyMap: e.#c,
+				keyList: e.#l,
+				valList: e.#u,
+				next: e.#d,
+				prev: e.#f,
+				get head() {
+					return e.#p;
+				},
+				get tail() {
+					return e.#m;
+				},
+				free: e.#h,
+				isBackgroundFetch: (t) => e.#L(t),
+				backgroundFetch: (t, n, r, i) => e.#I(t, n, r, i),
+				moveToTail: (t) => e.#z(t),
+				indexes: (t) => e.#M(t),
+				rindexes: (t) => e.#N(t),
+				isStale: (t) => e.#D(t)
+			};
+		}
+		get max() {
+			return this.#e;
+		}
+		get maxSize() {
+			return this.#t;
+		}
+		get calculatedSize() {
+			return this.#s;
+		}
+		get size() {
+			return this.#o;
+		}
+		get fetchMethod() {
+			return this.#i;
+		}
+		get memoMethod() {
+			return this.#a;
+		}
+		get dispose() {
+			return this.#n;
+		}
+		get disposeAfter() {
+			return this.#r;
+		}
+		constructor(t) {
+			let { max: r = 0, ttl: a, ttlResolution: o = 1, ttlAutopurge: u, updateAgeOnGet: f, updateAgeOnHas: p, allowStale: m, dispose: h, disposeAfter: g, noDisposeOnSet: _, noUpdateTTL: v, maxSize: y = 0, maxEntrySize: b = 0, sizeCalculation: x, fetchMethod: S, memoMethod: C, noDeleteOnFetchRejection: w, noDeleteOnStaleGet: T, allowStaleOnFetchRejection: E, allowStaleOnFetchAbort: D, ignoreFetchAbort: O } = t;
+			if (r !== 0 && !c(r)) throw TypeError("max option must be a nonnegative integer");
+			let k = r ? l(r) : Array;
+			if (!k) throw Error("invalid max value: " + r);
+			if (this.#e = r, this.#t = y, this.maxEntrySize = b || this.#t, this.sizeCalculation = x, this.sizeCalculation) {
+				if (!this.#t && !this.maxEntrySize) throw TypeError("cannot set sizeCalculation without setting maxSize or maxEntrySize");
+				if (typeof this.sizeCalculation != "function") throw TypeError("sizeCalculation set to non-function");
+			}
+			if (C !== void 0 && typeof C != "function") throw TypeError("memoMethod must be a function if defined");
+			if (this.#a = C, S !== void 0 && typeof S != "function") throw TypeError("fetchMethod must be a function if specified");
+			if (this.#i = S, this.#x = !!S, this.#c = /* @__PURE__ */ new Map(), this.#l = Array(r).fill(void 0), this.#u = Array(r).fill(void 0), this.#d = new k(r), this.#f = new k(r), this.#p = 0, this.#m = 0, this.#h = d.create(r), this.#o = 0, this.#s = 0, typeof h == "function" && (this.#n = h), typeof g == "function" ? (this.#r = g, this.#g = []) : (this.#r = void 0, this.#g = void 0), this.#b = !!this.#n, this.#S = !!this.#r, this.noDisposeOnSet = !!_, this.noUpdateTTL = !!v, this.noDeleteOnFetchRejection = !!w, this.allowStaleOnFetchRejection = !!E, this.allowStaleOnFetchAbort = !!D, this.ignoreFetchAbort = !!O, this.maxEntrySize !== 0) {
+				if (this.#t !== 0 && !c(this.#t)) throw TypeError("maxSize must be a positive integer if specified");
+				if (!c(this.maxEntrySize)) throw TypeError("maxEntrySize must be a positive integer if specified");
+				this.#O();
+			}
+			if (this.allowStale = !!m, this.noDeleteOnStaleGet = !!T, this.updateAgeOnGet = !!f, this.updateAgeOnHas = !!p, this.ttlResolution = c(o) || o === 0 ? o : 1, this.ttlAutopurge = !!u, this.ttl = a || 0, this.ttl) {
+				if (!c(this.ttl)) throw TypeError("ttl must be a positive integer if specified");
+				this.#C();
+			}
+			if (this.#e === 0 && this.ttl === 0 && this.#t === 0) throw TypeError("At least one of max, maxSize, or ttl is required");
+			if (!this.ttlAutopurge && !this.#e && !this.#t) {
+				let t = "LRU_CACHE_UNBOUNDED";
+				s(t) && (n.add(t), i("TTL caching without ttlAutopurge, max, or maxSize can result in unbounded memory consumption.", "UnboundedCacheWarning", t, e));
+			}
+		}
+		getRemainingTTL(e) {
+			return this.#c.has(e) ? 1 / 0 : 0;
+		}
+		#C() {
+			let e = new u(this.#e), n = new u(this.#e);
+			this.#y = e, this.#v = n, this.#E = (r, i, a = t.now()) => {
+				if (n[r] = i === 0 ? 0 : a, e[r] = i, i !== 0 && this.ttlAutopurge) {
+					let e = setTimeout(() => {
+						this.#D(r) && this.#B(this.#l[r], "expire");
+					}, i + 1);
+					e.unref && e.unref();
+				}
+			}, this.#w = (r) => {
+				n[r] = e[r] === 0 ? 0 : t.now();
+			}, this.#T = (t, a) => {
+				if (e[a]) {
+					let o = e[a], s = n[a];
+					if (!o || !s) return;
+					t.ttl = o, t.start = s, t.now = r || i(), t.remainingTTL = o - (t.now - s);
+				}
+			};
+			let r = 0, i = () => {
+				let e = t.now();
+				if (this.ttlResolution > 0) {
+					r = e;
+					let t = setTimeout(() => r = 0, this.ttlResolution);
+					t.unref && t.unref();
+				}
+				return e;
+			};
+			this.getRemainingTTL = (t) => {
+				let a = this.#c.get(t);
+				if (a === void 0) return 0;
+				let o = e[a], s = n[a];
+				return !o || !s ? 1 / 0 : o - ((r || i()) - s);
+			}, this.#D = (t) => {
+				let a = n[t], o = e[t];
+				return !!o && !!a && (r || i()) - a > o;
+			};
+		}
+		#w = () => {};
+		#T = () => {};
+		#E = () => {};
+		#D = () => !1;
+		#O() {
+			let e = new u(this.#e);
+			this.#s = 0, this.#_ = e, this.#k = (t) => {
+				this.#s -= e[t], e[t] = 0;
+			}, this.#j = (e, t, n, r) => {
+				if (this.#L(t)) return 0;
+				if (!c(n)) {
+					if (r) {
+						if (typeof r != "function") throw TypeError("sizeCalculation must be a function");
+						if (n = r(t, e), !c(n)) throw TypeError("sizeCalculation return invalid (expect positive integer)");
+					} else throw TypeError("invalid size value (must be positive integer). When maxSize or maxEntrySize is used, sizeCalculation or size must be set.");
+				}
+				return n;
+			}, this.#A = (t, n, r) => {
+				if (e[t] = n, this.#t) {
+					let n = this.#t - e[t];
+					for (; this.#s > n;) this.#F(!0);
+				}
+				this.#s += e[t], r && (r.entrySize = n, r.totalCalculatedSize = this.#s);
+			};
+		}
+		#k = (e) => {};
+		#A = (e, t, n) => {};
+		#j = (e, t, n, r) => {
+			if (n || r) throw TypeError("cannot set size without setting maxSize or maxEntrySize on cache");
+			return 0;
+		};
+		*#M({ allowStale: e = this.allowStale } = {}) {
+			if (this.#o) for (let t = this.#m; !(!this.#P(t) || ((e || !this.#D(t)) && (yield t), t === this.#p));) t = this.#f[t];
+		}
+		*#N({ allowStale: e = this.allowStale } = {}) {
+			if (this.#o) for (let t = this.#p; !(!this.#P(t) || ((e || !this.#D(t)) && (yield t), t === this.#m));) t = this.#d[t];
+		}
+		#P(e) {
+			return e !== void 0 && this.#c.get(this.#l[e]) === e;
+		}
+		*entries() {
+			for (let e of this.#M()) this.#u[e] !== void 0 && this.#l[e] !== void 0 && !this.#L(this.#u[e]) && (yield [this.#l[e], this.#u[e]]);
+		}
+		*rentries() {
+			for (let e of this.#N()) this.#u[e] !== void 0 && this.#l[e] !== void 0 && !this.#L(this.#u[e]) && (yield [this.#l[e], this.#u[e]]);
+		}
+		*keys() {
+			for (let e of this.#M()) {
+				let t = this.#l[e];
+				t !== void 0 && !this.#L(this.#u[e]) && (yield t);
+			}
+		}
+		*rkeys() {
+			for (let e of this.#N()) {
+				let t = this.#l[e];
+				t !== void 0 && !this.#L(this.#u[e]) && (yield t);
+			}
+		}
+		*values() {
+			for (let e of this.#M()) this.#u[e] !== void 0 && !this.#L(this.#u[e]) && (yield this.#u[e]);
+		}
+		*rvalues() {
+			for (let e of this.#N()) this.#u[e] !== void 0 && !this.#L(this.#u[e]) && (yield this.#u[e]);
+		}
+		[Symbol.iterator]() {
+			return this.entries();
+		}
+		[Symbol.toStringTag] = "LRUCache";
+		find(e, t = {}) {
+			for (let n of this.#M()) {
+				let r = this.#u[n], i = this.#L(r) ? r.__staleWhileFetching : r;
+				if (i !== void 0 && e(i, this.#l[n], this)) return this.get(this.#l[n], t);
+			}
+		}
+		forEach(e, t = this) {
+			for (let n of this.#M()) {
+				let r = this.#u[n], i = this.#L(r) ? r.__staleWhileFetching : r;
+				i !== void 0 && e.call(t, i, this.#l[n], this);
+			}
+		}
+		rforEach(e, t = this) {
+			for (let n of this.#N()) {
+				let r = this.#u[n], i = this.#L(r) ? r.__staleWhileFetching : r;
+				i !== void 0 && e.call(t, i, this.#l[n], this);
+			}
+		}
+		purgeStale() {
+			let e = !1;
+			for (let t of this.#N({ allowStale: !0 })) this.#D(t) && (this.#B(this.#l[t], "expire"), e = !0);
+			return e;
+		}
+		info(e) {
+			let n = this.#c.get(e);
+			if (n === void 0) return;
+			let r = this.#u[n], i = this.#L(r) ? r.__staleWhileFetching : r;
+			if (i === void 0) return;
+			let a = { value: i };
+			if (this.#y && this.#v) {
+				let e = this.#y[n], r = this.#v[n];
+				e && r && (a.ttl = e - (t.now() - r), a.start = Date.now());
+			}
+			return this.#_ && (a.size = this.#_[n]), a;
+		}
+		dump() {
+			let e = [];
+			for (let n of this.#M({ allowStale: !0 })) {
+				let r = this.#l[n], i = this.#u[n], a = this.#L(i) ? i.__staleWhileFetching : i;
+				if (a === void 0 || r === void 0) continue;
+				let o = { value: a };
+				if (this.#y && this.#v) {
+					o.ttl = this.#y[n];
+					let e = t.now() - this.#v[n];
+					o.start = Math.floor(Date.now() - e);
+				}
+				this.#_ && (o.size = this.#_[n]), e.unshift([r, o]);
+			}
+			return e;
+		}
+		load(e) {
+			this.clear();
+			for (let [n, r] of e) {
+				if (r.start) {
+					let e = Date.now() - r.start;
+					r.start = t.now() - e;
+				}
+				this.set(n, r.value, r);
+			}
+		}
+		set(e, t, n = {}) {
+			if (t === void 0) return this.delete(e), this;
+			let { ttl: r = this.ttl, start: i, noDisposeOnSet: a = this.noDisposeOnSet, sizeCalculation: o = this.sizeCalculation, status: s } = n, { noUpdateTTL: c = this.noUpdateTTL } = n, l = this.#j(e, t, n.size || 0, o);
+			if (this.maxEntrySize && l > this.maxEntrySize) return s && (s.set = "miss", s.maxEntrySizeExceeded = !0), this.#B(e, "set"), this;
+			let u = this.#o === 0 ? void 0 : this.#c.get(e);
+			if (u === void 0) u = this.#o === 0 ? this.#m : this.#h.length === 0 ? this.#o === this.#e ? this.#F(!1) : this.#o : this.#h.pop(), this.#l[u] = e, this.#u[u] = t, this.#c.set(e, u), this.#d[this.#m] = u, this.#f[u] = this.#m, this.#m = u, this.#o++, this.#A(u, l, s), s && (s.set = "add"), c = !1;
+			else {
+				this.#z(u);
+				let n = this.#u[u];
+				if (t !== n) {
+					if (this.#x && this.#L(n)) {
+						n.__abortController.abort(/* @__PURE__ */ Error("replaced"));
+						let { __staleWhileFetching: t } = n;
+						t !== void 0 && !a && (this.#b && this.#n?.(t, e, "set"), this.#S && this.#g?.push([
+							t,
+							e,
+							"set"
+						]));
+					} else a || (this.#b && this.#n?.(n, e, "set"), this.#S && this.#g?.push([
+						n,
+						e,
+						"set"
+					]));
+					if (this.#k(u), this.#A(u, l, s), this.#u[u] = t, s) {
+						s.set = "replace";
+						let e = n && this.#L(n) ? n.__staleWhileFetching : n;
+						e !== void 0 && (s.oldValue = e);
+					}
+				} else s && (s.set = "update");
+			}
+			if (r !== 0 && !this.#y && this.#C(), this.#y && (c || this.#E(u, r, i), s && this.#T(s, u)), !a && this.#S && this.#g) {
+				let e = this.#g, t;
+				for (; t = e?.shift();) this.#r?.(...t);
+			}
+			return this;
+		}
+		pop() {
+			try {
+				for (; this.#o;) {
+					let e = this.#u[this.#p];
+					if (this.#F(!0), this.#L(e)) {
+						if (e.__staleWhileFetching) return e.__staleWhileFetching;
+					} else if (e !== void 0) return e;
+				}
+			} finally {
+				if (this.#S && this.#g) {
+					let e = this.#g, t;
+					for (; t = e?.shift();) this.#r?.(...t);
+				}
+			}
+		}
+		#F(e) {
+			let t = this.#p, n = this.#l[t], r = this.#u[t];
+			return this.#x && this.#L(r) ? r.__abortController.abort(/* @__PURE__ */ Error("evicted")) : (this.#b || this.#S) && (this.#b && this.#n?.(r, n, "evict"), this.#S && this.#g?.push([
+				r,
+				n,
+				"evict"
+			])), this.#k(t), e && (this.#l[t] = void 0, this.#u[t] = void 0, this.#h.push(t)), this.#o === 1 ? (this.#p = this.#m = 0, this.#h.length = 0) : this.#p = this.#d[t], this.#c.delete(n), this.#o--, t;
+		}
+		has(e, t = {}) {
+			let { updateAgeOnHas: n = this.updateAgeOnHas, status: r } = t, i = this.#c.get(e);
+			if (i !== void 0) {
+				let e = this.#u[i];
+				if (this.#L(e) && e.__staleWhileFetching === void 0) return !1;
+				if (this.#D(i)) r && (r.has = "stale", this.#T(r, i));
+				else return n && this.#w(i), r && (r.has = "hit", this.#T(r, i)), !0;
+			} else r && (r.has = "miss");
+			return !1;
+		}
+		peek(e, t = {}) {
+			let { allowStale: n = this.allowStale } = t, r = this.#c.get(e);
+			if (r === void 0 || !n && this.#D(r)) return;
+			let i = this.#u[r];
+			return this.#L(i) ? i.__staleWhileFetching : i;
+		}
+		#I(e, t, n, r) {
+			let i = t === void 0 ? void 0 : this.#u[t];
+			if (this.#L(i)) return i;
+			let o = new a(), { signal: s } = n;
+			s?.addEventListener("abort", () => o.abort(s.reason), { signal: o.signal });
+			let c = {
+				signal: o.signal,
+				options: n,
+				context: r
+			}, l = (r, i = !1) => {
+				let { aborted: a } = o.signal, s = n.ignoreFetchAbort && r !== void 0;
+				if (n.status && (a && !i ? (n.status.fetchAborted = !0, n.status.fetchError = o.signal.reason, s && (n.status.fetchAbortIgnored = !0)) : n.status.fetchResolved = !0), a && !s && !i) return d(o.signal.reason);
+				let l = p;
+				return this.#u[t] === p && (r === void 0 ? l.__staleWhileFetching ? this.#u[t] = l.__staleWhileFetching : this.#B(e, "fetch") : (n.status && (n.status.fetchUpdated = !0), this.set(e, r, c.options))), r;
+			}, u = (e) => (n.status && (n.status.fetchRejected = !0, n.status.fetchError = e), d(e)), d = (r) => {
+				let { aborted: i } = o.signal, a = i && n.allowStaleOnFetchAbort, s = a || n.allowStaleOnFetchRejection, c = s || n.noDeleteOnFetchRejection, l = p;
+				if (this.#u[t] === p && (!c || l.__staleWhileFetching === void 0 ? this.#B(e, "fetch") : a || (this.#u[t] = l.__staleWhileFetching)), s) return n.status && l.__staleWhileFetching !== void 0 && (n.status.returnedStale = !0), l.__staleWhileFetching;
+				if (l.__returned === l) throw r;
+			}, f = (t, r) => {
+				let a = this.#i?.(e, i, c);
+				a && a instanceof Promise && a.then((e) => t(e === void 0 ? void 0 : e), r), o.signal.addEventListener("abort", () => {
+					(!n.ignoreFetchAbort || n.allowStaleOnFetchAbort) && (t(void 0), n.allowStaleOnFetchAbort && (t = (e) => l(e, !0)));
+				});
+			};
+			n.status && (n.status.fetchDispatched = !0);
+			let p = new Promise(f).then(l, u), m = Object.assign(p, {
+				__abortController: o,
+				__staleWhileFetching: i,
+				__returned: void 0
+			});
+			return t === void 0 ? (this.set(e, m, {
+				...c.options,
+				status: void 0
+			}), t = this.#c.get(e)) : this.#u[t] = m, m;
+		}
+		#L(e) {
+			if (!this.#x) return !1;
+			let t = e;
+			return !!t && t instanceof Promise && t.hasOwnProperty("__staleWhileFetching") && t.__abortController instanceof a;
+		}
+		async fetch(e, t = {}) {
+			let { allowStale: n = this.allowStale, updateAgeOnGet: r = this.updateAgeOnGet, noDeleteOnStaleGet: i = this.noDeleteOnStaleGet, ttl: a = this.ttl, noDisposeOnSet: o = this.noDisposeOnSet, size: s = 0, sizeCalculation: c = this.sizeCalculation, noUpdateTTL: l = this.noUpdateTTL, noDeleteOnFetchRejection: u = this.noDeleteOnFetchRejection, allowStaleOnFetchRejection: d = this.allowStaleOnFetchRejection, ignoreFetchAbort: f = this.ignoreFetchAbort, allowStaleOnFetchAbort: p = this.allowStaleOnFetchAbort, context: m, forceRefresh: h = !1, status: g, signal: _ } = t;
+			if (!this.#x) return g && (g.fetch = "get"), this.get(e, {
+				allowStale: n,
+				updateAgeOnGet: r,
+				noDeleteOnStaleGet: i,
+				status: g
+			});
+			let v = {
+				allowStale: n,
+				updateAgeOnGet: r,
+				noDeleteOnStaleGet: i,
+				ttl: a,
+				noDisposeOnSet: o,
+				size: s,
+				sizeCalculation: c,
+				noUpdateTTL: l,
+				noDeleteOnFetchRejection: u,
+				allowStaleOnFetchRejection: d,
+				allowStaleOnFetchAbort: p,
+				ignoreFetchAbort: f,
+				status: g,
+				signal: _
+			}, y = this.#c.get(e);
+			if (y === void 0) {
+				g && (g.fetch = "miss");
+				let t = this.#I(e, y, v, m);
+				return t.__returned = t;
+			}
+			{
+				let t = this.#u[y];
+				if (this.#L(t)) {
+					let e = n && t.__staleWhileFetching !== void 0;
+					return g && (g.fetch = "inflight", e && (g.returnedStale = !0)), e ? t.__staleWhileFetching : t.__returned = t;
+				}
+				let i = this.#D(y);
+				if (!h && !i) return g && (g.fetch = "hit"), this.#z(y), r && this.#w(y), g && this.#T(g, y), t;
+				let a = this.#I(e, y, v, m), o = a.__staleWhileFetching !== void 0 && n;
+				return g && (g.fetch = i ? "stale" : "refresh", o && i && (g.returnedStale = !0)), o ? a.__staleWhileFetching : a.__returned = a;
+			}
+		}
+		async forceFetch(e, t = {}) {
+			let n = await this.fetch(e, t);
+			if (n === void 0) throw Error("fetch() returned undefined");
+			return n;
+		}
+		memo(e, t = {}) {
+			let n = this.#a;
+			if (!n) throw Error("no memoMethod provided to constructor");
+			let { context: r, forceRefresh: i, ...a } = t, o = this.get(e, a);
+			if (!i && o !== void 0) return o;
+			let s = n(e, o, {
+				options: a,
+				context: r
+			});
+			return this.set(e, s, a), s;
+		}
+		get(e, t = {}) {
+			let { allowStale: n = this.allowStale, updateAgeOnGet: r = this.updateAgeOnGet, noDeleteOnStaleGet: i = this.noDeleteOnStaleGet, status: a } = t, o = this.#c.get(e);
+			if (o !== void 0) {
+				let t = this.#u[o], s = this.#L(t);
+				return a && this.#T(a, o), this.#D(o) ? (a && (a.get = "stale"), s ? (a && n && t.__staleWhileFetching !== void 0 && (a.returnedStale = !0), n ? t.__staleWhileFetching : void 0) : (i || this.#B(e, "expire"), a && n && (a.returnedStale = !0), n ? t : void 0)) : (a && (a.get = "hit"), s ? t.__staleWhileFetching : (this.#z(o), r && this.#w(o), t));
+			}
+			a && (a.get = "miss");
+		}
+		#R(e, t) {
+			this.#f[t] = e, this.#d[e] = t;
+		}
+		#z(e) {
+			e !== this.#m && (e === this.#p ? this.#p = this.#d[e] : this.#R(this.#f[e], this.#d[e]), this.#R(this.#m, e), this.#m = e);
+		}
+		delete(e) {
+			return this.#B(e, "delete");
+		}
+		#B(e, t) {
+			let n = !1;
+			if (this.#o !== 0) {
+				let r = this.#c.get(e);
+				if (r !== void 0) {
+					if (n = !0, this.#o === 1) this.#V(t);
+					else {
+						this.#k(r);
+						let n = this.#u[r];
+						if (this.#L(n) ? n.__abortController.abort(/* @__PURE__ */ Error("deleted")) : (this.#b || this.#S) && (this.#b && this.#n?.(n, e, t), this.#S && this.#g?.push([
+							n,
+							e,
+							t
+						])), this.#c.delete(e), this.#l[r] = void 0, this.#u[r] = void 0, r === this.#m) this.#m = this.#f[r];
+						else if (r === this.#p) this.#p = this.#d[r];
+						else {
+							let e = this.#f[r];
+							this.#d[e] = this.#d[r];
+							let t = this.#d[r];
+							this.#f[t] = this.#f[r];
+						}
+						this.#o--, this.#h.push(r);
+					}
+				}
+			}
+			if (this.#S && this.#g?.length) {
+				let e = this.#g, t;
+				for (; t = e?.shift();) this.#r?.(...t);
+			}
+			return n;
+		}
+		clear() {
+			return this.#V("delete");
+		}
+		#V(e) {
+			for (let t of this.#N({ allowStale: !0 })) {
+				let n = this.#u[t];
+				if (this.#L(n)) n.__abortController.abort(/* @__PURE__ */ Error("deleted"));
+				else {
+					let r = this.#l[t];
+					this.#b && this.#n?.(n, r, e), this.#S && this.#g?.push([
+						n,
+						r,
+						e
+					]);
+				}
+			}
+			if (this.#c.clear(), this.#u.fill(void 0), this.#l.fill(void 0), this.#y && this.#v && (this.#y.fill(0), this.#v.fill(0)), this.#_ && this.#_.fill(0), this.#p = 0, this.#m = 0, this.#h.length = 0, this.#s = 0, this.#o = 0, this.#S && this.#g) {
+				let e = this.#g, t;
+				for (; t = e?.shift();) this.#r?.(...t);
+			}
+		}
+	};
+}), _s = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.NumberAllocator = void 0, e.NumberAllocator = class {
+		used;
+		min;
+		max;
+		lowWaterMark;
+		constructor(e, t) {
+			this.min = e, this.max = t, this.used = /* @__PURE__ */ new Set(), this.lowWaterMark = e;
+		}
+		firstVacant() {
+			if (this.used.size === this.max - this.min + 1) return null;
+			for (let e = this.lowWaterMark; e <= this.max; e++) if (!this.used.has(e)) return e;
+			return null;
+		}
+		alloc() {
+			if (this.used.size === this.max - this.min + 1) return null;
+			for (let e = this.lowWaterMark; e <= this.max; e++) if (!this.used.has(e)) return this.used.add(e), this.lowWaterMark = e + 1, e;
+			return null;
+		}
+		use(e) {
+			return e < this.min || e > this.max || this.used.has(e) ? !1 : (this.used.add(e), !0);
+		}
+		free(e) {
+			e < this.min || e > this.max || (this.used.delete(e), e < this.lowWaterMark && (this.lowWaterMark = e));
+		}
+		clear() {
+			this.used.clear(), this.lowWaterMark = this.min;
+		}
+	};
+}), vs = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 });
+	var t = gs(), n = _s();
+	e.default = class {
+		aliasToTopic;
+		topicToAlias;
+		max;
+		numberAllocator;
+		length;
+		constructor(e) {
+			e > 0 && (this.aliasToTopic = new t.LRUCache({ max: e }), this.topicToAlias = {}, this.numberAllocator = new n.NumberAllocator(1, e), this.max = e, this.length = 0);
+		}
+		put(e, t) {
+			if (t === 0 || t > this.max) return !1;
+			let n = this.aliasToTopic.get(t);
+			return n && delete this.topicToAlias[n], this.aliasToTopic.set(t, e), this.topicToAlias[e] = t, this.numberAllocator.use(t), this.length = this.aliasToTopic.size, !0;
+		}
+		getTopicByAlias(e) {
+			return this.aliasToTopic.get(e);
+		}
+		getAliasByTopic(e) {
+			let t = this.topicToAlias[e];
+			return typeof t < "u" && this.aliasToTopic.get(t), t;
+		}
+		clear() {
+			this.aliasToTopic.clear(), this.topicToAlias = {}, this.numberAllocator.clear(), this.length = 0;
+		}
+		getLruAlias() {
+			return this.numberAllocator.firstVacant() || [...this.aliasToTopic.keys()][this.aliasToTopic.size - 1];
+		}
+	};
+}), ys = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 });
+	var n = hs(), r = t(vs()), i = fs();
+	e.default = (e, t, a) => {
+		e.log("_handleConnack");
+		let { options: o } = e, s = o.protocolVersion === 5 ? t.reasonCode : t.returnCode;
+		if (e.connackReceived) {
+			let t = new i.ErrorWithReasonCode("Protocol error: duplicate CONNACK on the same network connection", 130);
+			a?.discardParsedPackets(), e._cleanUp(!0), e.emit("error", t);
+			return;
+		}
+		if (e.connackReceived = !0, clearTimeout(e.connackTimer), delete e.topicAliasSend, e._serverProperties = t.properties, t.properties && t.properties.topicAliasMaximum) {
+			if (t.properties.topicAliasMaximum > 65535) {
+				a?.discardParsedPackets(), e._cleanUp(!0), e.emit("error", /* @__PURE__ */ Error("topicAliasMaximum from broker is out of range"));
+				return;
+			}
+			t.properties.topicAliasMaximum > 0 && (e.topicAliasSend = new r.default(t.properties.topicAliasMaximum));
+		}
+		if (s === 0) e.reconnecting = !1, e._onConnect(t);
+		else if (s > 0) {
+			e.log("_handleConnack :: connection refused with reason code %d", s);
+			let t = new i.ErrorWithReasonCode(`Connection refused: ${n.ReasonCodes[s]}`, s);
+			a?.discardParsedPackets(), e.reconnectSuppressed = !0, e._cleanUp(!0);
+			try {
+				e.emit("error", t);
+			} finally {
+				o.reconnectOnConnackError && (e.reconnectSuppressed = !1, e._setupReconnect());
+			}
+		}
+	};
+}), bs = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.default = (e, t, n) => {
+		e.log("handling pubrel packet");
+		let r = typeof n < "u" ? n : e.noop, { messageId: i } = t, a = {
+			cmd: "pubcomp",
+			messageId: i
+		};
+		e.incomingStore.get(t, (t, n) => {
+			t ? e._sendPacket(a, r) : (e.emit("message", n.topic, n.payload, n), e.handleMessage(n, (t) => {
+				if (t) return r(t);
+				e.incomingStore.del(n, e.noop), e._releaseIncomingQoS2Publish(i), e._sendPacket(a, r);
+			}));
+		});
+	};
+}), xs = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 });
+	var n = t(ps()), r = t(ms()), i = t(ys()), a = t(hs()), o = t(bs()), s = fs(), c = (e) => e < 128 ? 1 : e < 16384 ? 2 : e < 2097152 ? 3 : 4, l = (e) => 1 + c(e) + e;
+	e.default = (e, t, c, u) => {
+		let { options: d } = e, f = d.properties?.maximumPacketSize, p = l(t.length);
+		if (d.protocolVersion === 5 && f && f < p) return e.log("_handlePacket :: %s packet of %d bytes exceeds the advertised maximumPacketSize %d", t.cmd, p, f), u?.discardParsedPackets(), e._cleanUp(!0), c(), e.emit("error", new s.ErrorWithReasonCode(`exceeding packets size ${t.cmd}: ${p} bytes, maximumPacketSize is ${f}`, 149)), e;
+		switch (e.log("_handlePacket :: emitting packetreceive"), e.emit("packetreceive", t), t.cmd) {
+			case "publish":
+				(0, n.default)(e, t, c, u);
+				break;
+			case "puback":
+			case "pubrec":
+			case "pubcomp":
+			case "suback":
+			case "unsuback":
+				e.reschedulePing();
+				try {
+					(0, a.default)(e, t);
+				} finally {
+					c();
+				}
+				break;
+			case "pubrel":
+				e.reschedulePing(), (0, o.default)(e, t, c);
+				break;
+			case "connack":
+				try {
+					(0, i.default)(e, t, u);
+				} finally {
+					c();
+				}
+				break;
+			case "auth":
+				e.reschedulePing();
+				try {
+					(0, r.default)(e, t, u);
+				} finally {
+					c();
+				}
+				break;
+			case "pingresp":
+				e.log("_handlePacket :: received pingresp"), e.reschedulePing(!0), c();
+				break;
+			case "disconnect":
+				e.emit("disconnect", t), c();
+				break;
+			default: e.log("_handlePacket :: unknown command"), c();
+		}
+	};
+}), Ss = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.default = class {
+		nextId;
+		constructor() {
+			this.nextId = Math.max(1, Math.floor(Math.random() * 65535));
+		}
+		allocate() {
+			let e = this.nextId++;
+			return this.nextId === 65536 && (this.nextId = 1), e;
+		}
+		getLastAllocated() {
+			return this.nextId === 1 ? 65535 : this.nextId - 1;
+		}
+		register(e) {
+			return !0;
+		}
+		deallocate(e) {}
+		clear() {}
+	};
+}), Cs = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.default = class {
+		aliasToTopic;
+		max;
+		length;
+		constructor(e) {
+			this.aliasToTopic = {}, this.max = e;
+		}
+		put(e, t) {
+			return t === 0 || t > this.max ? !1 : (this.aliasToTopic[t] = e, this.length = Object.keys(this.aliasToTopic).length, !0);
+		}
+		getTopicByAlias(e) {
+			return this.aliasToTopic[e];
+		}
+		clear() {
+			this.aliasToTopic = {};
+		}
+	};
+}), ws = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 }), e.TypedEventEmitter = void 0;
+	var n = t((xo(), Y(lo))), r = fs(), i = class {};
+	e.TypedEventEmitter = i, (0, r.applyMixin)(i, n.default);
+}), Ts = J((e, t) => {
+	X(), $(), Q(), (function(n, r) {
+		typeof e == "object" && typeof t < "u" ? r(e) : typeof define == "function" && define.amd ? define(["exports"], r) : (n = typeof globalThis < "u" ? globalThis : n || self, r(n.fastUniqueNumbers = {}));
+	})(e, (function(e) {
+		var t = function(e) {
+			return function(t) {
+				var n = e(t);
+				return t.add(n), n;
+			};
+		}, n = function(e) {
+			return function(t, n) {
+				return e.set(t, n), n;
+			};
+		}, r = 2 ** 53 - 1, i = 536870912, a = i * 2, o = function(e, t) {
+			return function(n) {
+				var o = t.get(n), s = o === void 0 ? n.size : o < a ? o + 1 : 0;
+				if (!n.has(s)) return e(n, s);
+				if (n.size < i) {
+					for (; n.has(s);) s = Math.floor(Math.random() * a);
+					return e(n, s);
+				}
+				if (n.size > r) throw Error("Congratulations, you created a collection of unique numbers which uses all available integers!");
+				for (; n.has(s);) s = Math.floor(Math.random() * r);
+				return e(n, s);
+			};
+		}, s = /* @__PURE__ */ new WeakMap(), c = o(n(s), s);
+		e.addUniqueNumber = t(c), e.generateUniqueNumber = c;
+	}));
+}), Es = J((e, t) => {
+	X(), $(), Q();
+	function n(e) {
+		"@babel/helpers - typeof";
+		return t.exports = n = typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? function(e) {
+			return typeof e;
+		} : function(e) {
+			return e && typeof Symbol == "function" && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+		}, t.exports.__esModule = !0, t.exports.default = t.exports, n(e);
+	}
+	t.exports = n, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Ds = J((e, t) => {
+	X(), $(), Q();
+	var n = Es().default;
+	function r(e, t) {
+		if (n(e) != "object" || !e) return e;
+		var r = e[Symbol.toPrimitive];
+		if (r !== void 0) {
+			var i = r.call(e, t || "default");
+			if (n(i) != "object") return i;
+			throw TypeError("@@toPrimitive must return a primitive value.");
+		}
+		return (t === "string" ? String : Number)(e);
+	}
+	t.exports = r, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Os = J((e, t) => {
+	X(), $(), Q();
+	var n = Es().default, r = Ds();
+	function i(e) {
+		var t = r(e, "string");
+		return n(t) == "symbol" ? t : t + "";
+	}
+	t.exports = i, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), ks = J((e, t) => {
+	X(), $(), Q();
+	var n = Os();
+	function r(e, t, r) {
+		return (t = n(t)) in e ? Object.defineProperty(e, t, {
+			value: r,
+			enumerable: !0,
+			configurable: !0,
+			writable: !0
+		}) : e[t] = r, e;
+	}
+	t.exports = r, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), As = J((e, t) => {
+	X(), $(), Q();
+	function n(e) {
+		if (Array.isArray(e)) return e;
+	}
+	t.exports = n, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), js = J((e, t) => {
+	X(), $(), Q();
+	function n(e, t) {
+		var n = e == null ? null : typeof Symbol < "u" && e[Symbol.iterator] || e["@@iterator"];
+		if (n != null) {
+			var r, i, a, o, s = [], c = !0, l = !1;
+			try {
+				if (a = (n = n.call(e)).next, t === 0) {
+					if (Object(n) !== n) return;
+					c = !1;
+				} else for (; !(c = (r = a.call(n)).done) && (s.push(r.value), s.length !== t); c = !0);
+			} catch (e) {
+				l = !0, i = e;
+			} finally {
+				try {
+					if (!c && n.return != null && (o = n.return(), Object(o) !== o)) return;
+				} finally {
+					if (l) throw i;
+				}
+			}
+			return s;
+		}
+	}
+	t.exports = n, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Ms = J((e, t) => {
+	X(), $(), Q();
+	function n(e, t) {
+		(t == null || t > e.length) && (t = e.length);
+		for (var n = 0, r = Array(t); n < t; n++) r[n] = e[n];
+		return r;
+	}
+	t.exports = n, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Ns = J((e, t) => {
+	X(), $(), Q();
+	var n = Ms();
+	function r(e, t) {
+		if (e) {
+			if (typeof e == "string") return n(e, t);
+			var r = {}.toString.call(e).slice(8, -1);
+			return r === "Object" && e.constructor && (r = e.constructor.name), r === "Map" || r === "Set" ? Array.from(e) : r === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r) ? n(e, t) : void 0;
+		}
+	}
+	t.exports = r, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Ps = J((e, t) => {
+	X(), $(), Q();
+	function n() {
+		throw TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+	}
+	t.exports = n, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Fs = J((e, t) => {
+	X(), $(), Q();
+	var n = As(), r = js(), i = Ns(), a = Ps();
+	function o(e, t) {
+		return n(e) || r(e, t) || i(e, t) || a();
+	}
+	t.exports = o, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Is = J((e, t) => {
+	X(), $(), Q();
+	function n(e, t, n, r, i, a, o) {
+		try {
+			var s = e[a](o), c = s.value;
+		} catch (e) {
+			n(e);
+			return;
+		}
+		s.done ? t(c) : Promise.resolve(c).then(r, i);
+	}
+	function r(e) {
+		return function() {
+			var t = this, r = arguments;
+			return new Promise(function(i, a) {
+				var o = e.apply(t, r);
+				function s(e) {
+					n(o, i, a, s, c, "next", e);
+				}
+				function c(e) {
+					n(o, i, a, s, c, "throw", e);
+				}
+				s(void 0);
+			});
+		};
+	}
+	t.exports = r, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Ls = J((e, t) => {
+	X(), $(), Q();
+	function n(e, t) {
+		this.v = e, this.k = t;
+	}
+	t.exports = n, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Rs = J((e, t) => {
+	X(), $(), Q();
+	function n(e, r, i, a) {
+		var o = Object.defineProperty;
+		try {
+			o({}, "", {});
+		} catch {
+			o = 0;
+		}
+		t.exports = n = function(e, t, r, i) {
+			function a(t, r) {
+				n(e, t, function(e) {
+					return this._invoke(t, r, e);
+				});
+			}
+			t ? o ? o(e, t, {
+				value: r,
+				enumerable: !i,
+				configurable: !i,
+				writable: !i
+			}) : e[t] = r : (a("next", 0), a("throw", 1), a("return", 2));
+		}, t.exports.__esModule = !0, t.exports.default = t.exports, n(e, r, i, a);
+	}
+	t.exports = n, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), zs = J((e, t) => {
+	X(), $(), Q();
+	var n = Rs();
+	function r() {
+		var e, i, a = typeof Symbol == "function" ? Symbol : {}, o = a.iterator || "@@iterator", s = a.toStringTag || "@@toStringTag";
+		function c(t, r, a, o) {
+			var s = r && r.prototype instanceof u ? r : u, c = Object.create(s.prototype);
+			return n(c, "_invoke", (function(t, n, r) {
+				var a, o, s, c = 0, u = r || [], d = !1, f = {
+					p: 0,
+					n: 0,
+					v: e,
+					a: p,
+					f: p.bind(e, 4),
+					d: function(t, n) {
+						return a = t, o = 0, s = e, f.n = n, l;
+					}
+				};
+				function p(t, n) {
+					for (o = t, s = n, i = 0; !d && c && !r && i < u.length; i++) {
+						var r, a = u[i], p = f.p, m = a[2];
+						t > 3 ? (r = m === n) && (s = a[(o = a[4]) ? 5 : (o = 3, 3)], a[4] = a[5] = e) : a[0] <= p && ((r = t < 2 && p < a[1]) ? (o = 0, f.v = n, f.n = a[1]) : p < m && (r = t < 3 || a[0] > n || n > m) && (a[4] = t, a[5] = n, f.n = m, o = 0));
+					}
+					if (r || t > 1) return l;
+					throw d = !0, n;
+				}
+				return function(r, u, m) {
+					if (c > 1) throw TypeError("Generator is already running");
+					for (d && u === 1 && p(u, m), o = u, s = m; (i = o < 2 ? e : s) || !d;) {
+						a || (o ? o < 3 ? (o > 1 && (f.n = -1), p(o, s)) : f.n = s : f.v = s);
+						try {
+							if (c = 2, a) {
+								if (o || (r = "next"), i = a[r]) {
+									if (!(i = i.call(a, s))) throw TypeError("iterator result is not an object");
+									if (!i.done) return i;
+									s = i.value, o < 2 && (o = 0);
+								} else o === 1 && (i = a.return) && i.call(a), o < 2 && (s = TypeError("The iterator does not provide a '" + r + "' method"), o = 1);
+								a = e;
+							} else if ((i = (d = f.n < 0) ? s : t.call(n, f)) !== l) break;
+						} catch (t) {
+							a = e, o = 1, s = t;
+						} finally {
+							c = 1;
+						}
+					}
+					return {
+						value: i,
+						done: d
+					};
+				};
+			})(t, a, o), !0), c;
+		}
+		var l = {};
+		function u() {}
+		function d() {}
+		function f() {}
+		i = Object.getPrototypeOf;
+		var p = [][o] ? i(i([][o]())) : (n(i = {}, o, function() {
+			return this;
+		}), i), m = f.prototype = u.prototype = Object.create(p);
+		function h(e) {
+			return Object.setPrototypeOf ? Object.setPrototypeOf(e, f) : (e.__proto__ = f, n(e, s, "GeneratorFunction")), e.prototype = Object.create(m), e;
+		}
+		return d.prototype = f, n(m, "constructor", f), n(f, "constructor", d), d.displayName = "GeneratorFunction", n(f, s, "GeneratorFunction"), n(m), n(m, s, "Generator"), n(m, o, function() {
+			return this;
+		}), n(m, "toString", function() {
+			return "[object Generator]";
+		}), (t.exports = r = function() {
+			return {
+				w: c,
+				m: h
+			};
+		}, t.exports.__esModule = !0, t.exports.default = t.exports)();
+	}
+	t.exports = r, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Bs = J((e, t) => {
+	X(), $(), Q();
+	var n = Ls(), r = Rs();
+	function i(e, t) {
+		function a(r, i, o, s) {
+			try {
+				var c = e[r](i), l = c.value;
+				return l instanceof n ? t.resolve(l.v).then(function(e) {
+					a("next", e, o, s);
+				}, function(e) {
+					a("throw", e, o, s);
+				}) : t.resolve(l).then(function(e) {
+					c.value = e, o(c);
+				}, function(e) {
+					return a("throw", e, o, s);
+				});
+			} catch (e) {
+				s(e);
+			}
+		}
+		var o;
+		this.next || (r(i.prototype), r(i.prototype, typeof Symbol == "function" && Symbol.asyncIterator || "@asyncIterator", function() {
+			return this;
+		})), r(this, "_invoke", function(e, n, r) {
+			function i() {
+				return new t(function(t, n) {
+					a(e, r, t, n);
+				});
+			}
+			return o = o ? o.then(i, i) : i();
+		}, !0);
+	}
+	t.exports = i, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Vs = J((e, t) => {
+	X(), $(), Q();
+	var n = zs(), r = Bs();
+	function i(e, t, i, a, o) {
+		return new r(n().w(e, t, i, a), o || Promise);
+	}
+	t.exports = i, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Hs = J((e, t) => {
+	X(), $(), Q();
+	var n = Vs();
+	function r(e, t, r, i, a) {
+		var o = n(e, t, r, i, a);
+		return o.next().then(function(e) {
+			return e.done ? e.value : o.next();
+		});
+	}
+	t.exports = r, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Us = J((e, t) => {
+	X(), $(), Q();
+	function n(e) {
+		var t = Object(e), n = [];
+		for (var r in t) n.unshift(r);
+		return function e() {
+			for (; n.length;) if ((r = n.pop()) in t) return e.value = r, e.done = !1, e;
+			return e.done = !0, e;
+		};
+	}
+	t.exports = n, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Ws = J((e, t) => {
+	X(), $(), Q();
+	var n = Es().default;
+	function r(e) {
+		if (e != null) {
+			var t = e[typeof Symbol == "function" && Symbol.iterator || "@@iterator"], r = 0;
+			if (t) return t.call(e);
+			if (typeof e.next == "function") return e;
+			if (!isNaN(e.length)) return { next: function() {
+				return e && r >= e.length && (e = void 0), {
+					value: e && e[r++],
+					done: !e
+				};
+			} };
+		}
+		throw TypeError(n(e) + " is not iterable");
+	}
+	t.exports = r, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Gs = J((e, t) => {
+	X(), $(), Q();
+	var n = Ls(), r = zs(), i = Hs(), a = Vs(), o = Bs(), s = Us(), c = Ws();
+	function l() {
+		var e = r(), u = e.m(l), d = (Object.getPrototypeOf ? Object.getPrototypeOf(u) : u.__proto__).constructor;
+		function f(e) {
+			var t = typeof e == "function" && e.constructor;
+			return !!t && (t === d || (t.displayName || t.name) === "GeneratorFunction");
+		}
+		var p = {
+			throw: 1,
+			return: 2,
+			break: 3,
+			continue: 3
+		};
+		function m(e) {
+			var t, n;
+			return function(r) {
+				t || (t = {
+					stop: function() {
+						return n(r.a, 2);
+					},
+					catch: function() {
+						return r.v;
+					},
+					abrupt: function(e, t) {
+						return n(r.a, p[e], t);
+					},
+					delegateYield: function(e, i, a) {
+						return t.resultName = i, n(r.d, c(e), a);
+					},
+					finish: function(e) {
+						return n(r.f, e);
+					}
+				}, n = function(e, n, i) {
+					r.p = t.prev, r.n = t.next;
+					try {
+						return e(n, i);
+					} finally {
+						t.next = r.n;
+					}
+				}), t.resultName && (t[t.resultName] = r.v, t.resultName = void 0), t.sent = r.v, t.next = r.n;
+				try {
+					return e.call(this, t);
+				} finally {
+					r.p = t.prev, r.n = t.next;
+				}
+			};
+		}
+		return (t.exports = l = function() {
+			return {
+				wrap: function(t, n, r, i) {
+					return e.w(m(t), n, r, i && i.reverse());
+				},
+				isGeneratorFunction: f,
+				mark: e.m,
+				awrap: function(e, t) {
+					return new n(e, t);
+				},
+				AsyncIterator: o,
+				async: function(e, t, n, r, o) {
+					return (f(t) ? a : i)(m(e), t, n, r, o);
+				},
+				keys: s,
+				values: c
+			};
+		}, t.exports.__esModule = !0, t.exports.default = t.exports)();
+	}
+	t.exports = l, t.exports.__esModule = !0, t.exports.default = t.exports;
+}), Ks = J((e, t) => {
+	X(), $(), Q();
+	var n = Gs()();
+	t.exports = n;
+	try {
+		regeneratorRuntime = n;
+	} catch {
+		typeof globalThis == "object" ? globalThis.regeneratorRuntime = n : Function("r", "regeneratorRuntime = r")(n);
+	}
+}), qs = J((e, t) => {
+	X(), $(), Q(), (function(n, r) {
+		typeof e == "object" && typeof t < "u" ? r(e, Ts(), ks(), Fs(), Is(), Ks()) : typeof define == "function" && define.amd ? define([
+			"exports",
+			"fast-unique-numbers",
+			"@babel/runtime/helpers/defineProperty",
+			"@babel/runtime/helpers/slicedToArray",
+			"@babel/runtime/helpers/asyncToGenerator",
+			"@babel/runtime/regenerator"
+		], r) : (n = typeof globalThis < "u" ? globalThis : n || self, r(n.brokerFactory = {}, n.fastUniqueNumbers, n._defineProperty, n._slicedToArray, n._asyncToGenerator, n._regeneratorRuntime));
+	})(e, (function(e, t, n, r, i, a) {
+		function o(e, t) {
+			var n = Object.keys(e);
+			if (Object.getOwnPropertySymbols) {
+				var r = Object.getOwnPropertySymbols(e);
+				t && (r = r.filter(function(t) {
+					return Object.getOwnPropertyDescriptor(e, t).enumerable;
+				})), n.push.apply(n, r);
+			}
+			return n;
+		}
+		function s(e) {
+			for (var t = 1; t < arguments.length; t++) {
+				var r = arguments[t] == null ? {} : arguments[t];
+				t % 2 ? o(Object(r), !0).forEach(function(t) {
+					n(e, t, r[t]);
+				}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(r)) : o(Object(r)).forEach(function(t) {
+					Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(r, t));
+				});
+			}
+			return e;
+		}
+		var c = function(e, t, i, a) {
+			return function(o) {
+				var c = t(o);
+				return function(t) {
+					var o = e(t);
+					t.addEventListener("message", function(e) {
+						var t = e.data, n = t.id;
+						if (n !== null && o.has(n)) {
+							var r = o.get(n), i = r.reject, a = r.resolve;
+							o.delete(n), t.error === void 0 ? a(t.result) : i(Error(t.error.message));
+						}
+					}), a(t) && t.start();
+					for (var l = function(e) {
+						var n = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : null, r = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : [];
+						return new Promise(function(a, s) {
+							var c = i(o);
+							o.set(c, {
+								reject: s,
+								resolve: a
+							}), n === null ? t.postMessage({
+								id: c,
+								method: e
+							}, r) : t.postMessage({
+								id: c,
+								method: e,
+								params: n
+							}, r);
+						});
+					}, u = function(e, n) {
+						var r = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : [];
+						t.postMessage({
+							id: null,
+							method: e,
+							params: n
+						}, r);
+					}, d = {}, f = 0, p = Object.entries(c); f < p.length; f++) {
+						var m = r(p[f], 2), h = m[0], g = m[1];
+						d = s(s({}, d), {}, n({}, h, g({
+							call: l,
+							notify: u
+						})));
+					}
+					return s({}, d);
+				};
+			};
+		}, l = function(e) {
+			return function(t) {
+				if (e.has(t)) return e.get(t);
+				var n = /* @__PURE__ */ new Map();
+				return e.set(t, n), n;
+			};
+		};
+		function u(e, t) {
+			var n = Object.keys(e);
+			if (Object.getOwnPropertySymbols) {
+				var r = Object.getOwnPropertySymbols(e);
+				t && (r = r.filter(function(t) {
+					return Object.getOwnPropertyDescriptor(e, t).enumerable;
+				})), n.push.apply(n, r);
+			}
+			return n;
+		}
+		function d(e) {
+			for (var t = 1; t < arguments.length; t++) {
+				var r = arguments[t] == null ? {} : arguments[t];
+				t % 2 ? u(Object(r), !0).forEach(function(t) {
+					n(e, t, r[t]);
+				}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(r)) : u(Object(r)).forEach(function(t) {
+					Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(r, t));
+				});
+			}
+			return e;
+		}
+		e.createBroker = c(l(/* @__PURE__ */ new WeakMap()), function(e) {
+			return function(t) {
+				return d(d({}, t), {}, {
+					connect: function(t) {
+						var n = t.call;
+						return i(a.mark(function t() {
+							var r, i, o, s;
+							return a.wrap(function(t) {
+								for (;;) switch (t.prev = t.next) {
+									case 0: return r = new MessageChannel(), i = r.port1, o = r.port2, t.next = 1, n("connect", { port: i }, [i]);
+									case 1: return s = t.sent, e.set(o, s), t.abrupt("return", o);
+									case 2:
+									case "end": return t.stop();
+								}
+							}, t);
+						}));
+					},
+					disconnect: function(t) {
+						var n = t.call;
+						return (function() {
+							var t = i(a.mark(function t(r) {
+								var i;
+								return a.wrap(function(t) {
+									for (;;) switch (t.prev = t.next) {
+										case 0:
+											if (i = e.get(r), i !== void 0) {
+												t.next = 1;
+												break;
+											}
+											throw Error("The given port is not connected.");
+										case 1: return t.next = 2, n("disconnect", { portId: i });
+										case 2:
+										case "end": return t.stop();
+									}
+								}, t);
+							}));
+							return function(e) {
+								return t.apply(this, arguments);
+							};
+						})();
+					},
+					isSupported: function(e) {
+						var t = e.call;
+						return function() {
+							return t("isSupported");
+						};
+					}
+				});
+			};
+		}(/* @__PURE__ */ new WeakMap()), t.generateUniqueNumber, function(e) {
+			return typeof e.start == "function";
+		});
+	}));
+}), Js = J((e, t) => {
+	X(), $(), Q(), (function(n, r) {
+		typeof e == "object" && typeof t < "u" ? r(e, qs(), Ts(), Es()) : typeof define == "function" && define.amd ? define([
+			"exports",
+			"broker-factory",
+			"fast-unique-numbers",
+			"@babel/runtime/helpers/typeof"
+		], r) : (n = typeof globalThis < "u" ? globalThis : n || self, r(n.workerTimersBroker = {}, n.brokerFactory, n.fastUniqueNumbers, n._typeof));
+	})(e, (function(e, t, n, r) {
+		var i = function(e) {
+			return function(t) {
+				return function(n) {
+					r(e.get(n)) === "symbol" && (e.set(n, null), t(n).then(function() {
+						e.delete(n);
+					}));
+				};
+			};
+		}, a = function(e) {
+			return function(t) {
+				return function(n) {
+					r(e.get(n)) === "symbol" && (e.set(n, null), t(n).then(function() {
+						e.delete(n);
+					}));
+				};
+			};
+		}, o = function(e, t) {
+			return function(n) {
+				return function(r) {
+					for (var i = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 0, a = arguments.length, o = Array(a > 2 ? a - 2 : 0), s = 2; s < a; s++) o[s - 2] = arguments[s];
+					var c = Symbol(), l = e(t);
+					t.set(l, c);
+					var u = function() {
+						return n(i, l).then(function() {
+							var e = t.get(l);
+							if (e === void 0) throw Error("The timer is in an undefined state.");
+							e === c && (r.apply(void 0, o), t.get(l) === c && u());
+						});
+					};
+					return u(), l;
+				};
+			};
+		}, s = function(e, t) {
+			return function(n) {
+				return function(r) {
+					for (var i = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 0, a = arguments.length, o = Array(a > 2 ? a - 2 : 0), s = 2; s < a; s++) o[s - 2] = arguments[s];
+					var c = Symbol(), l = e(t);
+					return t.set(l, c), n(i, l).then(function() {
+						var e = t.get(l);
+						if (e === void 0) throw Error("The timer is in an undefined state.");
+						e === c && (t.delete(l), r.apply(void 0, o));
+					}), l;
+				};
+			};
+		}, c = /* @__PURE__ */ new Map([[0, null]]), l = /* @__PURE__ */ new Map([[0, null]]), u = i(c), d = a(l), f = o(n.generateUniqueNumber, c), p = s(n.generateUniqueNumber, l), m = t.createBroker({
+			clearInterval: function(e) {
+				var t = e.call;
+				return u(function(e) {
+					return t("clear", {
+						timerId: e,
+						timerType: "interval"
+					});
+				});
+			},
+			clearTimeout: function(e) {
+				var t = e.call;
+				return d(function(e) {
+					return t("clear", {
+						timerId: e,
+						timerType: "timeout"
+					});
+				});
+			},
+			setInterval: function(e) {
+				var t = e.call;
+				return f(function(e, n) {
+					return t("set", {
+						delay: e,
+						now: performance.timeOrigin + performance.now(),
+						timerId: n,
+						timerType: "interval"
+					});
+				});
+			},
+			setTimeout: function(e) {
+				var t = e.call;
+				return p(function(e, n) {
+					return t("set", {
+						delay: e,
+						now: performance.timeOrigin + performance.now(),
+						timerId: n,
+						timerType: "timeout"
+					});
+				});
+			}
+		});
+		e.load = function(e) {
+			return m(new Worker(e));
+		}, e.wrap = m;
+	}));
+}), Ys = J((e, t) => {
+	X(), $(), Q(), (function(n, r) {
+		typeof e == "object" && typeof t < "u" ? r(e, Js()) : typeof define == "function" && define.amd ? define(["exports", "worker-timers-broker"], r) : (n = typeof globalThis < "u" ? globalThis : n || self, r(n.workerTimers = {}, n.workerTimersBroker));
+	})(e, (function(e, t) {
+		var n = function(e, t) {
+			var n = null;
+			return function() {
+				if (n !== null) return n;
+				var r = new Blob([t], { type: "application/javascript; charset=utf-8" }), i = URL.createObjectURL(r);
+				return n = e(i), setTimeout(function() {
+					return URL.revokeObjectURL(i);
+				}), n;
+			};
+		}(t.load, "(()=>{var e={389(e,t){!function(e){\"use strict\";var t=function(e){return function(t){var r=e(t);return t.add(r),r}},r=function(e){return function(t,r){return e.set(t,r),r}},n=void 0===Number.MAX_SAFE_INTEGER?9007199254740991:Number.MAX_SAFE_INTEGER,o=536870912,u=2*o,a=function(e,t){return function(r){var a=t.get(r),i=void 0===a?r.size:a<u?a+1:0;if(!r.has(i))return e(r,i);if(r.size<o){for(;r.has(i);)i=Math.floor(Math.random()*u);return e(r,i)}if(r.size>n)throw new Error(\"Congratulations, you created a collection of unique numbers which uses all available integers!\");for(;r.has(i);)i=Math.floor(Math.random()*n);return e(r,i)}},i=new WeakMap,s=r(i),c=a(s,i),f=t(c);e.addUniqueNumber=f,e.generateUniqueNumber=c}(t)},623(e,t,r){!function(e,t,r,n,o){\"use strict\";var u={INTERNAL_ERROR:-32603,INVALID_PARAMS:-32602,METHOD_NOT_FOUND:-32601},a=function(e,t){return Object.assign(new Error(e),{status:t})},i=function(e){return a('The requested method called \"'.concat(e,'\" is not supported.'),u.METHOD_NOT_FOUND)},s=function(e){return a('The handler of the method called \"'.concat(e,'\" returned no required result.'),u.INTERNAL_ERROR)},c=function(e){return a('The handler of the method called \"'.concat(e,'\" returned an unexpected result.'),u.INTERNAL_ERROR)},f=function(e){return a('The specified parameter called \"portId\" with the given value \"'.concat(e,'\" does not identify a port connected to this worker.'),u.INVALID_PARAMS)},l=function(e,n){return function(){var o=t(r.mark(function t(o){var u,a,f,l,p,d,v,x,y,b,h,m,_,g,w;return r.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(u=o.data,a=u.id,f=u.method,l=u.params,p=n[f],t.prev=1,void 0!==p){t.next=2;break}throw i(f);case 2:if(void 0!==(d=void 0===l?p():p(l))){t.next=3;break}throw s(f);case 3:if(!(d instanceof Promise)){t.next=5;break}return t.next=4,d;case 4:g=t.sent,t.next=6;break;case 5:g=d;case 6:if(v=g,null!==a){t.next=8;break}if(void 0===v.result){t.next=7;break}throw c(f);case 7:t.next=10;break;case 8:if(void 0!==v.result){t.next=9;break}throw c(f);case 9:x=v.result,y=v.transferables,b=void 0===y?[]:y,e.postMessage({id:a,result:x},b);case 10:t.next=12;break;case 11:t.prev=11,w=t.catch(1),h=w.message,m=w.status,_=void 0===m?-32603:m,e.postMessage({error:{code:_,message:h},id:a});case 12:case\"end\":return t.stop()}},t,null,[[1,11]])}));return function(e){return o.apply(this,arguments)}}()},p=function(){return new Promise(function(e){var t=new ArrayBuffer(0),r=new MessageChannel,n=r.port1,o=r.port2;n.onmessage=function(t){var r=t.data;return e(null!==r)},o.postMessage(t,[t])})};function d(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),r.push.apply(r,n)}return r}function v(e){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?d(Object(r),!0).forEach(function(t){n(e,t,r[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(r)):d(Object(r)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(r,t))})}return e}var x=new Map,y=function(e,n,u){return v(v({},n),{},{connect:function(t){var r=t.port;r.start();var u=e(r,n),a=o.generateUniqueNumber(x);return x.set(a,function(){u(),r.close(),x.delete(a)}),{result:a}},disconnect:function(e){var t=e.portId,r=x.get(t);if(void 0===r)throw f(t);return r(),{result:null}},isSupported:function(){var e=t(r.mark(function e(){var t,n,o;return r.wrap(function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=1,p();case 1:if(!e.sent){e.next=5;break}if(!((t=u())instanceof Promise)){e.next=3;break}return e.next=2,t;case 2:o=e.sent,e.next=4;break;case 3:o=t;case 4:return n=o,e.abrupt(\"return\",{result:n});case 5:return e.abrupt(\"return\",{result:!1});case 6:case\"end\":return e.stop()}},e)}));function n(){return e.apply(this,arguments)}return n}()})},b=function(e,t){var r=y(b,t,arguments.length>2&&void 0!==arguments[2]?arguments[2]:function(){return!0}),n=l(e,r);return e.addEventListener(\"message\",n),function(){return e.removeEventListener(\"message\",n)}};e.createWorker=b,e.isSupported=p}(t,r(293),r(756),r(693),r(389))},472(e,t,r){!function(e,t,r,n){\"use strict\";var o=function(e,t){return function(r){var o=t.get(r);if(void 0===o)return Promise.resolve(!1);var u=n(o,2),a=u[0],i=u[1];return e(a),t.delete(r),i(!1),Promise.resolve(!0)}},u=function(e,t){var r=function(n,o,u,a){var i=n-e.now();i>0?o.set(a,[t(r,i,n,o,u,a),u]):(o.delete(a),u(!0))};return r},a=function(e,t,r,n){return function(o,u,a){var i=o+u-t.timeOrigin,s=i-t.now();return new Promise(function(t){e.set(a,[r(n,s,i,e,t,a),t])})}},i=new Map,s=o(globalThis.clearTimeout,i),c=new Map,f=o(globalThis.clearTimeout,c),l=u(performance,globalThis.setTimeout),p=a(i,performance,globalThis.setTimeout,l),d=a(c,performance,globalThis.setTimeout,l);r.createWorker(self,{clear:function(){var r=e(t.mark(function e(r){var n,o,u;return t.wrap(function(e){for(;;)switch(e.prev=e.next){case 0:return n=r.timerId,o=r.timerType,e.next=1,\"interval\"===o?s(n):f(n);case 1:return u=e.sent,e.abrupt(\"return\",{result:u});case 2:case\"end\":return e.stop()}},e)}));function n(e){return r.apply(this,arguments)}return n}(),set:function(){var r=e(t.mark(function e(r){var n,o,u,a,i;return t.wrap(function(e){for(;;)switch(e.prev=e.next){case 0:return n=r.delay,o=r.now,u=r.timerId,a=r.timerType,e.next=1,(\"interval\"===a?p:d)(n,o,u);case 1:return i=e.sent,e.abrupt(\"return\",{result:i});case 2:case\"end\":return e.stop()}},e)}));function n(e){return r.apply(this,arguments)}return n}()})}(r(293),r(756),r(623),r(715))},172(e){e.exports=function(e,t){this.v=e,this.k=t},e.exports.__esModule=!0,e.exports.default=e.exports},79(e){e.exports=function(e,t){(null==t||t>e.length)&&(t=e.length);for(var r=0,n=Array(t);r<t;r++)n[r]=e[r];return n},e.exports.__esModule=!0,e.exports.default=e.exports},987(e){e.exports=function(e){if(Array.isArray(e))return e},e.exports.__esModule=!0,e.exports.default=e.exports},293(e){function t(e,t,r,n,o,u,a){try{var i=e[u](a),s=i.value}catch(e){return void r(e)}i.done?t(s):Promise.resolve(s).then(n,o)}e.exports=function(e){return function(){var r=this,n=arguments;return new Promise(function(o,u){var a=e.apply(r,n);function i(e){t(a,o,u,i,s,\"next\",e)}function s(e){t(a,o,u,i,s,\"throw\",e)}i(void 0)})}},e.exports.__esModule=!0,e.exports.default=e.exports},693(e,t,r){var n=r(736);e.exports=function(e,t,r){return(t=n(t))in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e},e.exports.__esModule=!0,e.exports.default=e.exports},156(e){e.exports=function(e,t){var r=null==e?null:\"undefined\"!=typeof Symbol&&e[Symbol.iterator]||e[\"@@iterator\"];if(null!=r){var n,o,u,a,i=[],s=!0,c=!1;try{if(u=(r=r.call(e)).next,0===t){if(Object(r)!==r)return;s=!1}else for(;!(s=(n=u.call(r)).done)&&(i.push(n.value),i.length!==t);s=!0);}catch(e){c=!0,o=e}finally{try{if(!s&&null!=r.return&&(a=r.return(),Object(a)!==a))return}finally{if(c)throw o}}return i}},e.exports.__esModule=!0,e.exports.default=e.exports},752(e){e.exports=function(){throw new TypeError(\"Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\")},e.exports.__esModule=!0,e.exports.default=e.exports},993(e,t,r){var n=r(546);function o(){var t,r,u=\"function\"==typeof Symbol?Symbol:{},a=u.iterator||\"@@iterator\",i=u.toStringTag||\"@@toStringTag\";function s(e,o,u,a){var i=o&&o.prototype instanceof f?o:f,s=Object.create(i.prototype);return n(s,\"_invoke\",function(e,n,o){var u,a,i,s=0,f=o||[],l=!1,p={p:0,n:0,v:t,a:d,f:d.bind(t,4),d:function(e,r){return u=e,a=0,i=t,p.n=r,c}};function d(e,n){for(a=e,i=n,r=0;!l&&s&&!o&&r<f.length;r++){var o,u=f[r],d=p.p,v=u[2];e>3?(o=v===n)&&(i=u[(a=u[4])?5:(a=3,3)],u[4]=u[5]=t):u[0]<=d&&((o=e<2&&d<u[1])?(a=0,p.v=n,p.n=u[1]):d<v&&(o=e<3||u[0]>n||n>v)&&(u[4]=e,u[5]=n,p.n=v,a=0))}if(o||e>1)return c;throw l=!0,n}return function(o,f,v){if(s>1)throw TypeError(\"Generator is already running\");for(l&&1===f&&d(f,v),a=f,i=v;(r=a<2?t:i)||!l;){u||(a?a<3?(a>1&&(p.n=-1),d(a,i)):p.n=i:p.v=i);try{if(s=2,u){if(a||(o=\"next\"),r=u[o]){if(!(r=r.call(u,i)))throw TypeError(\"iterator result is not an object\");if(!r.done)return r;i=r.value,a<2&&(a=0)}else 1===a&&(r=u.return)&&r.call(u),a<2&&(i=TypeError(\"The iterator does not provide a '\"+o+\"' method\"),a=1);u=t}else if((r=(l=p.n<0)?i:e.call(n,p))!==c)break}catch(e){u=t,a=1,i=e}finally{s=1}}return{value:r,done:l}}}(e,u,a),!0),s}var c={};function f(){}function l(){}function p(){}r=Object.getPrototypeOf;var d=[][a]?r(r([][a]())):(n(r={},a,function(){return this}),r),v=p.prototype=f.prototype=Object.create(d);function x(e){return Object.setPrototypeOf?Object.setPrototypeOf(e,p):(e.__proto__=p,n(e,i,\"GeneratorFunction\")),e.prototype=Object.create(v),e}return l.prototype=p,n(v,\"constructor\",p),n(p,\"constructor\",l),l.displayName=\"GeneratorFunction\",n(p,i,\"GeneratorFunction\"),n(v),n(v,i,\"Generator\"),n(v,a,function(){return this}),n(v,\"toString\",function(){return\"[object Generator]\"}),(e.exports=o=function(){return{w:s,m:x}},e.exports.__esModule=!0,e.exports.default=e.exports)()}e.exports=o,e.exports.__esModule=!0,e.exports.default=e.exports},869(e,t,r){var n=r(887);e.exports=function(e,t,r,o,u){var a=n(e,t,r,o,u);return a.next().then(function(e){return e.done?e.value:a.next()})},e.exports.__esModule=!0,e.exports.default=e.exports},887(e,t,r){var n=r(993),o=r(791);e.exports=function(e,t,r,u,a){return new o(n().w(e,t,r,u),a||Promise)},e.exports.__esModule=!0,e.exports.default=e.exports},791(e,t,r){var n=r(172),o=r(546);e.exports=function e(t,r){function u(e,o,a,i){try{var s=t[e](o),c=s.value;return c instanceof n?r.resolve(c.v).then(function(e){u(\"next\",e,a,i)},function(e){u(\"throw\",e,a,i)}):r.resolve(c).then(function(e){s.value=e,a(s)},function(e){return u(\"throw\",e,a,i)})}catch(e){i(e)}}var a;this.next||(o(e.prototype),o(e.prototype,\"function\"==typeof Symbol&&Symbol.asyncIterator||\"@asyncIterator\",function(){return this})),o(this,\"_invoke\",function(e,t,n){function o(){return new r(function(t,r){u(e,n,t,r)})}return a=a?a.then(o,o):o()},!0)},e.exports.__esModule=!0,e.exports.default=e.exports},546(e){function t(r,n,o,u){var a=Object.defineProperty;try{a({},\"\",{})}catch(r){a=0}e.exports=t=function(e,r,n,o){function u(r,n){t(e,r,function(e){return this._invoke(r,n,e)})}r?a?a(e,r,{value:n,enumerable:!o,configurable:!o,writable:!o}):e[r]=n:(u(\"next\",0),u(\"throw\",1),u(\"return\",2))},e.exports.__esModule=!0,e.exports.default=e.exports,t(r,n,o,u)}e.exports=t,e.exports.__esModule=!0,e.exports.default=e.exports},373(e){e.exports=function(e){var t=Object(e),r=[];for(var n in t)r.unshift(n);return function e(){for(;r.length;)if((n=r.pop())in t)return e.value=n,e.done=!1,e;return e.done=!0,e}},e.exports.__esModule=!0,e.exports.default=e.exports},633(e,t,r){var n=r(172),o=r(993),u=r(869),a=r(887),i=r(791),s=r(373),c=r(579);function f(){\"use strict\";var t=o(),r=t.m(f),l=(Object.getPrototypeOf?Object.getPrototypeOf(r):r.__proto__).constructor;function p(e){var t=\"function\"==typeof e&&e.constructor;return!!t&&(t===l||\"GeneratorFunction\"===(t.displayName||t.name))}var d={throw:1,return:2,break:3,continue:3};function v(e){var t,r;return function(n){t||(t={stop:function(){return r(n.a,2)},catch:function(){return n.v},abrupt:function(e,t){return r(n.a,d[e],t)},delegateYield:function(e,o,u){return t.resultName=o,r(n.d,c(e),u)},finish:function(e){return r(n.f,e)}},r=function(e,r,o){n.p=t.prev,n.n=t.next;try{return e(r,o)}finally{t.next=n.n}}),t.resultName&&(t[t.resultName]=n.v,t.resultName=void 0),t.sent=n.v,t.next=n.n;try{return e.call(this,t)}finally{n.p=t.prev,n.n=t.next}}}return(e.exports=f=function(){return{wrap:function(e,r,n,o){return t.w(v(e),r,n,o&&o.reverse())},isGeneratorFunction:p,mark:t.m,awrap:function(e,t){return new n(e,t)},AsyncIterator:i,async:function(e,t,r,n,o){return(p(t)?a:u)(v(e),t,r,n,o)},keys:s,values:c}},e.exports.__esModule=!0,e.exports.default=e.exports)()}e.exports=f,e.exports.__esModule=!0,e.exports.default=e.exports},579(e,t,r){var n=r(738).default;e.exports=function(e){if(null!=e){var t=e[\"function\"==typeof Symbol&&Symbol.iterator||\"@@iterator\"],r=0;if(t)return t.call(e);if(\"function\"==typeof e.next)return e;if(!isNaN(e.length))return{next:function(){return e&&r>=e.length&&(e=void 0),{value:e&&e[r++],done:!e}}}}throw new TypeError(n(e)+\" is not iterable\")},e.exports.__esModule=!0,e.exports.default=e.exports},715(e,t,r){var n=r(987),o=r(156),u=r(122),a=r(752);e.exports=function(e,t){return n(e)||o(e,t)||u(e,t)||a()},e.exports.__esModule=!0,e.exports.default=e.exports},45(e,t,r){var n=r(738).default;e.exports=function(e,t){if(\"object\"!=n(e)||!e)return e;var r=e[Symbol.toPrimitive];if(void 0!==r){var o=r.call(e,t||\"default\");if(\"object\"!=n(o))return o;throw new TypeError(\"@@toPrimitive must return a primitive value.\")}return(\"string\"===t?String:Number)(e)},e.exports.__esModule=!0,e.exports.default=e.exports},736(e,t,r){var n=r(738).default,o=r(45);e.exports=function(e){var t=o(e,\"string\");return\"symbol\"==n(t)?t:t+\"\"},e.exports.__esModule=!0,e.exports.default=e.exports},738(e){function t(r){return e.exports=t=\"function\"==typeof Symbol&&\"symbol\"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&\"function\"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?\"symbol\":typeof e},e.exports.__esModule=!0,e.exports.default=e.exports,t(r)}e.exports=t,e.exports.__esModule=!0,e.exports.default=e.exports},122(e,t,r){var n=r(79);e.exports=function(e,t){if(e){if(\"string\"==typeof e)return n(e,t);var r={}.toString.call(e).slice(8,-1);return\"Object\"===r&&e.constructor&&(r=e.constructor.name),\"Map\"===r||\"Set\"===r?Array.from(e):\"Arguments\"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)?n(e,t):void 0}},e.exports.__esModule=!0,e.exports.default=e.exports},756(e,t,r){var n=r(633)();e.exports=n;try{regeneratorRuntime=n}catch(e){\"object\"==typeof globalThis?globalThis.regeneratorRuntime=n:Function(\"r\",\"regeneratorRuntime = r\")(n)}}},t={};function r(n){var o=t[n];if(void 0!==o)return o.exports;var u=t[n]={exports:{}};return e[n].call(u.exports,u,u.exports,r),u.exports}r.n=e=>{var t=e&&e.__esModule?()=>e.default:()=>e;return r.d(t,{a:t}),t},r.d=(e,t)=>{for(var n in t)r.o(t,n)&&!r.o(e,n)&&Object.defineProperty(e,n,{enumerable:!0,get:t[n]})},r.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t),(()=>{\"use strict\";r(472)})()})();");
+		e.clearInterval = function(e) {
+			return n().clearInterval(e);
+		}, e.clearTimeout = function(e) {
+			return n().clearTimeout(e);
+		}, e.setInterval = function() {
+			var e;
+			return (e = n()).setInterval.apply(e, arguments);
+		}, e.setTimeout = function() {
+			var e;
+			return (e = n()).setTimeout.apply(e, arguments);
+		};
+	}));
+}), Xs = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.isReactNativeBrowser = e.isWebWorker = void 0;
+	var t = () => typeof window < "u" ? typeof navigator < "u" && navigator.userAgent?.toLowerCase().indexOf(" electron/") > -1 && Z?.versions ? !Object.prototype.hasOwnProperty.call(Z.versions, "electron") : typeof window.document < "u" : !1, n = () => !!(typeof self == "object" && self?.constructor?.name?.includes("WorkerGlobalScope") && typeof Deno > "u"), r = () => typeof navigator < "u" && navigator.product === "ReactNative", i = t() || n() || r();
+	e.isWebWorker = n(), e.isReactNativeBrowser = r(), e.default = i;
+}), Zs = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__createBinding || (Object.create ? (function(e, t, n, r) {
+		r === void 0 && (r = n);
+		var i = Object.getOwnPropertyDescriptor(t, n);
+		(!i || ("get" in i ? !t.__esModule : i.writable || i.configurable)) && (i = {
+			enumerable: !0,
+			get: function() {
+				return t[n];
+			}
+		}), Object.defineProperty(e, r, i);
+	}) : (function(e, t, n, r) {
+		r === void 0 && (r = n), e[r] = t[n];
+	})), n = e && e.__setModuleDefault || (Object.create ? (function(e, t) {
+		Object.defineProperty(e, "default", {
+			enumerable: !0,
+			value: t
+		});
+	}) : function(e, t) {
+		e.default = t;
+	}), r = e && e.__importStar || (function() {
+		var e = function(t) {
+			return e = Object.getOwnPropertyNames || function(e) {
+				var t = [];
+				for (var n in e) Object.prototype.hasOwnProperty.call(e, n) && (t[t.length] = n);
+				return t;
+			}, e(t);
+		};
+		return function(r) {
+			if (r && r.__esModule) return r;
+			var i = {};
+			if (r != null) for (var a = e(r), o = 0; o < a.length; o++) a[o] !== "default" && t(i, r, a[o]);
+			return n(i, r), i;
+		};
+	})();
+	Object.defineProperty(e, "__esModule", { value: !0 });
+	var i = Ys(), a = r(Xs()), o = {
+		set: i.setInterval,
+		clear: i.clearInterval
+	}, s = {
+		set: (e, t) => setInterval(e, t),
+		clear: (e) => clearInterval(e)
+	};
+	e.default = (e) => {
+		switch (e) {
+			case "native": return s;
+			case "worker": return o;
+			default: return a.default && !a.isWebWorker && !a.isReactNativeBrowser ? o : s;
+		}
+	};
+}), Qs = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 });
+	var n = t(Zs());
+	e.default = class {
+		_keepalive;
+		timerId;
+		timer;
+		destroyed = !1;
+		counter;
+		client;
+		_keepaliveTimeoutTimestamp;
+		_intervalEvery;
+		get keepaliveTimeoutTimestamp() {
+			return this._keepaliveTimeoutTimestamp;
+		}
+		get intervalEvery() {
+			return this._intervalEvery;
+		}
+		get keepalive() {
+			return this._keepalive;
+		}
+		constructor(e, t) {
+			this.client = e, this.timer = typeof t == "object" && "set" in t && "clear" in t ? t : (0, n.default)(t), this.setKeepalive(e.keepalive);
+		}
+		clear() {
+			this.timerId &&= (this.timer.clear(this.timerId), null);
+		}
+		setKeepalive(e) {
+			if (e *= 1e3, isNaN(e) || e <= 0 || e > 2147483647) throw Error(`Keepalive value must be an integer between 0 and 2147483647. Provided value is ${e}`);
+			this._keepalive = e, this.reschedule(), this.client.log(`KeepaliveManager: set keepalive to ${e}ms`);
+		}
+		destroy() {
+			this.clear(), this.destroyed = !0;
+		}
+		reschedule() {
+			if (this.destroyed) return;
+			this.clear(), this.counter = 0;
+			let e = Math.ceil(this._keepalive * 1.5);
+			this._keepaliveTimeoutTimestamp = Date.now() + e, this._intervalEvery = Math.ceil(this._keepalive / 2), this.timerId = this.timer.set(() => {
+				this.destroyed || (this.counter += 1, this.counter === 2 ? this.client.sendPing() : this.counter > 2 && this.client.onKeepaliveTimeout());
+			}, this._intervalEvery);
+		}
+	};
+}), $s = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__createBinding || (Object.create ? (function(e, t, n, r) {
+		r === void 0 && (r = n);
+		var i = Object.getOwnPropertyDescriptor(t, n);
+		(!i || ("get" in i ? !t.__esModule : i.writable || i.configurable)) && (i = {
+			enumerable: !0,
+			get: function() {
+				return t[n];
+			}
+		}), Object.defineProperty(e, r, i);
+	}) : (function(e, t, n, r) {
+		r === void 0 && (r = n), e[r] = t[n];
+	})), n = e && e.__setModuleDefault || (Object.create ? (function(e, t) {
+		Object.defineProperty(e, "default", {
+			enumerable: !0,
+			value: t
+		});
+	}) : function(e, t) {
+		e.default = t;
+	}), r = e && e.__importStar || (function() {
+		var e = function(t) {
+			return e = Object.getOwnPropertyNames || function(e) {
+				var t = [];
+				for (var n in e) Object.prototype.hasOwnProperty.call(e, n) && (t[t.length] = n);
+				return t;
+			}, e(t);
+		};
+		return function(r) {
+			if (r && r.__esModule) return r;
+			var i = {};
+			if (r != null) for (var a = e(r), o = 0; o < a.length; o++) a[o] !== "default" && t(i, r, a[o]);
+			return n(i, r), i;
+		};
+	})(), i = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 });
+	var a = i(os()), o = Ko(), s = i(cs()), c = i(es()), l = r(ls()), u = i(us()), d = i(xs()), f = hs(), p = i(Ss()), m = i(Cs()), h = fs(), g = ws(), _ = i(Qs()), v = r(Xs()), y = globalThis.setImmediate || ((...e) => {
+		let t = e.shift();
+		(0, h.nextTick)(() => {
+			t(...e);
+		});
+	}), b = 65535, x = 147, S = {
+		keepalive: 60,
+		reschedulePings: !0,
+		protocolId: "MQTT",
+		protocolVersion: 4,
+		reconnectPeriod: 1e3,
+		connectTimeout: 3e4,
+		clean: !0,
+		resubscribe: !0,
+		subscribeBatchSize: null,
+		writeCache: !0,
+		timerVariant: "auto"
+	};
+	e.default = class e extends g.TypedEventEmitter {
+		static VERSION = h.MQTTJS_VERSION;
+		connected;
+		disconnecting;
+		disconnected;
+		reconnecting;
+		incomingStore;
+		outgoingStore;
+		options;
+		queueQoSZero;
+		_reconnectCount;
+		log;
+		messageIdProvider;
+		outgoing;
+		messageIdToTopic;
+		noop;
+		keepaliveManager;
+		stream;
+		queue;
+		streamBuilder;
+		_resubscribeTopics;
+		connackTimer;
+		reconnectTimer;
+		_storeProcessing;
+		_packetIdsDuringStoreProcessing;
+		_storeProcessingQueue;
+		_firstConnection;
+		topicAliasRecv;
+		topicAliasSend;
+		_incomingQoS2Ids;
+		_receiveMaximum;
+		_deferredReconnect;
+		_currentPump;
+		connackReceived;
+		reconnectSuppressed;
+		_authenticationMethod;
+		connackPacket;
+		_serverProperties;
+		static defaultId() {
+			return `mqttjs_${Math.random().toString(16).substr(2, 8)}`;
+		}
+		constructor(t, n) {
+			super(), this.options = n || {};
+			for (let e in S) typeof this.options[e] > "u" ? this.options[e] = S[e] : this.options[e] = n[e];
+			this.log = this.options.log || (0, c.default)("mqttjs:client"), this.noop = this._noop.bind(this), this.log("MqttClient :: version:", e.VERSION), v.isWebWorker ? this.log("MqttClient :: environment", "webworker") : this.log("MqttClient :: environment", v.default ? "browser" : "node"), this.log("MqttClient :: options.protocol", n.protocol), this.log("MqttClient :: options.protocolVersion", n.protocolVersion), this.log("MqttClient :: options.username", n.username), this.log("MqttClient :: options.keepalive", n.keepalive), this.log("MqttClient :: options.reconnectPeriod", n.reconnectPeriod), this.log("MqttClient :: options.rejectUnauthorized", n.rejectUnauthorized), this.log("MqttClient :: options.properties.topicAliasMaximum", n.properties ? n.properties.topicAliasMaximum : void 0), this.options.clientId = typeof n.clientId == "string" ? n.clientId : e.defaultId(), this.log("MqttClient :: clientId", this.options.clientId), this.options.customHandleAcks = n.protocolVersion === 5 && n.customHandleAcks ? n.customHandleAcks : (...e) => {
+				e[3](null, 0);
+			}, this.options.writeCache || (a.default.writeToStream.cacheNumbers = !1), this.streamBuilder = t, this.messageIdProvider = typeof this.options.messageIdProvider > "u" ? new p.default() : this.options.messageIdProvider, this.outgoingStore = n.outgoingStore || new u.default(), this.incomingStore = n.incomingStore || new u.default(), this._incomingQoS2Ids = /* @__PURE__ */ new Set(), this._receiveMaximum = b;
+			let r = n.properties?.receiveMaximum;
+			r !== void 0 && (Number.isInteger(r) && r >= 1 && r <= b ? this._receiveMaximum = r : this.log("MqttClient :: options.properties.receiveMaximum %o is not an integer between 1 and %d, enforcing and advertising %d instead", r, b, b)), this.queueQoSZero = n.queueQoSZero === void 0 || n.queueQoSZero, this._resubscribeTopics = {}, this.messageIdToTopic = {}, this.keepaliveManager = null, this.connected = !1, this.disconnecting = !1, this.reconnecting = !1, this.queue = [], this.connackTimer = null, this.connackReceived = !1, this.reconnectSuppressed = !1, this.reconnectTimer = null, this._storeProcessing = !1, this._packetIdsDuringStoreProcessing = {}, this._storeProcessingQueue = [], this.outgoing = {}, this._firstConnection = !0, n.properties && n.properties.topicAliasMaximum > 0 && (n.properties.topicAliasMaximum > 65535 ? this.log("MqttClient :: options.properties.topicAliasMaximum is out of range") : this.topicAliasRecv = new m.default(n.properties.topicAliasMaximum)), this.on("connect", () => {
+				let { queue: e } = this, t = () => {
+					let n = e.shift();
+					this.log("deliver :: entry %o", n);
+					let r = null;
+					if (!n) {
+						this._resubscribe();
+						return;
+					}
+					r = n.packet, this.log("deliver :: call _sendPacket for %o", r);
+					let i = !0;
+					r.messageId && r.messageId !== 0 && (this.messageIdProvider.register(r.messageId) || (i = !1)), i ? this._sendPacket(r, (e) => {
+						n.cb && n.cb(e), t();
+					}) : (this.log("messageId: %d has already used. The message is skipped and removed.", r.messageId), t());
+				};
+				this.log("connect :: sending queued packets"), t();
+			}), this.on("close", () => {
+				this.log("close :: connected set to `false`"), this.connected = !1, this.log("close :: clearing connackTimer"), clearTimeout(this.connackTimer), this._destroyKeepaliveManager(), this._serverProperties = void 0, this.topicAliasRecv && this.topicAliasRecv.clear(), this.log("close :: calling _setupReconnect"), this._setupReconnect();
+			}), this.options.manualConnect || (this.log("MqttClient :: setting up stream"), this.connect());
+		}
+		handleAuth(e, t) {
+			t();
+		}
+		handleMessage(e, t) {
+			t();
+		}
+		_nextId() {
+			return this.messageIdProvider.allocate();
+		}
+		getLastMessageId() {
+			return this.messageIdProvider.getLastAllocated();
+		}
+		_trackIncomingQoS2Publish(e, t, n) {
+			return this._incomingQoS2Ids.has(e) ? !0 : this.options.protocolVersion === 5 && this._incomingQoS2Ids.size >= this._receiveMaximum ? (this.log("_trackIncomingQoS2Publish :: inbound QoS 2 messages exceeded receiveMaximum %d", this._receiveMaximum), n?.discardParsedPackets(), (!n || n.isCurrent()) && this._cleanUp(!0), t(), this.emit("error", new h.ErrorWithReasonCode(`${f.ReasonCodes[x]}: ${this._incomingQoS2Ids.size + 1} inbound QoS 2 messages in flight, receiveMaximum is ${this._receiveMaximum}`, x)), !1) : (this._incomingQoS2Ids.add(e), !0);
+		}
+		_releaseIncomingQoS2Publish(e) {
+			this._incomingQoS2Ids.delete(e);
+		}
+		_discardIncomingQoS2State() {
+			if (this._incomingQoS2Ids.size !== 0) {
+				this.log("_discardIncomingQoS2State :: session not resumed, dropping %d inbound QoS 2 message(s)", this._incomingQoS2Ids.size);
+				for (let e of this._incomingQoS2Ids) this.incomingStore.del({ messageId: e }, this.noop);
+				this._incomingQoS2Ids.clear();
+			}
+		}
+		connect() {
+			let e = new o.Writable(), t = a.default.parser(this.options), n = null, r = [], i = {
+				discardParsedPackets: () => {
+					r.length = 0;
+				},
+				isCurrent: () => this._currentPump === i
+			};
+			this._currentPump = i, this.connackReceived = !1, this.reconnectSuppressed = !1, this.log("connect :: calling method to clear reconnect"), this._clearReconnect(), this._serverProperties = void 0, this.disconnected && !this.reconnecting && (this.incomingStore = this.options.incomingStore || new u.default(), this.outgoingStore = this.options.outgoingStore || new u.default(), this._incomingQoS2Ids.clear(), this.disconnecting = !1, this.disconnected = !1), this.log("connect :: using streamBuilder provided to client to create stream"), this.stream = this.streamBuilder(this), t.on("packet", (e) => {
+				this.log("parser :: on packet push to packets array."), r.push(e);
+			});
+			let s = () => {
+				this.log("work :: getting next packet in queue"), this._currentPump !== i && (this.log("work :: pump superseded, dropping %d queued packets", r.length), r.length = 0);
+				let e = r.shift();
+				if (e) this.log("work :: packet pulled from queue"), (0, d.default)(this, e, c, i);
+				else {
+					this.log("work :: no packets in queue");
+					let e = n;
+					n = null, this.log("work :: done flag is %s", !!e), e && e();
+				}
+			}, c = () => {
+				if (r.length) (0, h.nextTick)(s);
+				else {
+					let e = n;
+					n = null, e && e();
+				}
+			};
+			e._write = (e, r, i) => {
+				n = i, this.log("writable stream :: parsing buffer"), t.parse(e), s();
+			}, this.log("connect :: pipe stream to writable stream"), this.stream.pipe(e), this.stream.on("error", (e) => {
+				this.log("streamErrorHandler :: error", e.message), e.code ? (this.log("streamErrorHandler :: emitting error"), this.emit("error", e)) : this.noop(e);
+			}), this.stream.on("close", () => {
+				this.log("(%s)stream :: on close", this.options.clientId), this._flushVolatile(), this.log("stream: emit close to MqttClient"), this.emit("close");
+			}), this.log("connect: sending packet `connect`");
+			let l = {
+				cmd: "connect",
+				protocolId: this.options.protocolId,
+				protocolVersion: this.options.protocolVersion,
+				clean: this.options.clean,
+				clientId: this.options.clientId,
+				keepalive: this.options.keepalive,
+				username: this.options.username,
+				password: this.options.password,
+				properties: this.options.properties ? { ...this.options.properties } : void 0
+			};
+			if (l.properties?.receiveMaximum !== void 0 && (l.properties.receiveMaximum = this._receiveMaximum), this.options.will && (l.will = {
+				...this.options.will,
+				payload: this.options.will?.payload
+			}), this.topicAliasRecv && (l.properties ||= {}, this.topicAliasRecv && (l.properties.topicAliasMaximum = this.topicAliasRecv.max)), this._authenticationMethod = l.properties?.authenticationMethod, this._writePacket(l), t.on("error", this.emit.bind(this, "error")), this.options.properties) {
+				if (!this.options.properties.authenticationMethod && this.options.properties.authenticationData) return this.end(() => this.emit("error", /* @__PURE__ */ Error("Packet has no Authentication Method"))), this;
+				if (this.options.properties.authenticationMethod && this.options.authPacket && typeof this.options.authPacket == "object") {
+					let e = {
+						cmd: "auth",
+						reasonCode: 0,
+						...this.options.authPacket
+					};
+					this._writePacket(e);
+				}
+			}
+			return this.stream.setMaxListeners(1e3), clearTimeout(this.connackTimer), this.connackTimer = setTimeout(() => this._onConnackTimeout(), this.options.connectTimeout), this;
+		}
+		_onConnackTimeout() {
+			this.log("!!connectTimeout hit!! Calling _cleanUp with force `true`"), this._cleanUp(!0), this.emit("error", /* @__PURE__ */ Error("connack timeout"));
+		}
+		publish(e, t, n, r) {
+			this.log("publish :: message `%s` to topic `%s`", t, e);
+			let { options: i } = this;
+			typeof n == "function" && (r = n, n = null), n ||= {}, n = {
+				qos: 0,
+				retain: !1,
+				dup: !1,
+				...n
+			};
+			let { qos: a, retain: o, dup: s, properties: c, cbStorePut: l } = n;
+			if (this._checkDisconnecting(r)) return this;
+			let u = () => {
+				let n = 0;
+				if ((a === 1 || a === 2) && (n = this._nextId(), n === null)) return this.log("No messageId left"), !1;
+				let u = {
+					cmd: "publish",
+					topic: e,
+					payload: t,
+					qos: a,
+					retain: o,
+					messageId: n,
+					dup: s
+				};
+				switch (i.protocolVersion === 5 && (u.properties = c), this.log("publish :: qos", a), a) {
+					case 1:
+					case 2:
+						this.outgoing[u.messageId] = {
+							volatile: !1,
+							cmd: "publish",
+							cb: r || this.noop
+						}, this.log("MqttClient:publish: packet cmd: %s", u.cmd), this._sendPacket(u, void 0, l);
+						break;
+					default: this.log("MqttClient:publish: packet cmd: %s", u.cmd), this._sendPacket(u, r, l);
+				}
+				return !0;
+			};
+			return (this._storeProcessing || this._storeProcessingQueue.length > 0 || !u()) && this._storeProcessingQueue.push({
+				invoke: u,
+				cbStorePut: n.cbStorePut,
+				callback: r
+			}), this;
+		}
+		publishAsync(e, t, n) {
+			return new Promise((r, i) => {
+				this.publish(e, t, n, (e, t) => {
+					e ? i(e) : r(t);
+				});
+			});
+		}
+		subscribe(e, t, n) {
+			let r = this.options.protocolVersion;
+			typeof t == "function" && (n = t), n ||= this.noop;
+			let i = !1, a = [];
+			typeof e == "string" ? (e = [e], a = e) : Array.isArray(e) ? a = e : typeof e == "object" && (i = e.resubscribe, delete e.resubscribe, a = Object.keys(e));
+			let o = l.validateTopics(a);
+			if (o !== null) return y(n, /* @__PURE__ */ Error(`Invalid topic ${o}`)), this;
+			if (this._checkDisconnecting(n)) return this.log("subscribe: discconecting true"), this;
+			let s = { qos: 0 };
+			r === 5 && (s.nl = !1, s.rap = !1, s.rh = 0), t = {
+				...s,
+				...t
+			};
+			let { properties: c } = t, u = [], d = (e, n) => {
+				if (n ||= t, !Object.prototype.hasOwnProperty.call(this._resubscribeTopics, e) || this._resubscribeTopics[e].qos < n.qos || i) {
+					let t = {
+						topic: e,
+						qos: n.qos
+					};
+					r === 5 && (t.nl = n.nl, t.rap = n.rap, t.rh = n.rh, t.properties = c), this.log("subscribe: pushing topic `%s` and qos `%s` to subs list", t.topic, t.qos), u.push(t);
+				}
+			};
+			if (Array.isArray(e) ? e.forEach((e) => {
+				this.log("subscribe: array topic %s", e), d(e);
+			}) : Object.keys(e).forEach((t) => {
+				this.log("subscribe: object topic %s, %o", t, e[t]), d(t, e[t]);
+			}), !u.length) return n(null, []), this;
+			let f = (e, t) => {
+				let n = {
+					cmd: "subscribe",
+					subscriptions: e,
+					messageId: t
+				};
+				if (c && (n.properties = c), this.options.resubscribe) {
+					this.log("subscribe :: resubscribe true");
+					let t = [];
+					e.forEach((e) => {
+						if (this.options.reconnectPeriod > 0) {
+							let n = { qos: e.qos };
+							r === 5 && (n.nl = e.nl || !1, n.rap = e.rap || !1, n.rh = e.rh || 0, n.properties = e.properties), this._resubscribeTopics[e.topic] = n, t.push(e.topic);
+						}
+					}), this.messageIdToTopic[n.messageId] = t;
+				}
+				let i = new Promise((t, r) => {
+					this.outgoing[n.messageId] = {
+						volatile: !0,
+						cmd: "subscribe",
+						cb: (n, i) => {
+							if (n) {
+								r(new h.ErrorWithSubackPacket(n.message, i));
+								return;
+							}
+							let { granted: a } = i;
+							if (a.length !== e.length) {
+								r(new h.ErrorWithSubackPacket(`Protocol error: suback granted ${a.length} reason code(s) for ${e.length} subscription(s)`, i)), this._cleanUp(!0);
+								return;
+							}
+							for (let t = 0; t < a.length; t += 1) e[t].qos = a[t];
+							t(i);
+						}
+					};
+				});
+				return this.log("subscribe :: call _sendPacket"), this._sendPacket(n), i;
+			}, p = () => {
+				let e = this.options.subscribeBatchSize ?? u.length, t = [];
+				for (let n = 0; n < u.length; n += e) {
+					let r = u.slice(n, n + e), i = this._nextId();
+					if (i === null) return this.log("No messageId left"), !1;
+					t.push(f(r, i));
+				}
+				return Promise.all(t).then((e) => {
+					n(null, u, e.at(-1));
+				}).catch((e) => {
+					n(e, u, e.packet);
+				}), !0;
+			};
+			return (this._storeProcessing || this._storeProcessingQueue.length > 0 || !p()) && this._storeProcessingQueue.push({
+				invoke: p,
+				callback: n
+			}), this;
+		}
+		subscribeAsync(e, t) {
+			return new Promise((n, r) => {
+				this.subscribe(e, t, (e, t) => {
+					e ? r(e) : n(t);
+				});
+			});
+		}
+		unsubscribe(e, t, n) {
+			typeof e == "string" && (e = [e]), typeof t == "function" && (n = t), n ||= this.noop;
+			let r = l.validateTopics(e);
+			if (r !== null) return y(n, /* @__PURE__ */ Error(`Invalid topic ${r}`)), this;
+			if (this._checkDisconnecting(n)) return this;
+			let i = () => {
+				let r = this._nextId();
+				if (r === null) return this.log("No messageId left"), !1;
+				let i = {
+					cmd: "unsubscribe",
+					messageId: r,
+					unsubscriptions: []
+				};
+				return typeof e == "string" ? i.unsubscriptions = [e] : Array.isArray(e) && (i.unsubscriptions = e), this.options.resubscribe && i.unsubscriptions.forEach((e) => {
+					delete this._resubscribeTopics[e];
+				}), typeof t == "object" && t.properties && (i.properties = t.properties), this.outgoing[i.messageId] = {
+					volatile: !0,
+					cmd: "unsubscribe",
+					cb: n
+				}, this.log("unsubscribe: call _sendPacket"), this._sendPacket(i), !0;
+			};
+			return (this._storeProcessing || this._storeProcessingQueue.length > 0 || !i()) && this._storeProcessingQueue.push({
+				invoke: i,
+				callback: n
+			}), this;
+		}
+		unsubscribeAsync(e, t) {
+			return new Promise((n, r) => {
+				this.unsubscribe(e, t, (e, t) => {
+					e ? r(e) : n(t);
+				});
+			});
+		}
+		end(e, t, n) {
+			this.log("end :: (%s)", this.options.clientId), (e == null || typeof e != "boolean") && (n ||= t, t = e, e = !1), typeof t != "object" && (n ||= t, t = null), this.log("end :: cb? %s", !!n), (!n || typeof n != "function") && (n = this.noop);
+			let r = () => {
+				this.log("end :: closeStores: closing incoming and outgoing stores"), this.disconnected = !0, this._incomingQoS2Ids.clear(), this.incomingStore.close((e) => {
+					this.outgoingStore.close((t) => {
+						if (this.log("end :: closeStores: emitting end"), this.emit("end"), n) {
+							let r = e || t;
+							this.log("end :: closeStores: invoking callback with args"), n(r);
+						}
+					});
+				}), this._deferredReconnect ? this._deferredReconnect() : (this.options.reconnectPeriod === 0 || this.options.manualConnect) && (this.disconnecting = !1);
+			}, i = () => {
+				this.log("end :: (%s) :: finish :: calling _cleanUp with force %s", this.options.clientId, e), this._cleanUp(e, () => {
+					this.log("end :: finish :: calling process.nextTick on closeStores"), (0, h.nextTick)(r);
+				}, t);
+			};
+			return this.disconnecting ? (n(), this) : (this._clearReconnect(), this.disconnecting = !0, !e && Object.keys(this.outgoing).length > 0 ? (this.log("end :: (%s) :: calling finish in 10ms once outgoing is empty", this.options.clientId), this.once("outgoingEmpty", setTimeout.bind(null, i, 10))) : (this.log("end :: (%s) :: immediately calling finish", this.options.clientId), i()), this);
+		}
+		endAsync(e, t) {
+			return new Promise((n, r) => {
+				this.end(e, t, (e) => {
+					e ? r(e) : n();
+				});
+			});
+		}
+		removeOutgoingMessage(e) {
+			if (this.outgoing[e]) {
+				let { cb: t } = this.outgoing[e];
+				this._removeOutgoingAndStoreMessage(e, () => {
+					t(/* @__PURE__ */ Error("Message removed"));
+				});
+			}
+			return this;
+		}
+		reconnect(e) {
+			this.log("client reconnect");
+			let t = () => {
+				e ? (this.options.incomingStore = e.incomingStore, this.options.outgoingStore = e.outgoingStore) : (this.options.incomingStore = null, this.options.outgoingStore = null), this.incomingStore = this.options.incomingStore || new u.default(), this.outgoingStore = this.options.outgoingStore || new u.default(), this._incomingQoS2Ids.clear(), this.disconnecting = !1, this.disconnected = !1, this._deferredReconnect = null, this._reconnect();
+			};
+			return this.disconnecting && !this.disconnected ? this._deferredReconnect = t : t(), this;
+		}
+		_flushVolatile() {
+			this.outgoing && (this.log("_flushVolatile :: deleting volatile messages from the queue and setting their callbacks as error function"), Object.keys(this.outgoing).forEach((e) => {
+				this.outgoing[e].volatile && typeof this.outgoing[e].cb == "function" && (this.outgoing[e].cb(/* @__PURE__ */ Error("Connection closed")), delete this.outgoing[e]);
+			}));
+		}
+		_flush() {
+			this.outgoing && (this.log("_flush: queue exists? %b", !!this.outgoing), Object.keys(this.outgoing).forEach((e) => {
+				typeof this.outgoing[e].cb == "function" && (this.outgoing[e].cb(/* @__PURE__ */ Error("Connection closed")), delete this.outgoing[e]);
+			}));
+		}
+		_removeTopicAliasAndRecoverTopicName(e) {
+			let t;
+			e.properties && (t = e.properties.topicAlias);
+			let n = e.topic.toString();
+			if (this.log("_removeTopicAliasAndRecoverTopicName :: alias %d, topic %o", t, n), n.length === 0) {
+				if (typeof t > "u" || (n = this.topicAliasSend.getTopicByAlias(t), typeof n > "u")) return /* @__PURE__ */ Error("Unregistered Topic Alias");
+				e.topic = n;
+			}
+			t && delete e.properties.topicAlias;
+		}
+		_checkDisconnecting(e) {
+			return this.disconnecting && (e && e !== this.noop ? e(/* @__PURE__ */ Error("client disconnecting")) : this.emit("error", /* @__PURE__ */ Error("client disconnecting"))), this.disconnecting;
+		}
+		_reconnect() {
+			this.log("_reconnect: emitting reconnect to client"), this.emit("reconnect"), this.connected ? (this.end(() => {
+				this.connect();
+			}), this.log("client already connected. disconnecting first.")) : (this.log("_reconnect: calling connect"), this.connect());
+		}
+		_setupReconnect() {
+			!this.disconnecting && !this.reconnectSuppressed && !this.reconnectTimer && this.options.reconnectPeriod > 0 ? (this.reconnecting ||= (this.log("_setupReconnect :: emit `offline` state"), this.emit("offline"), this.log("_setupReconnect :: set `reconnecting` to `true`"), !0), this.log("_setupReconnect :: setting reconnectTimer for %d ms", this.options.reconnectPeriod), this.reconnectTimer = setInterval(() => {
+				this.log("reconnectTimer :: reconnect triggered!"), this._reconnect();
+			}, this.options.reconnectPeriod)) : this.log("_setupReconnect :: doing nothing...");
+		}
+		_clearReconnect() {
+			this.log("_clearReconnect : clearing reconnect timer"), this.reconnectTimer &&= (clearInterval(this.reconnectTimer), null);
+		}
+		_cleanUp(e, t, n = {}) {
+			if (t && (this.log("_cleanUp :: done callback provided for on stream close"), this.stream.on("close", t)), this.log("_cleanUp :: forced? %s", e), e) this.options.reconnectPeriod === 0 && this.options.clean && this._flush(), this.log("_cleanUp :: (%s) :: destroying stream", this.options.clientId), this.stream.destroy();
+			else {
+				let e = {
+					cmd: "disconnect",
+					...n
+				};
+				this.log("_cleanUp :: (%s) :: call _sendPacket with disconnect packet", this.options.clientId), this._sendPacket(e, () => {
+					this.log("_cleanUp :: (%s) :: destroying stream", this.options.clientId), y(() => {
+						this.stream.end(() => {
+							this.log("_cleanUp :: (%s) :: stream destroyed", this.options.clientId);
+						});
+					});
+				});
+			}
+			!this.disconnecting && !this.reconnecting && (this.log("_cleanUp :: client not disconnecting/reconnecting. Clearing and resetting reconnect."), this._clearReconnect(), this._setupReconnect()), this._destroyKeepaliveManager(), t && !this.connected && (this.log("_cleanUp :: (%s) :: removing stream `done` callback `close` listener", this.options.clientId), this.stream.removeListener("close", t), t());
+		}
+		_storeAndSend(e, t, n) {
+			this.log("storeAndSend :: store packet with cmd %s to outgoingStore", e.cmd);
+			let r = e, i;
+			if (r.cmd === "publish" && (r = (0, s.default)(e), i = this._removeTopicAliasAndRecoverTopicName(r), i)) return t && t(i);
+			this.outgoingStore.put(r, (r) => {
+				if (r) return t && t(r);
+				n(), this._writePacket(e, t);
+			});
+		}
+		_applyTopicAlias(e) {
+			if (this.options.protocolVersion === 5 && e.cmd === "publish") {
+				let t;
+				e.properties && (t = e.properties.topicAlias);
+				let n = e.topic.toString();
+				if (this.topicAliasSend) {
+					if (t) {
+						if (n.length !== 0 && (this.log("applyTopicAlias :: register topic: %s - alias: %d", n, t), !this.topicAliasSend.put(n, t))) return this.log("applyTopicAlias :: error out of range. topic: %s - alias: %d", n, t), /* @__PURE__ */ Error("Sending Topic Alias out of range");
+					} else n.length !== 0 && (this.options.autoAssignTopicAlias ? (t = this.topicAliasSend.getAliasByTopic(n), t ? (e.topic = "", e.properties = {
+						...e.properties,
+						topicAlias: t
+					}, this.log("applyTopicAlias :: auto assign(use) topic: %s - alias: %d", n, t)) : (t = this.topicAliasSend.getLruAlias(), this.topicAliasSend.put(n, t), e.properties = {
+						...e.properties,
+						topicAlias: t
+					}, this.log("applyTopicAlias :: auto assign topic: %s - alias: %d", n, t))) : this.options.autoUseTopicAlias && (t = this.topicAliasSend.getAliasByTopic(n), t && (e.topic = "", e.properties = {
+						...e.properties,
+						topicAlias: t
+					}, this.log("applyTopicAlias :: auto use topic: %s - alias: %d", n, t))));
+				} else if (t) return this.log("applyTopicAlias :: error out of range. topic: %s - alias: %d", n, t), /* @__PURE__ */ Error("Sending Topic Alias out of range");
+			}
+		}
+		_noop(e) {
+			this.log("noop ::", e);
+		}
+		_writePacket(e, t) {
+			this.log("_writePacket :: packet: %O", e), this.log("_writePacket :: emitting `packetsend`"), this.emit("packetsend", e), this.log("_writePacket :: writing to stream");
+			let n = a.default.writeToStream(e, this.stream, this.options);
+			this.log("_writePacket :: writeToStream result %s", n), !n && t && t !== this.noop ? (this.log("_writePacket :: handle events on `drain` once through callback."), this.stream.once("drain", t)) : t && (this.log("_writePacket :: invoking cb"), t());
+		}
+		_sendPacket(e, t, n, r) {
+			this.log("_sendPacket :: (%s) ::  start", this.options.clientId), n ||= this.noop, t ||= this.noop;
+			let i = this._applyTopicAlias(e);
+			if (i) {
+				t(i);
+				return;
+			}
+			if (!this.connected) {
+				if (e.cmd === "auth") {
+					this._writePacket(e, t);
+					return;
+				}
+				this.log("_sendPacket :: client not connected. Storing packet offline."), this._storePacket(e, t, n);
+				return;
+			}
+			if (r) {
+				this._writePacket(e, t);
+				return;
+			}
+			switch (e.cmd) {
+				case "publish": break;
+				case "pubrel":
+					this._storeAndSend(e, t, n);
+					return;
+				default:
+					this._writePacket(e, t);
+					return;
+			}
+			switch (e.qos) {
+				case 2:
+				case 1:
+					this._storeAndSend(e, t, n);
+					break;
+				default: this._writePacket(e, t);
+			}
+			this.log("_sendPacket :: (%s) ::  end", this.options.clientId);
+		}
+		_storePacket(e, t, n) {
+			this.log("_storePacket :: packet: %o", e), this.log("_storePacket :: cb? %s", !!t), n ||= this.noop;
+			let r = e;
+			if (r.cmd === "publish") {
+				r = (0, s.default)(e);
+				let n = this._removeTopicAliasAndRecoverTopicName(r);
+				if (n) return t && t(n);
+			}
+			let i = r.qos || 0;
+			i === 0 && this.queueQoSZero || r.cmd !== "publish" ? this.queue.push({
+				packet: r,
+				cb: t
+			}) : i > 0 ? (t = this.outgoing[r.messageId] ? this.outgoing[r.messageId].cb : null, this.outgoingStore.put(r, (e) => {
+				if (e) return t && t(e);
+				n();
+			})) : t && t(/* @__PURE__ */ Error("No connection to broker"));
+		}
+		get serverProperties() {
+			return this._serverProperties;
+		}
+		get keepalive() {
+			let e = this.connected ? this._serverProperties?.serverKeepAlive : void 0;
+			return e && this.options.keepalive ? e : this.options.keepalive;
+		}
+		_setupKeepaliveManager() {
+			this.log("_setupKeepaliveManager :: keepalive %d (seconds)", this.keepalive), !this.keepaliveManager && this.keepalive && (this.keepaliveManager = new _.default(this, this.options.timerVariant));
+		}
+		_destroyKeepaliveManager() {
+			this.keepaliveManager &&= (this.log("_destroyKeepaliveManager :: destroying keepalive manager"), this.keepaliveManager.destroy(), null);
+		}
+		reschedulePing(e = !1) {
+			this.keepaliveManager && this.keepalive && (e || this.options.reschedulePings) && this._reschedulePing();
+		}
+		_reschedulePing() {
+			this.log("_reschedulePing :: rescheduling ping"), this.keepaliveManager.reschedule();
+		}
+		sendPing() {
+			this.log("_sendPing :: sending pingreq"), this._sendPacket({ cmd: "pingreq" });
+		}
+		onKeepaliveTimeout() {
+			this.log("onKeepaliveTimeout :: calling _cleanUp with force true"), this._cleanUp(!0), this.emit("error", /* @__PURE__ */ Error("Keepalive timeout"));
+		}
+		_resubscribe() {
+			this.log("_resubscribe");
+			let e = Object.keys(this._resubscribeTopics);
+			if (!this._firstConnection && (this.options.clean || this.options.protocolVersion >= 4 && !this.connackPacket.sessionPresent) && e.length > 0) {
+				if (this.options.resubscribe) {
+					if (this.options.protocolVersion === 5) {
+						this.log("_resubscribe: protocolVersion 5");
+						for (let t = 0; t < e.length; t++) {
+							let n = {};
+							n[e[t]] = this._resubscribeTopics[e[t]], n.resubscribe = !0, this.subscribe(n, { properties: n[e[t]].properties });
+						}
+					} else this._resubscribeTopics.resubscribe = !0, this.subscribe(this._resubscribeTopics);
+				} else this._resubscribeTopics = {};
+			}
+			this._firstConnection = !1;
+		}
+		_onConnect(e) {
+			if (this.disconnected) {
+				this.emit("connect", e);
+				return;
+			}
+			this.connackPacket = e, !this.options.clean && (this.options.protocolVersion < 4 || e.sessionPresent === !0) || this._discardIncomingQoS2State(), this.messageIdProvider.clear(), this.connected = !0, this._setupKeepaliveManager();
+			let t = () => {
+				let n = this.outgoingStore.createStream(), r = () => {
+					n.destroy(), n = null, this._flushStoreProcessingQueue(), i();
+				}, i = () => {
+					this._storeProcessing = !1, this._packetIdsDuringStoreProcessing = {};
+				};
+				this.once("close", r), n.on("error", (e) => {
+					i(), this._flushStoreProcessingQueue(), this.removeListener("close", r), this.emit("error", e);
+				});
+				let a = () => {
+					if (!n) return;
+					let e = n.read(1), t;
+					if (!e) {
+						n.once("readable", a);
+						return;
+					}
+					if (this._storeProcessing = !0, this._packetIdsDuringStoreProcessing[e.messageId]) {
+						a();
+						return;
+					}
+					!this.disconnecting && !this.reconnectTimer ? (t = this.outgoing[e.messageId] ? this.outgoing[e.messageId].cb : null, this.outgoing[e.messageId] = {
+						volatile: !1,
+						cmd: e.cmd,
+						cb(e, n) {
+							t && t(e, n), a();
+						}
+					}, this._packetIdsDuringStoreProcessing[e.messageId] = !0, this.messageIdProvider.register(e.messageId) ? this._sendPacket(e, void 0, void 0, !0) : this.log("messageId: %d has already used.", e.messageId)) : n.destroy && n.destroy();
+				};
+				n.on("end", () => {
+					let n = !0;
+					for (let e in this._packetIdsDuringStoreProcessing) if (!this._packetIdsDuringStoreProcessing[e]) {
+						n = !1;
+						break;
+					}
+					this.removeListener("close", r), n ? (i(), this._invokeAllStoreProcessingQueue(), this.emit("connect", e)) : t();
+				}), a();
+			};
+			t();
+		}
+		_invokeStoreProcessingQueue() {
+			if (!this._storeProcessing && this._storeProcessingQueue.length > 0) {
+				let e = this._storeProcessingQueue[0];
+				if (e && e.invoke()) return this._storeProcessingQueue.shift(), !0;
+			}
+			return !1;
+		}
+		_invokeAllStoreProcessingQueue() {
+			for (; this._invokeStoreProcessingQueue(););
+		}
+		_flushStoreProcessingQueue() {
+			for (let e of this._storeProcessingQueue) e.cbStorePut && e.cbStorePut(/* @__PURE__ */ Error("Connection closed")), e.callback && e.callback(/* @__PURE__ */ Error("Connection closed"));
+			this._storeProcessingQueue.splice(0);
+		}
+		_removeOutgoingAndStoreMessage(e, t) {
+			delete this.outgoing[e], this.outgoingStore.del({ messageId: e }, (n, r) => {
+				t(n, r), this.messageIdProvider.deallocate(e), this._invokeStoreProcessingQueue();
+			});
+		}
+	};
+}), ec = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 });
+	var t = _s();
+	e.default = class {
+		numberAllocator;
+		lastId;
+		constructor() {
+			this.numberAllocator = new t.NumberAllocator(1, 65535);
+		}
+		allocate() {
+			return this.lastId = this.numberAllocator.alloc(), this.lastId;
+		}
+		getLastAllocated() {
+			return this.lastId;
+		}
+		register(e) {
+			return this.numberAllocator.use(e);
+		}
+		deallocate(e) {
+			this.numberAllocator.free(e);
+		}
+		clear() {
+			this.numberAllocator.clear();
+		}
+	};
+});
+function tc() {
+	if (rc) return nc;
+	rc = !0;
+	let e = 2147483647, t = /^xn--/, n = /[^\0-\x7F]/, r = /[\x2E\u3002\uFF0E\uFF61]/g, i = {
+		overflow: "Overflow: input needs wider integers to process",
+		"not-basic": "Illegal input >= 0x80 (not a basic code point)",
+		"invalid-input": "Invalid input"
+	}, a = Math.floor, o = String.fromCharCode;
+	function s(e) {
+		throw RangeError(i[e]);
+	}
+	function c(e, t) {
+		let n = [], r = e.length;
+		for (; r--;) n[r] = t(e[r]);
+		return n;
+	}
+	function l(e, t) {
+		let n = e.split("@"), i = "";
+		n.length > 1 && (i = n[0] + "@", e = n[1]), e = e.replace(r, ".");
+		let a = c(e.split("."), t).join(".");
+		return i + a;
+	}
+	function u(e) {
+		let t = [], n = 0, r = e.length;
+		for (; n < r;) {
+			let i = e.charCodeAt(n++);
+			if (i >= 55296 && i <= 56319 && n < r) {
+				let r = e.charCodeAt(n++);
+				(r & 64512) == 56320 ? t.push(((i & 1023) << 10) + (r & 1023) + 65536) : (t.push(i), n--);
+			} else t.push(i);
+		}
+		return t;
+	}
+	let d = (e) => String.fromCodePoint(...e), f = function(e) {
+		return e >= 48 && e < 58 ? 26 + (e - 48) : e >= 65 && e < 91 ? e - 65 : e >= 97 && e < 123 ? e - 97 : 36;
+	}, p = function(e, t) {
+		return e + 22 + 75 * (e < 26) - ((t != 0) << 5);
+	}, m = function(e, t, n) {
+		let r = 0;
+		for (e = n ? a(e / 700) : e >> 1, e += a(e / t); e > 455; r += 36) e = a(e / 35);
+		return a(r + 36 * e / (e + 38));
+	}, h = function(t) {
+		let n = [], r = t.length, i = 0, o = 128, c = 72, l = t.lastIndexOf("-");
+		l < 0 && (l = 0);
+		for (let e = 0; e < l; ++e) t.charCodeAt(e) >= 128 && s("not-basic"), n.push(t.charCodeAt(e));
+		for (let u = l > 0 ? l + 1 : 0; u < r;) {
+			let l = i;
+			for (let n = 1, o = 36;; o += 36) {
+				u >= r && s("invalid-input");
+				let l = f(t.charCodeAt(u++));
+				l >= 36 && s("invalid-input"), l > a((e - i) / n) && s("overflow"), i += l * n;
+				let d = o <= c ? 1 : o >= c + 26 ? 26 : o - c;
+				if (l < d) break;
+				let p = 36 - d;
+				n > a(e / p) && s("overflow"), n *= p;
+			}
+			let d = n.length + 1;
+			c = m(i - l, d, l == 0), a(i / d) > e - o && s("overflow"), o += a(i / d), i %= d, n.splice(i++, 0, o);
+		}
+		return String.fromCodePoint(...n);
+	}, g = function(t) {
+		let n = [];
+		t = u(t);
+		let r = t.length, i = 128, c = 0, l = 72;
+		for (let e of t) e < 128 && n.push(o(e));
+		let d = n.length, f = d;
+		for (d && n.push("-"); f < r;) {
+			let r = e;
+			for (let e of t) e >= i && e < r && (r = e);
+			let u = f + 1;
+			r - i > a((e - c) / u) && s("overflow"), c += (r - i) * u, i = r;
+			for (let r of t) if (r < i && ++c > e && s("overflow"), r === i) {
+				let e = c;
+				for (let t = 36;; t += 36) {
+					let r = t <= l ? 1 : t >= l + 26 ? 26 : t - l;
+					if (e < r) break;
+					let i = e - r, s = 36 - r;
+					n.push(o(p(r + i % s, 0))), e = a(i / s);
+				}
+				n.push(o(p(e, 0))), l = m(c, u, f === d), c = 0, ++f;
+			}
+			++c, ++i;
+		}
+		return n.join("");
+	};
+	return nc = {
+		version: "2.3.1",
+		ucs2: {
+			decode: u,
+			encode: d
+		},
+		decode: h,
+		encode: g,
+		toASCII: function(e) {
+			return l(e, function(e) {
+				return n.test(e) ? "xn--" + g(e) : e;
+			});
+		},
+		toUnicode: function(e) {
+			return l(e, function(e) {
+				return t.test(e) ? h(e.slice(4).toLowerCase()) : e;
+			});
+		}
+	}, nc;
+}
+var nc, rc, ic, ac = ui(() => {
+	X(), $(), Q(), nc = {}, rc = !1, ic = tc(), ic.decode, ic.encode, ic.toASCII, ic.toUnicode, ic.ucs2, ic.version;
+});
+function oc() {
+	return Oc || (Oc = !0, Dc = function() {
+		if (typeof Symbol != "function" || typeof Object.getOwnPropertySymbols != "function") return !1;
+		if (typeof Symbol.iterator == "symbol") return !0;
+		var e = {}, t = Symbol("test"), n = Object(t);
+		if (typeof t == "string" || Object.prototype.toString.call(t) !== "[object Symbol]" || Object.prototype.toString.call(n) !== "[object Symbol]") return !1;
+		var r = 42;
+		for (t in e[t] = r, e) return !1;
+		if (typeof Object.keys == "function" && Object.keys(e).length !== 0 || typeof Object.getOwnPropertyNames == "function" && Object.getOwnPropertyNames(e).length !== 0) return !1;
+		var i = Object.getOwnPropertySymbols(e);
+		if (i.length !== 1 || i[0] !== t || !Object.prototype.propertyIsEnumerable.call(e, t)) return !1;
+		if (typeof Object.getOwnPropertyDescriptor == "function") {
+			var a = Object.getOwnPropertyDescriptor(e, t);
+			if (a.value !== r || a.enumerable !== !0) return !1;
+		}
+		return !0;
+	}), Dc;
+}
+function sc() {
+	return Ac || (Ac = !0, kc = Error), kc;
+}
+function cc() {
+	return Mc || (Mc = !0, jc = EvalError), jc;
+}
+function lc() {
+	return Pc || (Pc = !0, Nc = RangeError), Nc;
+}
+function uc() {
+	return Ic || (Ic = !0, Fc = ReferenceError), Fc;
+}
+function dc() {
+	return Rc || (Rc = !0, Lc = SyntaxError), Lc;
+}
+function fc() {
+	return Bc || (Bc = !0, zc = TypeError), zc;
+}
+function pc() {
+	return Hc || (Hc = !0, Vc = URIError), Vc;
+}
+function mc() {
+	if (Wc) return Uc;
+	Wc = !0;
+	var e = typeof Symbol < "u" && Symbol, t = oc();
+	return Uc = function() {
+		return typeof e != "function" || typeof Symbol != "function" || typeof e("foo") != "symbol" || typeof Symbol("bar") != "symbol" ? !1 : t();
+	}, Uc;
+}
+function hc() {
+	if (Kc) return Gc;
+	Kc = !0;
+	var e = {
+		__proto__: null,
+		foo: {}
+	}, t = Object;
+	return Gc = function() {
+		return { __proto__: e }.foo === e.foo && !(e instanceof t);
+	}, Gc;
+}
+function gc() {
+	if (Jc) return qc;
+	Jc = !0;
+	var e = "Function.prototype.bind called on incompatible ", t = Object.prototype.toString, n = Math.max, r = "[object Function]", i = function(e, t) {
+		for (var n = [], r = 0; r < e.length; r += 1) n[r] = e[r];
+		for (var i = 0; i < t.length; i += 1) n[i + e.length] = t[i];
+		return n;
+	}, a = function(e, t) {
+		for (var n = [], r = t, i = 0; r < e.length; r += 1, i += 1) n[i] = e[r];
+		return n;
+	}, o = function(e, t) {
+		for (var n = "", r = 0; r < e.length; r += 1) n += e[r], r + 1 < e.length && (n += t);
+		return n;
+	};
+	return qc = function(s) {
+		var c = this;
+		if (typeof c != "function" || t.apply(c) !== r) throw TypeError(e + c);
+		for (var l = a(arguments, 1), u, d = function() {
+			if (this instanceof u) {
+				var e = c.apply(this, i(l, arguments));
+				return Object(e) === e ? e : this;
+			}
+			return c.apply(s, i(l, arguments));
+		}, f = n(0, c.length - l.length), p = [], m = 0; m < f; m++) p[m] = "$" + m;
+		if (u = Function("binder", "return function (" + o(p, ",") + "){ return binder.apply(this,arguments); }")(d), c.prototype) {
+			var h = function() {};
+			h.prototype = c.prototype, u.prototype = new h(), h.prototype = null;
+		}
+		return u;
+	}, qc;
+}
+function _c() {
+	if (Xc) return Yc;
+	Xc = !0;
+	var e = gc();
+	return Yc = Function.prototype.bind || e, Yc;
+}
+function vc() {
+	if (Qc) return Zc;
+	Qc = !0;
+	var e = Function.prototype.call, t = Object.prototype.hasOwnProperty;
+	return Zc = _c().call(e, t), Zc;
+}
+function yc() {
+	if (el) return $c;
+	el = !0;
+	var e, t = sc(), n = cc(), r = lc(), i = uc(), a = dc(), o = fc(), s = pc(), c = Function, l = function(e) {
+		try {
+			return c("\"use strict\"; return (" + e + ").constructor;")();
+		} catch {}
+	}, u = Object.getOwnPropertyDescriptor;
+	if (u) try {
+		u({}, "");
+	} catch {
+		u = null;
+	}
+	var d = function() {
+		throw new o();
+	}, f = u ? (function() {
+		try {
+			return arguments.callee, d;
+		} catch {
+			try {
+				return u(arguments, "callee").get;
+			} catch {
+				return d;
+			}
+		}
+	})() : d, p = mc()(), m = hc()(), h = Object.getPrototypeOf || (m ? function(e) {
+		return e.__proto__;
+	} : null), g = {}, _ = typeof Uint8Array > "u" || !h ? e : h(Uint8Array), v = {
+		__proto__: null,
+		"%AggregateError%": typeof AggregateError > "u" ? e : AggregateError,
+		"%Array%": Array,
+		"%ArrayBuffer%": typeof ArrayBuffer > "u" ? e : ArrayBuffer,
+		"%ArrayIteratorPrototype%": p && h ? h([][Symbol.iterator]()) : e,
+		"%AsyncFromSyncIteratorPrototype%": e,
+		"%AsyncFunction%": g,
+		"%AsyncGenerator%": g,
+		"%AsyncGeneratorFunction%": g,
+		"%AsyncIteratorPrototype%": g,
+		"%Atomics%": typeof Atomics > "u" ? e : Atomics,
+		"%BigInt%": typeof BigInt > "u" ? e : BigInt,
+		"%BigInt64Array%": typeof BigInt64Array > "u" ? e : BigInt64Array,
+		"%BigUint64Array%": typeof BigUint64Array > "u" ? e : BigUint64Array,
+		"%Boolean%": Boolean,
+		"%DataView%": typeof DataView > "u" ? e : DataView,
+		"%Date%": Date,
+		"%decodeURI%": decodeURI,
+		"%decodeURIComponent%": decodeURIComponent,
+		"%encodeURI%": encodeURI,
+		"%encodeURIComponent%": encodeURIComponent,
+		"%Error%": t,
+		"%eval%": eval,
+		"%EvalError%": n,
+		"%Float32Array%": typeof Float32Array > "u" ? e : Float32Array,
+		"%Float64Array%": typeof Float64Array > "u" ? e : Float64Array,
+		"%FinalizationRegistry%": typeof FinalizationRegistry > "u" ? e : FinalizationRegistry,
+		"%Function%": c,
+		"%GeneratorFunction%": g,
+		"%Int8Array%": typeof Int8Array > "u" ? e : Int8Array,
+		"%Int16Array%": typeof Int16Array > "u" ? e : Int16Array,
+		"%Int32Array%": typeof Int32Array > "u" ? e : Int32Array,
+		"%isFinite%": isFinite,
+		"%isNaN%": isNaN,
+		"%IteratorPrototype%": p && h ? h(h([][Symbol.iterator]())) : e,
+		"%JSON%": typeof JSON == "object" ? JSON : e,
+		"%Map%": typeof Map > "u" ? e : Map,
+		"%MapIteratorPrototype%": typeof Map > "u" || !p || !h ? e : h((/* @__PURE__ */ new Map())[Symbol.iterator]()),
+		"%Math%": Math,
+		"%Number%": Number,
+		"%Object%": Object,
+		"%parseFloat%": parseFloat,
+		"%parseInt%": parseInt,
+		"%Promise%": typeof Promise > "u" ? e : Promise,
+		"%Proxy%": typeof Proxy > "u" ? e : Proxy,
+		"%RangeError%": r,
+		"%ReferenceError%": i,
+		"%Reflect%": typeof Reflect > "u" ? e : Reflect,
+		"%RegExp%": RegExp,
+		"%Set%": typeof Set > "u" ? e : Set,
+		"%SetIteratorPrototype%": typeof Set > "u" || !p || !h ? e : h((/* @__PURE__ */ new Set())[Symbol.iterator]()),
+		"%SharedArrayBuffer%": typeof SharedArrayBuffer > "u" ? e : SharedArrayBuffer,
+		"%String%": String,
+		"%StringIteratorPrototype%": p && h ? h(""[Symbol.iterator]()) : e,
+		"%Symbol%": p ? Symbol : e,
+		"%SyntaxError%": a,
+		"%ThrowTypeError%": f,
+		"%TypedArray%": _,
+		"%TypeError%": o,
+		"%Uint8Array%": typeof Uint8Array > "u" ? e : Uint8Array,
+		"%Uint8ClampedArray%": typeof Uint8ClampedArray > "u" ? e : Uint8ClampedArray,
+		"%Uint16Array%": typeof Uint16Array > "u" ? e : Uint16Array,
+		"%Uint32Array%": typeof Uint32Array > "u" ? e : Uint32Array,
+		"%URIError%": s,
+		"%WeakMap%": typeof WeakMap > "u" ? e : WeakMap,
+		"%WeakRef%": typeof WeakRef > "u" ? e : WeakRef,
+		"%WeakSet%": typeof WeakSet > "u" ? e : WeakSet
+	};
+	if (h) try {
+		null.error;
+	} catch (e) {
+		v["%Error.prototype%"] = h(h(e));
+	}
+	var y = function e(t) {
+		var n;
+		if (t === "%AsyncFunction%") n = l("async function () {}");
+		else if (t === "%GeneratorFunction%") n = l("function* () {}");
+		else if (t === "%AsyncGeneratorFunction%") n = l("async function* () {}");
+		else if (t === "%AsyncGenerator%") {
+			var r = e("%AsyncGeneratorFunction%");
+			r && (n = r.prototype);
+		} else if (t === "%AsyncIteratorPrototype%") {
+			var i = e("%AsyncGenerator%");
+			i && h && (n = h(i.prototype));
+		}
+		return v[t] = n, n;
+	}, b = {
+		__proto__: null,
+		"%ArrayBufferPrototype%": ["ArrayBuffer", "prototype"],
+		"%ArrayPrototype%": ["Array", "prototype"],
+		"%ArrayProto_entries%": [
+			"Array",
+			"prototype",
+			"entries"
+		],
+		"%ArrayProto_forEach%": [
+			"Array",
+			"prototype",
+			"forEach"
+		],
+		"%ArrayProto_keys%": [
+			"Array",
+			"prototype",
+			"keys"
+		],
+		"%ArrayProto_values%": [
+			"Array",
+			"prototype",
+			"values"
+		],
+		"%AsyncFunctionPrototype%": ["AsyncFunction", "prototype"],
+		"%AsyncGenerator%": ["AsyncGeneratorFunction", "prototype"],
+		"%AsyncGeneratorPrototype%": [
+			"AsyncGeneratorFunction",
+			"prototype",
+			"prototype"
+		],
+		"%BooleanPrototype%": ["Boolean", "prototype"],
+		"%DataViewPrototype%": ["DataView", "prototype"],
+		"%DatePrototype%": ["Date", "prototype"],
+		"%ErrorPrototype%": ["Error", "prototype"],
+		"%EvalErrorPrototype%": ["EvalError", "prototype"],
+		"%Float32ArrayPrototype%": ["Float32Array", "prototype"],
+		"%Float64ArrayPrototype%": ["Float64Array", "prototype"],
+		"%FunctionPrototype%": ["Function", "prototype"],
+		"%Generator%": ["GeneratorFunction", "prototype"],
+		"%GeneratorPrototype%": [
+			"GeneratorFunction",
+			"prototype",
+			"prototype"
+		],
+		"%Int8ArrayPrototype%": ["Int8Array", "prototype"],
+		"%Int16ArrayPrototype%": ["Int16Array", "prototype"],
+		"%Int32ArrayPrototype%": ["Int32Array", "prototype"],
+		"%JSONParse%": ["JSON", "parse"],
+		"%JSONStringify%": ["JSON", "stringify"],
+		"%MapPrototype%": ["Map", "prototype"],
+		"%NumberPrototype%": ["Number", "prototype"],
+		"%ObjectPrototype%": ["Object", "prototype"],
+		"%ObjProto_toString%": [
+			"Object",
+			"prototype",
+			"toString"
+		],
+		"%ObjProto_valueOf%": [
+			"Object",
+			"prototype",
+			"valueOf"
+		],
+		"%PromisePrototype%": ["Promise", "prototype"],
+		"%PromiseProto_then%": [
+			"Promise",
+			"prototype",
+			"then"
+		],
+		"%Promise_all%": ["Promise", "all"],
+		"%Promise_reject%": ["Promise", "reject"],
+		"%Promise_resolve%": ["Promise", "resolve"],
+		"%RangeErrorPrototype%": ["RangeError", "prototype"],
+		"%ReferenceErrorPrototype%": ["ReferenceError", "prototype"],
+		"%RegExpPrototype%": ["RegExp", "prototype"],
+		"%SetPrototype%": ["Set", "prototype"],
+		"%SharedArrayBufferPrototype%": ["SharedArrayBuffer", "prototype"],
+		"%StringPrototype%": ["String", "prototype"],
+		"%SymbolPrototype%": ["Symbol", "prototype"],
+		"%SyntaxErrorPrototype%": ["SyntaxError", "prototype"],
+		"%TypedArrayPrototype%": ["TypedArray", "prototype"],
+		"%TypeErrorPrototype%": ["TypeError", "prototype"],
+		"%Uint8ArrayPrototype%": ["Uint8Array", "prototype"],
+		"%Uint8ClampedArrayPrototype%": ["Uint8ClampedArray", "prototype"],
+		"%Uint16ArrayPrototype%": ["Uint16Array", "prototype"],
+		"%Uint32ArrayPrototype%": ["Uint32Array", "prototype"],
+		"%URIErrorPrototype%": ["URIError", "prototype"],
+		"%WeakMapPrototype%": ["WeakMap", "prototype"],
+		"%WeakSetPrototype%": ["WeakSet", "prototype"]
+	}, x = _c(), S = vc(), C = x.call(Function.call, Array.prototype.concat), w = x.call(Function.apply, Array.prototype.splice), T = x.call(Function.call, String.prototype.replace), E = x.call(Function.call, String.prototype.slice), D = x.call(Function.call, RegExp.prototype.exec), O = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g, k = /\\(\\)?/g, A = function(e) {
+		var t = E(e, 0, 1), n = E(e, -1);
+		if (t === "%" && n !== "%") throw new a("invalid intrinsic syntax, expected closing `%`");
+		if (n === "%" && t !== "%") throw new a("invalid intrinsic syntax, expected opening `%`");
+		var r = [];
+		return T(e, O, function(e, t, n, i) {
+			r[r.length] = n ? T(i, k, "$1") : t || e;
+		}), r;
+	}, j = function(e, t) {
+		var n = e, r;
+		if (S(b, n) && (r = b[n], n = "%" + r[0] + "%"), S(v, n)) {
+			var i = v[n];
+			if (i === g && (i = y(n)), typeof i > "u" && !t) throw new o("intrinsic " + e + " exists, but is not available. Please file an issue!");
+			return {
+				alias: r,
+				name: n,
+				value: i
+			};
+		}
+		throw new a("intrinsic " + e + " does not exist!");
+	};
+	return $c = function(e, t) {
+		if (typeof e != "string" || e.length === 0) throw new o("intrinsic name must be a non-empty string");
+		if (arguments.length > 1 && typeof t != "boolean") throw new o("\"allowMissing\" argument must be a boolean");
+		if (D(/^%?[^%]*%?$/, e) === null) throw new a("`%` may not be present anywhere but at the beginning and end of the intrinsic name");
+		var n = A(e), r = n.length > 0 ? n[0] : "", i = j("%" + r + "%", t), s = i.name, c = i.value, l = !1, d = i.alias;
+		d && (r = d[0], w(n, C([0, 1], d)));
+		for (var f = 1, p = !0; f < n.length; f += 1) {
+			var m = n[f], h = E(m, 0, 1), g = E(m, -1);
+			if ((h === "\"" || h === "'" || h === "`" || g === "\"" || g === "'" || g === "`") && h !== g) throw new a("property names with quotes must have matching quotes");
+			if ((m === "constructor" || !p) && (l = !0), r += "." + m, s = "%" + r + "%", S(v, s)) c = v[s];
+			else if (c != null) {
+				if (!(m in c)) {
+					if (!t) throw new o("base intrinsic for " + e + " exists, but the property is not available.");
+					return;
+				}
+				if (u && f + 1 >= n.length) {
+					var _ = u(c, m);
+					p = !!_, c = p && "get" in _ && !("originalValue" in _.get) ? _.get : c[m];
+				} else p = S(c, m), c = c[m];
+				p && !l && (v[s] = c);
+			}
+		}
+		return c;
+	}, $c;
+}
+function bc() {
+	if (nl) return tl;
+	nl = !0;
+	var e = yc()("%Object.defineProperty%", !0) || !1;
+	if (e) try {
+		e({}, "a", { value: 1 });
+	} catch {
+		e = !1;
+	}
+	return tl = e, tl;
+}
+function xc() {
+	if (il) return rl;
+	il = !0;
+	var e = yc()("%Object.getOwnPropertyDescriptor%", !0);
+	if (e) try {
+		e([], "length");
+	} catch {
+		e = null;
+	}
+	return rl = e, rl;
+}
+function Sc() {
+	if (ol) return al;
+	ol = !0;
+	var e = bc(), t = dc(), n = fc(), r = xc();
+	return al = function(i, a, o) {
+		if (!i || typeof i != "object" && typeof i != "function") throw new n("`obj` must be an object or a function`");
+		if (typeof a != "string" && typeof a != "symbol") throw new n("`property` must be a string or a symbol`");
+		if (arguments.length > 3 && typeof arguments[3] != "boolean" && arguments[3] !== null) throw new n("`nonEnumerable`, if provided, must be a boolean or null");
+		if (arguments.length > 4 && typeof arguments[4] != "boolean" && arguments[4] !== null) throw new n("`nonWritable`, if provided, must be a boolean or null");
+		if (arguments.length > 5 && typeof arguments[5] != "boolean" && arguments[5] !== null) throw new n("`nonConfigurable`, if provided, must be a boolean or null");
+		if (arguments.length > 6 && typeof arguments[6] != "boolean") throw new n("`loose`, if provided, must be a boolean");
+		var s = arguments.length > 3 ? arguments[3] : null, c = arguments.length > 4 ? arguments[4] : null, l = arguments.length > 5 ? arguments[5] : null, u = arguments.length > 6 && arguments[6], d = !!r && r(i, a);
+		if (e) e(i, a, {
+			configurable: l === null && d ? d.configurable : !l,
+			enumerable: s === null && d ? d.enumerable : !s,
+			value: o,
+			writable: c === null && d ? d.writable : !c
+		});
+		else if (u || !s && !c && !l) i[a] = o;
+		else throw new t("This environment does not support defining a property as non-configurable, non-writable, or non-enumerable.");
+	}, al;
+}
+function Cc() {
+	if (cl) return sl;
+	cl = !0;
+	var e = bc(), t = function() {
+		return !!e;
+	};
+	return t.hasArrayLengthDefineBug = function() {
+		if (!e) return null;
+		try {
+			return e([], "length", { value: 1 }).length !== 1;
+		} catch {
+			return !0;
+		}
+	}, sl = t, sl;
+}
+function wc() {
+	if (ul) return ll;
+	ul = !0;
+	var e = yc(), t = Sc(), n = Cc()(), r = xc(), i = fc(), a = e("%Math.floor%");
+	return ll = function(e, o) {
+		if (typeof e != "function") throw new i("`fn` is not a function");
+		if (typeof o != "number" || o < 0 || o > 4294967295 || a(o) !== o) throw new i("`length` must be a positive 32-bit integer");
+		var s = arguments.length > 2 && !!arguments[2], c = !0, l = !0;
+		if ("length" in e && r) {
+			var u = r(e, "length");
+			u && !u.configurable && (c = !1), u && !u.writable && (l = !1);
+		}
+		return (c || l || !s) && (n ? t(e, "length", o, !0, !0) : t(e, "length", o)), e;
+	}, ll;
+}
+function Tc() {
+	if (fl) return dl;
+	fl = !0;
+	var e = _c(), t = yc(), n = wc(), r = fc(), i = t("%Function.prototype.apply%"), a = t("%Function.prototype.call%"), o = t("%Reflect.apply%", !0) || e.call(a, i), s = bc(), c = t("%Math.max%");
+	dl = function(t) {
+		if (typeof t != "function") throw new r("a function is required");
+		return n(o(e, a, arguments), 1 + c(0, t.length - (arguments.length - 1)), !0);
+	};
+	var l = function() {
+		return o(e, i, arguments);
+	};
+	return s ? s(dl, "apply", { value: l }) : dl.apply = l, dl;
+}
+function Ec() {
+	if (ml) return pl;
+	ml = !0;
+	var e = yc(), t = Tc(), n = t(e("String.prototype.indexOf"));
+	return pl = function(r, i) {
+		var a = e(r, !!i);
+		return typeof a == "function" && n(r, ".prototype.") > -1 ? t(a) : a;
+	}, pl;
+}
+var Dc, Oc, kc, Ac, jc, Mc, Nc, Pc, Fc, Ic, Lc, Rc, zc, Bc, Vc, Hc, Uc, Wc, Gc, Kc, qc, Jc, Yc, Xc, Zc, Qc, $c, el, tl, nl, rl, il, al, ol, sl, cl, ll, ul, dl, fl, pl, ml, hl = ui(() => {
+	X(), $(), Q(), Dc = {}, Oc = !1, kc = {}, Ac = !1, jc = {}, Mc = !1, Nc = {}, Pc = !1, Fc = {}, Ic = !1, Lc = {}, Rc = !1, zc = {}, Bc = !1, Vc = {}, Hc = !1, Uc = {}, Wc = !1, Gc = {}, Kc = !1, qc = {}, Jc = !1, Yc = {}, Xc = !1, Zc = {}, Qc = !1, $c = {}, el = !1, tl = {}, nl = !1, rl = {}, il = !1, al = {}, ol = !1, sl = {}, cl = !1, ll = {}, ul = !1, dl = {}, fl = !1, pl = {}, ml = !1;
+});
+function gl(e) {
+	throw Error("Node.js process " + e + " is not supported by JSPM core outside of Node.js");
+}
+function _l() {
+	!Nl || !Pl || (Nl = !1, Pl.length ? Ml = Pl.concat(Ml) : Fl = -1, Ml.length && vl());
+}
+function vl() {
+	if (!Nl) {
+		var e = setTimeout(_l, 0);
+		Nl = !0;
+		for (var t = Ml.length; t;) {
+			for (Pl = Ml, Ml = []; ++Fl < t;) Pl && Pl[Fl].run();
+			Fl = -1, t = Ml.length;
+		}
+		Pl = null, Nl = !1, clearTimeout(e);
+	}
+}
+function yl(e) {
+	var t = Array(arguments.length - 1);
+	if (arguments.length > 1) for (var n = 1; n < arguments.length; n++) t[n - 1] = arguments[n];
+	Ml.push(new bl(e, t)), Ml.length === 1 && !Nl && setTimeout(vl, 0);
+}
+function bl(e, t) {
+	this.fun = e, this.array = t;
+}
+function xl() {}
+function Sl(e) {
+	gl("_linkedBinding");
+}
+function Cl(e) {
+	gl("dlopen");
+}
+function wl() {
+	return [];
+}
+function Tl() {
+	return [];
+}
+function El(e, t) {
+	if (!e) throw Error(t || "assertion error");
+}
+function Dl() {
+	return !1;
+}
+function Ol() {
+	return ku.now() / 1e3;
+}
+function kl(e) {
+	var t = Math.floor((Date.now() - ku.now()) * .001), n = ku.now() * .001, r = Math.floor(n) + t, i = Math.floor(n % 1 * 1e9);
+	return e && (r -= e[0], i -= e[1], i < 0 && (r--, i += ju)), [r, i];
+}
+function Al() {
+	return Uu;
+}
+function jl(e) {
+	return [];
+}
+var Ml, Nl, Pl, Fl, Il, Ll, Rl, zl, Bl, Vl, Hl, Ul, Wl, Gl, Kl, ql, Jl, Yl, Xl, Zl, Ql, $l, eu, tu, nu, ru, iu, au, ou, su, cu, lu, uu, du, fu, pu, mu, hu, gu, _u, vu, yu, bu, xu, Su, Cu, wu, Tu, Eu, Du, Ou, ku, Au, ju, Mu, Nu, Pu, Fu, Iu, Lu, Ru, zu, Bu, Vu, Hu, Uu, Wu = ui(() => {
+	X(), $(), Q(), Ml = [], Nl = !1, Fl = -1, bl.prototype.run = function() {
+		this.fun.apply(null, this.array);
+	}, Il = "browser", Ll = "x64", Rl = "browser", zl = {
+		PATH: "/usr/bin",
+		LANG: navigator.language + ".UTF-8",
+		PWD: "/",
+		HOME: "/home",
+		TMP: "/tmp"
+	}, Bl = ["/usr/bin/node"], Vl = [], Hl = "v16.8.0", Ul = {}, Wl = function(e, t) {
+		console.warn((t ? t + ": " : "") + e);
+	}, Gl = function(e) {
+		gl("binding");
+	}, Kl = function(e) {
+		return 0;
+	}, ql = function() {
+		return "/";
+	}, Jl = function(e) {}, Yl = {
+		name: "node",
+		sourceUrl: "",
+		headersUrl: "",
+		libUrl: ""
+	}, Xl = xl, Zl = [], Ql = {}, $l = !1, eu = {}, tu = xl, nu = xl, ru = function() {
+		return {};
+	}, iu = ru, au = ru, ou = xl, su = xl, cu = xl, lu = {}, uu = {
+		inspector: !1,
+		debug: !1,
+		uv: !1,
+		ipv6: !1,
+		tls_alpn: !1,
+		tls_sni: !1,
+		tls_ocsp: !1,
+		tls: !1,
+		cached_builtins: !0
+	}, du = xl, fu = xl, pu = xl, mu = xl, hu = xl, gu = xl, _u = xl, vu = void 0, yu = void 0, bu = void 0, xu = xl, Su = 2, Cu = 1, wu = "/bin/usr/node", Tu = 9229, Eu = "node", Du = [], Ou = xl, ku = {
+		now: typeof performance < "u" ? performance.now.bind(performance) : void 0,
+		timing: typeof performance < "u" ? performance.timing : void 0
+	}, ku.now === void 0 && (Au = Date.now(), ku.timing && ku.timing.navigationStart && (Au = ku.timing.navigationStart), ku.now = () => Date.now() - Au), ju = 1e9, kl.bigint = function(e) {
+		var t = kl(e);
+		return typeof BigInt > "u" ? t[0] * ju + t[1] : BigInt(t[0] * ju) + BigInt(t[1]);
+	}, Mu = 10, Nu = {}, Pu = 0, Fu = Al, Iu = Al, Lu = Al, Ru = Al, zu = Al, Bu = xl, Vu = Al, Hu = Al, Uu = {
+		version: Hl,
+		versions: Ul,
+		arch: Ll,
+		platform: Rl,
+		release: Yl,
+		_rawDebug: Xl,
+		moduleLoadList: Zl,
+		binding: Gl,
+		_linkedBinding: Sl,
+		_events: Nu,
+		_eventsCount: Pu,
+		_maxListeners: Mu,
+		on: Al,
+		addListener: Fu,
+		once: Iu,
+		off: Lu,
+		removeListener: Ru,
+		removeAllListeners: zu,
+		emit: Bu,
+		prependListener: Vu,
+		prependOnceListener: Hu,
+		listeners: jl,
+		domain: Ql,
+		_exiting: $l,
+		config: eu,
+		dlopen: Cl,
+		uptime: Ol,
+		_getActiveRequests: wl,
+		_getActiveHandles: Tl,
+		reallyExit: tu,
+		_kill: nu,
+		cpuUsage: ru,
+		resourceUsage: iu,
+		memoryUsage: au,
+		kill: ou,
+		exit: su,
+		openStdin: cu,
+		allowedNodeEnvironmentFlags: lu,
+		assert: El,
+		features: uu,
+		_fatalExceptions: du,
+		setUncaughtExceptionCaptureCallback: fu,
+		hasUncaughtExceptionCaptureCallback: Dl,
+		emitWarning: Wl,
+		nextTick: yl,
+		_tickCallback: pu,
+		_debugProcess: mu,
+		_debugEnd: hu,
+		_startProfilerIdleNotifier: gu,
+		_stopProfilerIdleNotifier: _u,
+		stdout: vu,
+		stdin: bu,
+		stderr: yu,
+		abort: xu,
+		umask: Kl,
+		chdir: Jl,
+		cwd: ql,
+		env: zl,
+		title: Il,
+		argv: Bl,
+		execArgv: Vl,
+		pid: Su,
+		ppid: Cu,
+		execPath: wu,
+		debugPort: Tu,
+		hrtime: kl,
+		argv0: Eu,
+		_preload_modules: Du,
+		setSourceMapsEnabled: Ou
+	};
+});
+function Gu() {
+	if (qu) return Ku;
+	qu = !0;
+	var e = Uu;
+	function t(e) {
+		if (typeof e != "string") throw TypeError("Path must be a string. Received " + JSON.stringify(e));
+	}
+	function n(e, t) {
+		for (var n = "", r = 0, i = -1, a = 0, o, s = 0; s <= e.length; ++s) {
+			if (s < e.length) o = e.charCodeAt(s);
+			else {
+				if (o === 47) break;
+				o = 47;
+			}
+			if (o === 47) {
+				if (i !== s - 1 && a !== 1) {
+					if (i !== s - 1 && a === 2) {
+						if (n.length < 2 || r !== 2 || n.charCodeAt(n.length - 1) !== 46 || n.charCodeAt(n.length - 2) !== 46) {
+							if (n.length > 2) {
+								var c = n.lastIndexOf("/");
+								if (c !== n.length - 1) {
+									c === -1 ? (n = "", r = 0) : (n = n.slice(0, c), r = n.length - 1 - n.lastIndexOf("/")), i = s, a = 0;
+									continue;
+								}
+							} else if (n.length === 2 || n.length === 1) {
+								n = "", r = 0, i = s, a = 0;
+								continue;
+							}
+						}
+						t && (n.length > 0 ? n += "/.." : n = "..", r = 2);
+					} else n.length > 0 ? n += "/" + e.slice(i + 1, s) : n = e.slice(i + 1, s), r = s - i - 1;
+				}
+				i = s, a = 0;
+			} else o === 46 && a !== -1 ? ++a : a = -1;
+		}
+		return n;
+	}
+	function r(e, t) {
+		var n = t.dir || t.root, r = t.base || (t.name || "") + (t.ext || "");
+		return n ? n === t.root ? n + r : n + e + r : r;
+	}
+	var i = {
+		resolve: function() {
+			for (var r = "", i = !1, a, o = arguments.length - 1; o >= -1 && !i; o--) {
+				var s;
+				o >= 0 ? s = arguments[o] : (a === void 0 && (a = e.cwd()), s = a), t(s), s.length !== 0 && (r = s + "/" + r, i = s.charCodeAt(0) === 47);
+			}
+			return r = n(r, !i), i ? r.length > 0 ? "/" + r : "/" : r.length > 0 ? r : ".";
+		},
+		normalize: function(e) {
+			if (t(e), e.length === 0) return ".";
+			var r = e.charCodeAt(0) === 47, i = e.charCodeAt(e.length - 1) === 47;
+			return e = n(e, !r), e.length === 0 && !r && (e = "."), e.length > 0 && i && (e += "/"), r ? "/" + e : e;
+		},
+		isAbsolute: function(e) {
+			return t(e), e.length > 0 && e.charCodeAt(0) === 47;
+		},
+		join: function() {
+			if (arguments.length === 0) return ".";
+			for (var e, n = 0; n < arguments.length; ++n) {
+				var r = arguments[n];
+				t(r), r.length > 0 && (e === void 0 ? e = r : e += "/" + r);
+			}
+			return e === void 0 ? "." : i.normalize(e);
+		},
+		relative: function(e, n) {
+			if (t(e), t(n), e === n || (e = i.resolve(e), n = i.resolve(n), e === n)) return "";
+			for (var r = 1; r < e.length && e.charCodeAt(r) === 47; ++r);
+			for (var a = e.length, o = a - r, s = 1; s < n.length && n.charCodeAt(s) === 47; ++s);
+			for (var c = n.length - s, l = o < c ? o : c, u = -1, d = 0; d <= l; ++d) {
+				if (d === l) {
+					if (c > l) {
+						if (n.charCodeAt(s + d) === 47) return n.slice(s + d + 1);
+						if (d === 0) return n.slice(s + d);
+					} else o > l && (e.charCodeAt(r + d) === 47 ? u = d : d === 0 && (u = 0));
+					break;
+				}
+				var f = e.charCodeAt(r + d);
+				if (f !== n.charCodeAt(s + d)) break;
+				f === 47 && (u = d);
+			}
+			var p = "";
+			for (d = r + u + 1; d <= a; ++d) (d === a || e.charCodeAt(d) === 47) && (p.length === 0 ? p += ".." : p += "/..");
+			return p.length > 0 ? p + n.slice(s + u) : (s += u, n.charCodeAt(s) === 47 && ++s, n.slice(s));
+		},
+		_makeLong: function(e) {
+			return e;
+		},
+		dirname: function(e) {
+			if (t(e), e.length === 0) return ".";
+			for (var n = e.charCodeAt(0), r = n === 47, i = -1, a = !0, o = e.length - 1; o >= 1; --o) if (n = e.charCodeAt(o), n === 47) {
+				if (!a) {
+					i = o;
+					break;
+				}
+			} else a = !1;
+			return i === -1 ? r ? "/" : "." : r && i === 1 ? "//" : e.slice(0, i);
+		},
+		basename: function(e, n) {
+			if (n !== void 0 && typeof n != "string") throw TypeError("\"ext\" argument must be a string");
+			t(e);
+			var r = 0, i = -1, a = !0, o;
+			if (n !== void 0 && n.length > 0 && n.length <= e.length) {
+				if (n.length === e.length && n === e) return "";
+				var s = n.length - 1, c = -1;
+				for (o = e.length - 1; o >= 0; --o) {
+					var l = e.charCodeAt(o);
+					if (l === 47) {
+						if (!a) {
+							r = o + 1;
+							break;
+						}
+					} else c === -1 && (a = !1, c = o + 1), s >= 0 && (l === n.charCodeAt(s) ? --s === -1 && (i = o) : (s = -1, i = c));
+				}
+				return r === i ? i = c : i === -1 && (i = e.length), e.slice(r, i);
+			}
+			for (o = e.length - 1; o >= 0; --o) if (e.charCodeAt(o) === 47) {
+				if (!a) {
+					r = o + 1;
+					break;
+				}
+			} else i === -1 && (a = !1, i = o + 1);
+			return i === -1 ? "" : e.slice(r, i);
+		},
+		extname: function(e) {
+			t(e);
+			for (var n = -1, r = 0, i = -1, a = !0, o = 0, s = e.length - 1; s >= 0; --s) {
+				var c = e.charCodeAt(s);
+				if (c === 47) {
+					if (!a) {
+						r = s + 1;
+						break;
+					}
+					continue;
+				}
+				i === -1 && (a = !1, i = s + 1), c === 46 ? n === -1 ? n = s : o !== 1 && (o = 1) : n !== -1 && (o = -1);
+			}
+			return n === -1 || i === -1 || o === 0 || o === 1 && n === i - 1 && n === r + 1 ? "" : e.slice(n, i);
+		},
+		format: function(e) {
+			if (typeof e != "object" || !e) throw TypeError("The \"pathObject\" argument must be of type Object. Received type " + typeof e);
+			return r("/", e);
+		},
+		parse: function(e) {
+			t(e);
+			var n = {
+				root: "",
+				dir: "",
+				base: "",
+				ext: "",
+				name: ""
+			};
+			if (e.length === 0) return n;
+			var r = e.charCodeAt(0), i = r === 47, a;
+			i ? (n.root = "/", a = 1) : a = 0;
+			for (var o = -1, s = 0, c = -1, l = !0, u = e.length - 1, d = 0; u >= a; --u) {
+				if (r = e.charCodeAt(u), r === 47) {
+					if (!l) {
+						s = u + 1;
+						break;
+					}
+					continue;
+				}
+				c === -1 && (l = !1, c = u + 1), r === 46 ? o === -1 ? o = u : d !== 1 && (d = 1) : o !== -1 && (d = -1);
+			}
+			return o === -1 || c === -1 || d === 0 || d === 1 && o === c - 1 && o === s + 1 ? c !== -1 && (n.base = n.name = s === 0 && i ? e.slice(1, c) : e.slice(s, c)) : (s === 0 && i ? (n.name = e.slice(1, o), n.base = e.slice(1, c)) : (n.name = e.slice(s, o), n.base = e.slice(s, c)), n.ext = e.slice(o, c)), s > 0 ? n.dir = e.slice(0, s - 1) : i && (n.dir = "/"), n;
+		},
+		sep: "/",
+		delimiter: ":",
+		win32: null,
+		posix: null
+	};
+	return i.posix = i, Ku = i, Ku;
+}
+var Ku, qu, Ju, Yu = ui(() => {
+	X(), $(), Q(), Wu(), Ku = {}, qu = !1, Ju = Gu();
+}), Xu = {};
+di(Xu, {
+	URL: () => Pd,
+	Url: () => kd,
+	default: () => Dd,
+	fileURLToPath: () => ad,
+	format: () => Ad,
+	parse: () => Nd,
+	pathToFileURL: () => cd,
+	resolve: () => jd,
+	resolveObject: () => Md
+});
+function Zu() {
+	if (dd) return ud;
+	dd = !0;
+	var e = typeof Map == "function" && Map.prototype, t = Object.getOwnPropertyDescriptor && e ? Object.getOwnPropertyDescriptor(Map.prototype, "size") : null, n = e && t && typeof t.get == "function" ? t.get : null, r = e && Map.prototype.forEach, i = typeof Set == "function" && Set.prototype, a = Object.getOwnPropertyDescriptor && i ? Object.getOwnPropertyDescriptor(Set.prototype, "size") : null, o = i && a && typeof a.get == "function" ? a.get : null, s = i && Set.prototype.forEach, c = typeof WeakMap == "function" && WeakMap.prototype ? WeakMap.prototype.has : null, l = typeof WeakSet == "function" && WeakSet.prototype ? WeakSet.prototype.has : null, u = typeof WeakRef == "function" && WeakRef.prototype ? WeakRef.prototype.deref : null, d = Boolean.prototype.valueOf, f = Object.prototype.toString, p = Function.prototype.toString, m = String.prototype.match, h = String.prototype.slice, g = String.prototype.replace, _ = String.prototype.toUpperCase, v = String.prototype.toLowerCase, y = RegExp.prototype.test, b = Array.prototype.concat, x = Array.prototype.join, S = Array.prototype.slice, C = Math.floor, w = typeof BigInt == "function" ? BigInt.prototype.valueOf : null, T = Object.getOwnPropertySymbols, E = typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? Symbol.prototype.toString : null, D = typeof Symbol == "function" && typeof Symbol.iterator == "object", O = typeof Symbol == "function" && Symbol.toStringTag ? Symbol.toStringTag : null, k = Object.prototype.propertyIsEnumerable, A = (typeof Reflect == "function" ? Reflect.getPrototypeOf : Object.getPrototypeOf) || ([].__proto__ === Array.prototype ? function(e) {
+		return e.__proto__;
+	} : null);
+	function j(e, t) {
+		if (e === 1 / 0 || e === -1 / 0 || e !== e || e && e > -1e3 && e < 1e3 || y.call(/e/, t)) return t;
+		var n = /[0-9](?=(?:[0-9]{3})+(?![0-9]))/g;
+		if (typeof e == "number") {
+			var r = e < 0 ? -C(-e) : C(e);
+			if (r !== e) {
+				var i = String(r), a = h.call(t, i.length + 1);
+				return g.call(i, n, "$&_") + "." + g.call(g.call(a, /([0-9]{3})/g, "$&_"), /_$/, "");
+			}
+		}
+		return g.call(t, n, "$&_");
+	}
+	var M = ld, N = M.custom, P = H(N) ? N : null;
+	ud = function e(t, i, a, c) {
+		var l = i || {};
+		if (ie(l, "quoteStyle") && l.quoteStyle !== "single" && l.quoteStyle !== "double") throw TypeError("option \"quoteStyle\" must be \"single\" or \"double\"");
+		if (ie(l, "maxStringLength") && (typeof l.maxStringLength == "number" ? l.maxStringLength < 0 && l.maxStringLength !== 1 / 0 : l.maxStringLength !== null)) throw TypeError("option \"maxStringLength\", if provided, must be a positive integer, Infinity, or `null`");
+		var u = !ie(l, "customInspect") || l.customInspect;
+		if (typeof u != "boolean" && u !== "symbol") throw TypeError("option \"customInspect\", if provided, must be `true`, `false`, or `'symbol'`");
+		if (ie(l, "indent") && l.indent !== null && l.indent !== "	" && !(parseInt(l.indent, 10) === l.indent && l.indent > 0)) throw TypeError("option \"indent\" must be \"\\t\", an integer > 0, or `null`");
+		if (ie(l, "numericSeparator") && typeof l.numericSeparator != "boolean") throw TypeError("option \"numericSeparator\", if provided, must be `true` or `false`");
+		var f = l.numericSeparator;
+		if (typeof t > "u") return "undefined";
+		if (t === null) return "null";
+		if (typeof t == "boolean") return t ? "true" : "false";
+		if (typeof t == "string") return pe(t, l);
+		if (typeof t == "number") {
+			if (t === 0) return 1 / 0 / t > 0 ? "0" : "-0";
+			var p = String(t);
+			return f ? j(t, p) : p;
+		}
+		if (typeof t == "bigint") {
+			var m = String(t) + "n";
+			return f ? j(t, m) : m;
+		}
+		var _ = typeof l.depth > "u" ? 5 : l.depth;
+		if (typeof a > "u" && (a = 0), a >= _ && _ > 0 && typeof t == "object") return L(t) ? "[Array]" : "[Object]";
+		var y = _e(l, a);
+		if (typeof c > "u") c = [];
+		else if (oe(c, t) >= 0) return "[Circular]";
+		function C(t, n, r) {
+			if (n && (c = S.call(c), c.push(n)), r) {
+				var i = { depth: l.depth };
+				return ie(l, "quoteStyle") && (i.quoteStyle = l.quoteStyle), e(t, i, a + 1, c);
+			}
+			return e(t, l, a + 1, c);
+		}
+		if (typeof t == "function" && !z(t)) {
+			var T = U(t), N = ye(t, C);
+			return "[Function" + (T ? ": " + T : " (anonymous)") + "]" + (N.length > 0 ? " { " + x.call(N, ", ") + " }" : "");
+		}
+		if (H(t)) {
+			var re = D ? g.call(String(t), /^(Symbol\(.*\))_[^)]*$/, "$1") : E.call(t);
+			return typeof t == "object" && !D ? me(re) : re;
+		}
+		if (fe(t)) {
+			for (var W = "<" + v.call(String(t.nodeName)), be = t.attributes || [], xe = 0; xe < be.length; xe++) W += " " + be[xe].name + "=" + F(I(be[xe].value), "double", l);
+			return W += ">", t.childNodes && t.childNodes.length && (W += "..."), W += "</" + v.call(String(t.nodeName)) + ">", W;
+		}
+		if (L(t)) {
+			if (t.length === 0) return "[]";
+			var Se = ye(t, C);
+			return y && !ge(Se) ? "[" + ve(Se, y) + "]" : "[ " + x.call(Se, ", ") + " ]";
+		}
+		if (ee(t)) {
+			var Ce = ye(t, C);
+			return !("cause" in Error.prototype) && "cause" in t && !k.call(t, "cause") ? "{ [" + String(t) + "] " + x.call(b.call("[cause]: " + C(t.cause), Ce), ", ") + " }" : Ce.length === 0 ? "[" + String(t) + "]" : "{ [" + String(t) + "] " + x.call(Ce, ", ") + " }";
+		}
+		if (typeof t == "object" && u) {
+			if (P && typeof t[P] == "function" && M) return M(t, { depth: _ - a });
+			if (u !== "symbol" && typeof t.inspect == "function") return t.inspect();
+		}
+		if (se(t)) {
+			var we = [];
+			return r && r.call(t, function(e, n) {
+				we.push(C(n, t, !0) + " => " + C(e, t));
+			}), he("Map", n.call(t), we, y);
+		}
+		if (ue(t)) {
+			var Te = [];
+			return s && s.call(t, function(e) {
+				Te.push(C(e, t));
+			}), he("Set", o.call(t), Te, y);
+		}
+		if (ce(t)) return G("WeakMap");
+		if (de(t)) return G("WeakSet");
+		if (le(t)) return G("WeakRef");
+		if (V(t)) return me(C(Number(t)));
+		if (ne(t)) return me(C(w.call(t)));
+		if (te(t)) return me(d.call(t));
+		if (B(t)) return me(C(String(t)));
+		if (typeof window < "u" && t === window) return "{ [object Window] }";
+		if (typeof globalThis < "u" && t === globalThis || typeof fd < "u" && t === fd) return "{ [object globalThis] }";
+		if (!R(t) && !z(t)) {
+			var Ee = ye(t, C), De = A ? A(t) === Object.prototype : t instanceof Object || t.constructor === Object, Oe = t instanceof Object ? "" : "null prototype", ke = !De && O && Object(t) === t && O in t ? h.call(ae(t), 8, -1) : Oe ? "Object" : "", Ae = (De || typeof t.constructor != "function" ? "" : t.constructor.name ? t.constructor.name + " " : "") + (ke || Oe ? "[" + x.call(b.call([], ke || [], Oe || []), ": ") + "] " : "");
+			return Ee.length === 0 ? Ae + "{}" : y ? Ae + "{" + ve(Ee, y) + "}" : Ae + "{ " + x.call(Ee, ", ") + " }";
+		}
+		return String(t);
+	};
+	function F(e, t, n) {
+		var r = (n.quoteStyle || t) === "double" ? "\"" : "'";
+		return r + e + r;
+	}
+	function I(e) {
+		return g.call(String(e), /"/g, "&quot;");
+	}
+	function L(e) {
+		return ae(e) === "[object Array]" && (!O || !(typeof e == "object" && O in e));
+	}
+	function R(e) {
+		return ae(e) === "[object Date]" && (!O || !(typeof e == "object" && O in e));
+	}
+	function z(e) {
+		return ae(e) === "[object RegExp]" && (!O || !(typeof e == "object" && O in e));
+	}
+	function ee(e) {
+		return ae(e) === "[object Error]" && (!O || !(typeof e == "object" && O in e));
+	}
+	function B(e) {
+		return ae(e) === "[object String]" && (!O || !(typeof e == "object" && O in e));
+	}
+	function V(e) {
+		return ae(e) === "[object Number]" && (!O || !(typeof e == "object" && O in e));
+	}
+	function te(e) {
+		return ae(e) === "[object Boolean]" && (!O || !(typeof e == "object" && O in e));
+	}
+	function H(e) {
+		if (D) return e && typeof e == "object" && e instanceof Symbol;
+		if (typeof e == "symbol") return !0;
+		if (!e || typeof e != "object" || !E) return !1;
+		try {
+			return E.call(e), !0;
+		} catch {}
+		return !1;
+	}
+	function ne(e) {
+		if (!e || typeof e != "object" || !w) return !1;
+		try {
+			return w.call(e), !0;
+		} catch {}
+		return !1;
+	}
+	var re = Object.prototype.hasOwnProperty || function(e) {
+		return e in (this || fd);
+	};
+	function ie(e, t) {
+		return re.call(e, t);
+	}
+	function ae(e) {
+		return f.call(e);
+	}
+	function U(e) {
+		if (e.name) return e.name;
+		var t = m.call(p.call(e), /^function\s*([\w$]+)/);
+		return t ? t[1] : null;
+	}
+	function oe(e, t) {
+		if (e.indexOf) return e.indexOf(t);
+		for (var n = 0, r = e.length; n < r; n++) if (e[n] === t) return n;
+		return -1;
+	}
+	function se(e) {
+		if (!n || !e || typeof e != "object") return !1;
+		try {
+			n.call(e);
+			try {
+				o.call(e);
+			} catch {
+				return !0;
+			}
+			return e instanceof Map;
+		} catch {}
+		return !1;
+	}
+	function ce(e) {
+		if (!c || !e || typeof e != "object") return !1;
+		try {
+			c.call(e, c);
+			try {
+				l.call(e, l);
+			} catch {
+				return !0;
+			}
+			return e instanceof WeakMap;
+		} catch {}
+		return !1;
+	}
+	function le(e) {
+		if (!u || !e || typeof e != "object") return !1;
+		try {
+			return u.call(e), !0;
+		} catch {}
+		return !1;
+	}
+	function ue(e) {
+		if (!o || !e || typeof e != "object") return !1;
+		try {
+			o.call(e);
+			try {
+				n.call(e);
+			} catch {
+				return !0;
+			}
+			return e instanceof Set;
+		} catch {}
+		return !1;
+	}
+	function de(e) {
+		if (!l || !e || typeof e != "object") return !1;
+		try {
+			l.call(e, l);
+			try {
+				c.call(e, c);
+			} catch {
+				return !0;
+			}
+			return e instanceof WeakSet;
+		} catch {}
+		return !1;
+	}
+	function fe(e) {
+		return !e || typeof e != "object" ? !1 : typeof HTMLElement < "u" && e instanceof HTMLElement || typeof e.nodeName == "string" && typeof e.getAttribute == "function";
+	}
+	function pe(e, t) {
+		if (e.length > t.maxStringLength) {
+			var n = e.length - t.maxStringLength, r = "... " + n + " more character" + (n > 1 ? "s" : "");
+			return pe(h.call(e, 0, t.maxStringLength), t) + r;
+		}
+		return F(g.call(g.call(e, /(['\\])/g, "\\$1"), /[\x00-\x1f]/g, W), "single", t);
+	}
+	function W(e) {
+		var t = e.charCodeAt(0), n = {
+			8: "b",
+			9: "t",
+			10: "n",
+			12: "f",
+			13: "r"
+		}[t];
+		return n ? "\\" + n : "\\x" + (t < 16 ? "0" : "") + _.call(t.toString(16));
+	}
+	function me(e) {
+		return "Object(" + e + ")";
+	}
+	function G(e) {
+		return e + " { ? }";
+	}
+	function he(e, t, n, r) {
+		var i = r ? ve(n, r) : x.call(n, ", ");
+		return e + " (" + t + ") {" + i + "}";
+	}
+	function ge(e) {
+		for (var t = 0; t < e.length; t++) if (oe(e[t], "\n") >= 0) return !1;
+		return !0;
+	}
+	function _e(e, t) {
+		var n;
+		if (e.indent === "	") n = "	";
+		else if (typeof e.indent == "number" && e.indent > 0) n = x.call(Array(e.indent + 1), " ");
+		else return null;
+		return {
+			base: n,
+			prev: x.call(Array(t + 1), n)
+		};
+	}
+	function ve(e, t) {
+		if (e.length === 0) return "";
+		var n = "\n" + t.prev + t.base;
+		return n + x.call(e, "," + n) + "\n" + t.prev;
+	}
+	function ye(e, t) {
+		var n = L(e), r = [];
+		if (n) {
+			r.length = e.length;
+			for (var i = 0; i < e.length; i++) r[i] = ie(e, i) ? t(e[i], e) : "";
+		}
+		var a = typeof T == "function" ? T(e) : [], o;
+		if (D) {
+			o = {};
+			for (var s = 0; s < a.length; s++) o["$" + a[s]] = a[s];
+		}
+		for (var c in e) ie(e, c) && (n && String(Number(c)) === c && c < e.length || D && o["$" + c] instanceof Symbol || (y.call(/[^\w$]/, c) ? r.push(t(c, e) + ": " + t(e[c], e)) : r.push(c + ": " + t(e[c], e))));
+		if (typeof T == "function") for (var l = 0; l < a.length; l++) k.call(e, a[l]) && r.push("[" + t(a[l]) + "]: " + t(e[a[l]], e));
+		return r;
+	}
+	return ud;
+}
+function Qu() {
+	if (md) return pd;
+	md = !0;
+	var e = yc(), t = Ec(), n = Zu(), r = fc(), i = e("%WeakMap%", !0), a = e("%Map%", !0), o = t("WeakMap.prototype.get", !0), s = t("WeakMap.prototype.set", !0), c = t("WeakMap.prototype.has", !0), l = t("Map.prototype.get", !0), u = t("Map.prototype.set", !0), d = t("Map.prototype.has", !0), f = function(e, t) {
+		for (var n = e, r; (r = n.next) !== null; n = r) if (r.key === t) return n.next = r.next, r.next = e.next, e.next = r, r;
+	}, p = function(e, t) {
+		var n = f(e, t);
+		return n && n.value;
+	}, m = function(e, t, n) {
+		var r = f(e, t);
+		r ? r.value = n : e.next = {
+			key: t,
+			next: e.next,
+			value: n
+		};
+	}, h = function(e, t) {
+		return !!f(e, t);
+	};
+	return pd = function() {
+		var e, t, f, g = {
+			assert: function(e) {
+				if (!g.has(e)) throw new r("Side channel does not contain " + n(e));
+			},
+			get: function(n) {
+				if (i && n && (typeof n == "object" || typeof n == "function")) {
+					if (e) return o(e, n);
+				} else if (a) {
+					if (t) return l(t, n);
+				} else if (f) return p(f, n);
+			},
+			has: function(n) {
+				if (i && n && (typeof n == "object" || typeof n == "function")) {
+					if (e) return c(e, n);
+				} else if (a) {
+					if (t) return d(t, n);
+				} else if (f) return h(f, n);
+				return !1;
+			},
+			set: function(n, r) {
+				i && n && (typeof n == "object" || typeof n == "function") ? (e ||= new i(), s(e, n, r)) : a ? (t ||= new a(), u(t, n, r)) : (f ||= {
+					key: {},
+					next: null
+				}, m(f, n, r));
+			}
+		};
+		return g;
+	}, pd;
+}
+function $u() {
+	if (gd) return hd;
+	gd = !0;
+	var e = String.prototype.replace, t = /%20/g, n = {
+		RFC1738: "RFC1738",
+		RFC3986: "RFC3986"
+	};
+	return hd = {
+		default: n.RFC3986,
+		formatters: {
+			RFC1738: function(n) {
+				return e.call(n, t, "+");
+			},
+			RFC3986: function(e) {
+				return String(e);
+			}
+		},
+		RFC1738: n.RFC1738,
+		RFC3986: n.RFC3986
+	}, hd;
+}
+function ed() {
+	if (vd) return _d;
+	vd = !0;
+	var e = $u(), t = Object.prototype.hasOwnProperty, n = Array.isArray, r = (function() {
+		for (var e = [], t = 0; t < 256; ++t) e.push("%" + ((t < 16 ? "0" : "") + t.toString(16)).toUpperCase());
+		return e;
+	})(), i = function(e) {
+		for (; e.length > 1;) {
+			var t = e.pop(), r = t.obj[t.prop];
+			if (n(r)) {
+				for (var i = [], a = 0; a < r.length; ++a) typeof r[a] < "u" && i.push(r[a]);
+				t.obj[t.prop] = i;
+			}
+		}
+	}, a = function(e, t) {
+		for (var n = t && t.plainObjects ? Object.create(null) : {}, r = 0; r < e.length; ++r) typeof e[r] < "u" && (n[r] = e[r]);
+		return n;
+	}, o = function e(r, i, o) {
+		if (!i) return r;
+		if (typeof i != "object") {
+			if (n(r)) r.push(i);
+			else if (r && typeof r == "object") (o && (o.plainObjects || o.allowPrototypes) || !t.call(Object.prototype, i)) && (r[i] = !0);
+			else return [r, i];
+			return r;
+		}
+		if (!r || typeof r != "object") return [r].concat(i);
+		var s = r;
+		return n(r) && !n(i) && (s = a(r, o)), n(r) && n(i) ? (i.forEach(function(n, i) {
+			if (t.call(r, i)) {
+				var a = r[i];
+				a && typeof a == "object" && n && typeof n == "object" ? r[i] = e(a, n, o) : r.push(n);
+			} else r[i] = n;
+		}), r) : Object.keys(i).reduce(function(n, r) {
+			var a = i[r];
+			return n[r] = t.call(n, r) ? e(n[r], a, o) : a, n;
+		}, s);
+	}, s = function(e, t) {
+		return Object.keys(t).reduce(function(e, n) {
+			return e[n] = t[n], e;
+		}, e);
+	}, c = function(e, t, n) {
+		var r = e.replace(/\+/g, " ");
+		if (n === "iso-8859-1") return r.replace(/%[0-9a-f]{2}/gi, unescape);
+		try {
+			return decodeURIComponent(r);
+		} catch {
+			return r;
+		}
+	}, l = 1024;
+	return _d = {
+		arrayToObject: a,
+		assign: s,
+		combine: function(e, t) {
+			return [].concat(e, t);
+		},
+		compact: function(e) {
+			for (var t = [{
+				obj: { o: e },
+				prop: "o"
+			}], n = [], r = 0; r < t.length; ++r) for (var a = t[r], o = a.obj[a.prop], s = Object.keys(o), c = 0; c < s.length; ++c) {
+				var l = s[c], u = o[l];
+				typeof u == "object" && u && n.indexOf(u) === -1 && (t.push({
+					obj: o,
+					prop: l
+				}), n.push(u));
+			}
+			return i(t), e;
+		},
+		decode: c,
+		encode: function(t, n, i, a, o) {
+			if (t.length === 0) return t;
+			var s = t;
+			if (typeof t == "symbol" ? s = Symbol.prototype.toString.call(t) : typeof t != "string" && (s = String(t)), i === "iso-8859-1") return escape(s).replace(/%u[0-9a-f]{4}/gi, function(e) {
+				return "%26%23" + parseInt(e.slice(2), 16) + "%3B";
+			});
+			for (var c = "", u = 0; u < s.length; u += l) {
+				for (var d = s.length >= l ? s.slice(u, u + l) : s, f = [], p = 0; p < d.length; ++p) {
+					var m = d.charCodeAt(p);
+					if (m === 45 || m === 46 || m === 95 || m === 126 || m >= 48 && m <= 57 || m >= 65 && m <= 90 || m >= 97 && m <= 122 || o === e.RFC1738 && (m === 40 || m === 41)) {
+						f[f.length] = d.charAt(p);
+						continue;
+					}
+					if (m < 128) {
+						f[f.length] = r[m];
+						continue;
+					}
+					if (m < 2048) {
+						f[f.length] = r[192 | m >> 6] + r[128 | m & 63];
+						continue;
+					}
+					if (m < 55296 || m >= 57344) {
+						f[f.length] = r[224 | m >> 12] + r[128 | m >> 6 & 63] + r[128 | m & 63];
+						continue;
+					}
+					p += 1, m = 65536 + ((m & 1023) << 10 | d.charCodeAt(p) & 1023), f[f.length] = r[240 | m >> 18] + r[128 | m >> 12 & 63] + r[128 | m >> 6 & 63] + r[128 | m & 63];
+				}
+				c += f.join("");
+			}
+			return c;
+		},
+		isBuffer: function(e) {
+			return !e || typeof e != "object" ? !1 : !!(e.constructor && e.constructor.isBuffer && e.constructor.isBuffer(e));
+		},
+		isRegExp: function(e) {
+			return Object.prototype.toString.call(e) === "[object RegExp]";
+		},
+		maybeMap: function(e, t) {
+			if (n(e)) {
+				for (var r = [], i = 0; i < e.length; i += 1) r.push(t(e[i]));
+				return r;
+			}
+			return t(e);
+		},
+		merge: o
+	}, _d;
+}
+function td() {
+	if (bd) return yd;
+	bd = !0;
+	var e = Qu(), t = ed(), n = $u(), r = Object.prototype.hasOwnProperty, i = {
+		brackets: function(e) {
+			return e + "[]";
+		},
+		comma: "comma",
+		indices: function(e, t) {
+			return e + "[" + t + "]";
+		},
+		repeat: function(e) {
+			return e;
+		}
+	}, a = Array.isArray, o = Array.prototype.push, s = function(e, t) {
+		o.apply(e, a(t) ? t : [t]);
+	}, c = Date.prototype.toISOString, l = n.default, u = {
+		addQueryPrefix: !1,
+		allowDots: !1,
+		allowEmptyArrays: !1,
+		arrayFormat: "indices",
+		charset: "utf-8",
+		charsetSentinel: !1,
+		delimiter: "&",
+		encode: !0,
+		encodeDotInKeys: !1,
+		encoder: t.encode,
+		encodeValuesOnly: !1,
+		format: l,
+		formatter: n.formatters[l],
+		indices: !1,
+		serializeDate: function(e) {
+			return c.call(e);
+		},
+		skipNulls: !1,
+		strictNullHandling: !1
+	}, d = function(e) {
+		return typeof e == "string" || typeof e == "number" || typeof e == "boolean" || typeof e == "symbol" || typeof e == "bigint";
+	}, f = {}, p = function n(r, i, o, c, l, p, m, h, g, _, v, y, b, x, S, C, w, T) {
+		for (var E = r, D = T, O = 0, k = !1; (D = D.get(f)) !== void 0 && !k;) {
+			var A = D.get(r);
+			if (O += 1, typeof A < "u") {
+				if (A === O) throw RangeError("Cyclic object value");
+				k = !0;
+			}
+			typeof D.get(f) > "u" && (O = 0);
+		}
+		if (typeof _ == "function" ? E = _(i, E) : E instanceof Date ? E = b(E) : o === "comma" && a(E) && (E = t.maybeMap(E, function(e) {
+			return e instanceof Date ? b(e) : e;
+		})), E === null) {
+			if (p) return g && !C ? g(i, u.encoder, w, "key", x) : i;
+			E = "";
+		}
+		if (d(E) || t.isBuffer(E)) return g ? [S(C ? i : g(i, u.encoder, w, "key", x)) + "=" + S(g(E, u.encoder, w, "value", x))] : [S(i) + "=" + S(String(E))];
+		var j = [];
+		if (typeof E > "u") return j;
+		var M;
+		if (o === "comma" && a(E)) C && g && (E = t.maybeMap(E, g)), M = [{ value: E.length > 0 ? E.join(",") || null : void 0 }];
+		else if (a(_)) M = _;
+		else {
+			var N = Object.keys(E);
+			M = v ? N.sort(v) : N;
+		}
+		var P = h ? i.replace(/\./g, "%2E") : i, F = c && a(E) && E.length === 1 ? P + "[]" : P;
+		if (l && a(E) && E.length === 0) return F + "[]";
+		for (var I = 0; I < M.length; ++I) {
+			var L = M[I], R = typeof L == "object" && typeof L.value < "u" ? L.value : E[L];
+			if (!(m && R === null)) {
+				var z = y && h ? L.replace(/\./g, "%2E") : L, ee = a(E) ? typeof o == "function" ? o(F, z) : F : F + (y ? "." + z : "[" + z + "]");
+				T.set(r, O);
+				var B = e();
+				B.set(f, T), s(j, n(R, ee, o, c, l, p, m, h, o === "comma" && C && a(E) ? null : g, _, v, y, b, x, S, C, w, B));
+			}
+		}
+		return j;
+	}, m = function(e) {
+		if (!e) return u;
+		if (typeof e.allowEmptyArrays < "u" && typeof e.allowEmptyArrays != "boolean") throw TypeError("`allowEmptyArrays` option can only be `true` or `false`, when provided");
+		if (typeof e.encodeDotInKeys < "u" && typeof e.encodeDotInKeys != "boolean") throw TypeError("`encodeDotInKeys` option can only be `true` or `false`, when provided");
+		if (e.encoder !== null && typeof e.encoder < "u" && typeof e.encoder != "function") throw TypeError("Encoder has to be a function.");
+		var t = e.charset || u.charset;
+		if (typeof e.charset < "u" && e.charset !== "utf-8" && e.charset !== "iso-8859-1") throw TypeError("The charset option must be either utf-8, iso-8859-1, or undefined");
+		var o = n.default;
+		if (typeof e.format < "u") {
+			if (!r.call(n.formatters, e.format)) throw TypeError("Unknown format option provided.");
+			o = e.format;
+		}
+		var s = n.formatters[o], c = u.filter;
+		(typeof e.filter == "function" || a(e.filter)) && (c = e.filter);
+		var l = e.arrayFormat in i ? e.arrayFormat : "indices" in e ? e.indices ? "indices" : "repeat" : u.arrayFormat;
+		if ("commaRoundTrip" in e && typeof e.commaRoundTrip != "boolean") throw TypeError("`commaRoundTrip` must be a boolean, or absent");
+		var d = typeof e.allowDots > "u" ? e.encodeDotInKeys === !0 || u.allowDots : !!e.allowDots;
+		return {
+			addQueryPrefix: typeof e.addQueryPrefix == "boolean" ? e.addQueryPrefix : u.addQueryPrefix,
+			allowDots: d,
+			allowEmptyArrays: typeof e.allowEmptyArrays == "boolean" ? !!e.allowEmptyArrays : u.allowEmptyArrays,
+			arrayFormat: l,
+			charset: t,
+			charsetSentinel: typeof e.charsetSentinel == "boolean" ? e.charsetSentinel : u.charsetSentinel,
+			commaRoundTrip: e.commaRoundTrip,
+			delimiter: typeof e.delimiter > "u" ? u.delimiter : e.delimiter,
+			encode: typeof e.encode == "boolean" ? e.encode : u.encode,
+			encodeDotInKeys: typeof e.encodeDotInKeys == "boolean" ? e.encodeDotInKeys : u.encodeDotInKeys,
+			encoder: typeof e.encoder == "function" ? e.encoder : u.encoder,
+			encodeValuesOnly: typeof e.encodeValuesOnly == "boolean" ? e.encodeValuesOnly : u.encodeValuesOnly,
+			filter: c,
+			format: o,
+			formatter: s,
+			serializeDate: typeof e.serializeDate == "function" ? e.serializeDate : u.serializeDate,
+			skipNulls: typeof e.skipNulls == "boolean" ? e.skipNulls : u.skipNulls,
+			sort: typeof e.sort == "function" ? e.sort : null,
+			strictNullHandling: typeof e.strictNullHandling == "boolean" ? e.strictNullHandling : u.strictNullHandling
+		};
+	};
+	return yd = function(t, n) {
+		var r = t, o = m(n), c, l;
+		typeof o.filter == "function" ? (l = o.filter, r = l("", r)) : a(o.filter) && (l = o.filter, c = l);
+		var u = [];
+		if (typeof r != "object" || !r) return "";
+		var d = i[o.arrayFormat], f = d === "comma" && o.commaRoundTrip;
+		c ||= Object.keys(r), o.sort && c.sort(o.sort);
+		for (var h = e(), g = 0; g < c.length; ++g) {
+			var _ = c[g];
+			o.skipNulls && r[_] === null || s(u, p(r[_], _, d, f, o.allowEmptyArrays, o.strictNullHandling, o.skipNulls, o.encodeDotInKeys, o.encode ? o.encoder : null, o.filter, o.sort, o.allowDots, o.serializeDate, o.format, o.formatter, o.encodeValuesOnly, o.charset, h));
+		}
+		var v = u.join(o.delimiter), y = o.addQueryPrefix === !0 ? "?" : "";
+		return o.charsetSentinel && (o.charset === "iso-8859-1" ? y += "utf8=%26%2310003%3B&" : y += "utf8=%E2%9C%93&"), v.length > 0 ? y + v : "";
+	}, yd;
+}
+function nd() {
+	if (Sd) return xd;
+	Sd = !0;
+	var e = ed(), t = Object.prototype.hasOwnProperty, n = Array.isArray, r = {
+		allowDots: !1,
+		allowEmptyArrays: !1,
+		allowPrototypes: !1,
+		allowSparse: !1,
+		arrayLimit: 20,
+		charset: "utf-8",
+		charsetSentinel: !1,
+		comma: !1,
+		decodeDotInKeys: !1,
+		decoder: e.decode,
+		delimiter: "&",
+		depth: 5,
+		duplicates: "combine",
+		ignoreQueryPrefix: !1,
+		interpretNumericEntities: !1,
+		parameterLimit: 1e3,
+		parseArrays: !0,
+		plainObjects: !1,
+		strictDepth: !1,
+		strictNullHandling: !1
+	}, i = function(e) {
+		return e.replace(/&#(\d+);/g, function(e, t) {
+			return String.fromCharCode(parseInt(t, 10));
+		});
+	}, a = function(e, t) {
+		return e && typeof e == "string" && t.comma && e.indexOf(",") > -1 ? e.split(",") : e;
+	}, o = "utf8=%26%2310003%3B", s = "utf8=%E2%9C%93", c = function(c, l) {
+		var u = { __proto__: null }, d = l.ignoreQueryPrefix ? c.replace(/^\?/, "") : c;
+		d = d.replace(/%5B/gi, "[").replace(/%5D/gi, "]");
+		var f = l.parameterLimit === 1 / 0 ? void 0 : l.parameterLimit, p = d.split(l.delimiter, f), m = -1, h, g = l.charset;
+		if (l.charsetSentinel) for (h = 0; h < p.length; ++h) p[h].indexOf("utf8=") === 0 && (p[h] === s ? g = "utf-8" : p[h] === o && (g = "iso-8859-1"), m = h, h = p.length);
+		for (h = 0; h < p.length; ++h) if (h !== m) {
+			var _ = p[h], v = _.indexOf("]="), y = v === -1 ? _.indexOf("=") : v + 1, b, x;
+			y === -1 ? (b = l.decoder(_, r.decoder, g, "key"), x = l.strictNullHandling ? null : "") : (b = l.decoder(_.slice(0, y), r.decoder, g, "key"), x = e.maybeMap(a(_.slice(y + 1), l), function(e) {
+				return l.decoder(e, r.decoder, g, "value");
+			})), x && l.interpretNumericEntities && g === "iso-8859-1" && (x = i(x)), _.indexOf("[]=") > -1 && (x = n(x) ? [x] : x);
+			var S = t.call(u, b);
+			S && l.duplicates === "combine" ? u[b] = e.combine(u[b], x) : (!S || l.duplicates === "last") && (u[b] = x);
+		}
+		return u;
+	}, l = function(e, t, n, r) {
+		for (var i = r ? t : a(t, n), o = e.length - 1; o >= 0; --o) {
+			var s, c = e[o];
+			if (c === "[]" && n.parseArrays) s = n.allowEmptyArrays && (i === "" || n.strictNullHandling && i === null) ? [] : [].concat(i);
+			else {
+				s = n.plainObjects ? Object.create(null) : {};
+				var l = c.charAt(0) === "[" && c.charAt(c.length - 1) === "]" ? c.slice(1, -1) : c, u = n.decodeDotInKeys ? l.replace(/%2E/g, ".") : l, d = parseInt(u, 10);
+				!n.parseArrays && u === "" ? s = { 0: i } : !isNaN(d) && c !== u && String(d) === u && d >= 0 && n.parseArrays && d <= n.arrayLimit ? (s = [], s[d] = i) : u !== "__proto__" && (s[u] = i);
+			}
+			i = s;
+		}
+		return i;
+	}, u = function(e, n, r, i) {
+		if (e) {
+			var a = r.allowDots ? e.replace(/\.([^.[]+)/g, "[$1]") : e, o = /(\[[^[\]]*])/, s = /(\[[^[\]]*])/g, c = r.depth > 0 && o.exec(a), u = c ? a.slice(0, c.index) : a, d = [];
+			if (u) {
+				if (!r.plainObjects && t.call(Object.prototype, u) && !r.allowPrototypes) return;
+				d.push(u);
+			}
+			for (var f = 0; r.depth > 0 && (c = s.exec(a)) !== null && f < r.depth;) {
+				if (f += 1, !r.plainObjects && t.call(Object.prototype, c[1].slice(1, -1)) && !r.allowPrototypes) return;
+				d.push(c[1]);
+			}
+			if (c) {
+				if (r.strictDepth === !0) throw RangeError("Input depth exceeded depth option of " + r.depth + " and strictDepth is true");
+				d.push("[" + a.slice(c.index) + "]");
+			}
+			return l(d, n, r, i);
+		}
+	}, d = function(t) {
+		if (!t) return r;
+		if (typeof t.allowEmptyArrays < "u" && typeof t.allowEmptyArrays != "boolean") throw TypeError("`allowEmptyArrays` option can only be `true` or `false`, when provided");
+		if (typeof t.decodeDotInKeys < "u" && typeof t.decodeDotInKeys != "boolean") throw TypeError("`decodeDotInKeys` option can only be `true` or `false`, when provided");
+		if (t.decoder !== null && typeof t.decoder < "u" && typeof t.decoder != "function") throw TypeError("Decoder has to be a function.");
+		if (typeof t.charset < "u" && t.charset !== "utf-8" && t.charset !== "iso-8859-1") throw TypeError("The charset option must be either utf-8, iso-8859-1, or undefined");
+		var n = typeof t.charset > "u" ? r.charset : t.charset, i = typeof t.duplicates > "u" ? r.duplicates : t.duplicates;
+		if (i !== "combine" && i !== "first" && i !== "last") throw TypeError("The duplicates option must be either combine, first, or last");
+		return {
+			allowDots: typeof t.allowDots > "u" ? t.decodeDotInKeys === !0 || r.allowDots : !!t.allowDots,
+			allowEmptyArrays: typeof t.allowEmptyArrays == "boolean" ? !!t.allowEmptyArrays : r.allowEmptyArrays,
+			allowPrototypes: typeof t.allowPrototypes == "boolean" ? t.allowPrototypes : r.allowPrototypes,
+			allowSparse: typeof t.allowSparse == "boolean" ? t.allowSparse : r.allowSparse,
+			arrayLimit: typeof t.arrayLimit == "number" ? t.arrayLimit : r.arrayLimit,
+			charset: n,
+			charsetSentinel: typeof t.charsetSentinel == "boolean" ? t.charsetSentinel : r.charsetSentinel,
+			comma: typeof t.comma == "boolean" ? t.comma : r.comma,
+			decodeDotInKeys: typeof t.decodeDotInKeys == "boolean" ? t.decodeDotInKeys : r.decodeDotInKeys,
+			decoder: typeof t.decoder == "function" ? t.decoder : r.decoder,
+			delimiter: typeof t.delimiter == "string" || e.isRegExp(t.delimiter) ? t.delimiter : r.delimiter,
+			depth: typeof t.depth == "number" || t.depth === !1 ? +t.depth : r.depth,
+			duplicates: i,
+			ignoreQueryPrefix: t.ignoreQueryPrefix === !0,
+			interpretNumericEntities: typeof t.interpretNumericEntities == "boolean" ? t.interpretNumericEntities : r.interpretNumericEntities,
+			parameterLimit: typeof t.parameterLimit == "number" ? t.parameterLimit : r.parameterLimit,
+			parseArrays: t.parseArrays !== !1,
+			plainObjects: typeof t.plainObjects == "boolean" ? t.plainObjects : r.plainObjects,
+			strictDepth: typeof t.strictDepth == "boolean" ? !!t.strictDepth : r.strictDepth,
+			strictNullHandling: typeof t.strictNullHandling == "boolean" ? t.strictNullHandling : r.strictNullHandling
+		};
+	};
+	return xd = function(t, n) {
+		var r = d(n);
+		if (t === "" || t === null || typeof t > "u") return r.plainObjects ? Object.create(null) : {};
+		for (var i = typeof t == "string" ? c(t, r) : t, a = r.plainObjects ? Object.create(null) : {}, o = Object.keys(i), s = 0; s < o.length; ++s) {
+			var l = o[s], f = u(l, i[l], r, typeof t == "string");
+			a = e.merge(a, f, r);
+		}
+		return r.allowSparse === !0 ? a : e.compact(a);
+	}, xd;
+}
+function rd() {
+	if (wd) return Cd;
+	wd = !0;
+	var e = td(), t = nd();
+	return Cd = {
+		formats: $u(),
+		parse: t,
+		stringify: e
+	}, Cd;
+}
+function id() {
+	if (Ed) return Td;
+	Ed = !0;
+	var e = ic;
+	function t() {
+		this.protocol = null, this.slashes = null, this.auth = null, this.host = null, this.port = null, this.hostname = null, this.hash = null, this.search = null, this.query = null, this.pathname = null, this.path = null, this.href = null;
+	}
+	var n = /^([a-z0-9.+-]+:)/i, r = /:[0-9]*$/, i = /^(\/\/?(?!\/)[^?\s]*)(\?[^\s]*)?$/, a = [
+		"'",
+		"{",
+		"}",
+		"|",
+		"\\",
+		"^",
+		"`",
+		"<",
+		">",
+		"\"",
+		"`",
+		" ",
+		"\r",
+		"\n",
+		"	"
+	], o = [
+		"%",
+		"/",
+		"?",
+		";",
+		"#"
+	].concat(a), s = [
+		"/",
+		"?",
+		"#"
+	], c = 255, l = /^[+a-z0-9A-Z_-]{0,63}$/, u = /^([+a-z0-9A-Z_-]{0,63})(.*)$/, d = {
+		javascript: !0,
+		"javascript:": !0
+	}, f = {
+		javascript: !0,
+		"javascript:": !0
+	}, p = {
+		http: !0,
+		https: !0,
+		ftp: !0,
+		gopher: !0,
+		file: !0,
+		"http:": !0,
+		"https:": !0,
+		"ftp:": !0,
+		"gopher:": !0,
+		"file:": !0
+	}, m = rd();
+	function h(e, n, r) {
+		if (e && typeof e == "object" && e instanceof t) return e;
+		var i = new t();
+		return i.parse(e, n, r), i;
+	}
+	t.prototype.parse = function(t, r, h) {
+		if (typeof t != "string") throw TypeError("Parameter 'url' must be a string, not " + typeof t);
+		var g = t.indexOf("?"), _ = g !== -1 && g < t.indexOf("#") ? "?" : "#", v = t.split(_);
+		v[0] = v[0].replace(/\\/g, "/"), t = v.join(_);
+		var y = t;
+		if (y = y.trim(), !h && t.split("#").length === 1) {
+			var b = i.exec(y);
+			if (b) return this.path = y, this.href = y, this.pathname = b[1], b[2] ? (this.search = b[2], this.query = r ? m.parse(this.search.substr(1)) : this.search.substr(1)) : r && (this.search = "", this.query = {}), this;
+		}
+		var x = n.exec(y);
+		if (x) {
+			x = x[0];
+			var S = x.toLowerCase();
+			this.protocol = S, y = y.substr(x.length);
+		}
+		if (h || x || y.match(/^\/\/[^@/]+@[^@/]+/)) {
+			var C = y.substr(0, 2) === "//";
+			C && !(x && f[x]) && (y = y.substr(2), this.slashes = !0);
+		}
+		if (!f[x] && (C || x && !p[x])) {
+			for (var w = -1, T = 0; T < s.length; T++) {
+				var E = y.indexOf(s[T]);
+				E !== -1 && (w === -1 || E < w) && (w = E);
+			}
+			var D, O = w === -1 ? y.lastIndexOf("@") : y.lastIndexOf("@", w);
+			O !== -1 && (D = y.slice(0, O), y = y.slice(O + 1), this.auth = decodeURIComponent(D)), w = -1;
+			for (var T = 0; T < o.length; T++) {
+				var E = y.indexOf(o[T]);
+				E !== -1 && (w === -1 || E < w) && (w = E);
+			}
+			w === -1 && (w = y.length), this.host = y.slice(0, w), y = y.slice(w), this.parseHost(), this.hostname = this.hostname || "";
+			var k = this.hostname[0] === "[" && this.hostname[this.hostname.length - 1] === "]";
+			if (!k) for (var A = this.hostname.split(/\./), T = 0, j = A.length; T < j; T++) {
+				var M = A[T];
+				if (M && !M.match(l)) {
+					for (var N = "", P = 0, F = M.length; P < F; P++) M.charCodeAt(P) > 127 ? N += "x" : N += M[P];
+					if (!N.match(l)) {
+						var I = A.slice(0, T), L = A.slice(T + 1), R = M.match(u);
+						R && (I.push(R[1]), L.unshift(R[2])), L.length && (y = "/" + L.join(".") + y), this.hostname = I.join(".");
+						break;
+					}
+				}
+			}
+			this.hostname = this.hostname.length > c ? "" : this.hostname.toLowerCase(), k || (this.hostname = e.toASCII(this.hostname));
+			var z = this.port ? ":" + this.port : "", ee = this.hostname || "";
+			this.host = ee + z, this.href += this.host, k && (this.hostname = this.hostname.substr(1, this.hostname.length - 2), y[0] !== "/" && (y = "/" + y));
+		}
+		if (!d[S]) for (var T = 0, j = a.length; T < j; T++) {
+			var B = a[T];
+			if (y.indexOf(B) !== -1) {
+				var V = encodeURIComponent(B);
+				V === B && (V = escape(B)), y = y.split(B).join(V);
+			}
+		}
+		var te = y.indexOf("#");
+		te !== -1 && (this.hash = y.substr(te), y = y.slice(0, te));
+		var H = y.indexOf("?");
+		if (H === -1 ? r && (this.search = "", this.query = {}) : (this.search = y.substr(H), this.query = y.substr(H + 1), r && (this.query = m.parse(this.query)), y = y.slice(0, H)), y && (this.pathname = y), p[S] && this.hostname && !this.pathname && (this.pathname = "/"), this.pathname || this.search) {
+			var z = this.pathname || "", ne = this.search || "";
+			this.path = z + ne;
+		}
+		return this.href = this.format(), this;
+	};
+	function g(e) {
+		return typeof e == "string" && (e = h(e)), e instanceof t ? e.format() : t.prototype.format.call(e);
+	}
+	t.prototype.format = function() {
+		var e = this.auth || "";
+		e && (e = encodeURIComponent(e), e = e.replace(/%3A/i, ":"), e += "@");
+		var t = this.protocol || "", n = this.pathname || "", r = this.hash || "", i = !1, a = "";
+		this.host ? i = e + this.host : this.hostname && (i = e + (this.hostname.indexOf(":") === -1 ? this.hostname : "[" + this.hostname + "]"), this.port && (i += ":" + this.port)), this.query && typeof this.query == "object" && Object.keys(this.query).length && (a = m.stringify(this.query, {
+			arrayFormat: "repeat",
+			addQueryPrefix: !1
+		}));
+		var o = this.search || a && "?" + a || "";
+		return t && t.substr(-1) !== ":" && (t += ":"), this.slashes || (!t || p[t]) && i !== !1 ? (i = "//" + (i || ""), n && n.charAt(0) !== "/" && (n = "/" + n)) : i ||= "", r && r.charAt(0) !== "#" && (r = "#" + r), o && o.charAt(0) !== "?" && (o = "?" + o), n = n.replace(/[?#]/g, function(e) {
+			return encodeURIComponent(e);
+		}), o = o.replace("#", "%23"), t + i + n + o + r;
+	};
+	function _(e, t) {
+		return h(e, !1, !0).resolve(t);
+	}
+	t.prototype.resolve = function(e) {
+		return this.resolveObject(h(e, !1, !0)).format();
+	};
+	function v(e, t) {
+		return e ? h(e, !1, !0).resolveObject(t) : t;
+	}
+	return t.prototype.resolveObject = function(e) {
+		if (typeof e == "string") {
+			var n = new t();
+			n.parse(e, !1, !0), e = n;
+		}
+		for (var r = new t(), i = Object.keys(this), a = 0; a < i.length; a++) {
+			var o = i[a];
+			r[o] = this[o];
+		}
+		if (r.hash = e.hash, e.href === "") return r.href = r.format(), r;
+		if (e.slashes && !e.protocol) {
+			for (var s = Object.keys(e), c = 0; c < s.length; c++) {
+				var l = s[c];
+				l !== "protocol" && (r[l] = e[l]);
+			}
+			return p[r.protocol] && r.hostname && !r.pathname && (r.pathname = "/", r.path = r.pathname), r.href = r.format(), r;
+		}
+		if (e.protocol && e.protocol !== r.protocol) {
+			if (!p[e.protocol]) {
+				for (var u = Object.keys(e), d = 0; d < u.length; d++) {
+					var m = u[d];
+					r[m] = e[m];
+				}
+				return r.href = r.format(), r;
+			}
+			if (r.protocol = e.protocol, !e.host && !f[e.protocol]) {
+				for (var h = (e.pathname || "").split("/"); h.length && !(e.host = h.shift()););
+				e.host || (e.host = ""), e.hostname || (e.hostname = ""), h[0] !== "" && h.unshift(""), h.length < 2 && h.unshift(""), r.pathname = h.join("/");
+			} else r.pathname = e.pathname;
+			return r.search = e.search, r.query = e.query, r.host = e.host || "", r.auth = e.auth, r.hostname = e.hostname || e.host, r.port = e.port, (r.pathname || r.search) && (r.path = (r.pathname || "") + (r.search || "")), r.slashes = r.slashes || e.slashes, r.href = r.format(), r;
+		}
+		var g = r.pathname && r.pathname.charAt(0) === "/", _ = e.host || e.pathname && e.pathname.charAt(0) === "/", v = _ || g || r.host && e.pathname, y = v, b = r.pathname && r.pathname.split("/") || [], h = e.pathname && e.pathname.split("/") || [], x = r.protocol && !p[r.protocol];
+		if (x && (r.hostname = "", r.port = null, r.host && (b[0] === "" ? b[0] = r.host : b.unshift(r.host)), r.host = "", e.protocol && (e.hostname = null, e.port = null, e.host && (h[0] === "" ? h[0] = e.host : h.unshift(e.host)), e.host = null), v &&= h[0] === "" || b[0] === ""), _) r.host = e.host || e.host === "" ? e.host : r.host, r.hostname = e.hostname || e.hostname === "" ? e.hostname : r.hostname, r.search = e.search, r.query = e.query, b = h;
+		else if (h.length) b ||= [], b.pop(), b = b.concat(h), r.search = e.search, r.query = e.query;
+		else if (e.search != null) {
+			if (x) {
+				r.host = b.shift(), r.hostname = r.host;
+				var S = r.host && r.host.indexOf("@") > 0 ? r.host.split("@") : !1;
+				S && (r.auth = S.shift(), r.hostname = S.shift(), r.host = r.hostname);
+			}
+			return r.search = e.search, r.query = e.query, (r.pathname !== null || r.search !== null) && (r.path = (r.pathname ? r.pathname : "") + (r.search ? r.search : "")), r.href = r.format(), r;
+		}
+		if (!b.length) return r.pathname = null, r.path = r.search ? "/" + r.search : null, r.href = r.format(), r;
+		for (var C = b.slice(-1)[0], w = (r.host || e.host || b.length > 1) && (C === "." || C === "..") || C === "", T = 0, E = b.length; E >= 0; E--) C = b[E], C === "." ? b.splice(E, 1) : C === ".." ? (b.splice(E, 1), T++) : T && (b.splice(E, 1), T--);
+		if (!v && !y) for (; T--;) b.unshift("..");
+		v && b[0] !== "" && (!b[0] || b[0].charAt(0) !== "/") && b.unshift(""), w && b.join("/").substr(-1) !== "/" && b.push("");
+		var D = b[0] === "" || b[0] && b[0].charAt(0) === "/";
+		if (x) {
+			r.hostname = D ? "" : b.length ? b.shift() : "", r.host = r.hostname;
+			var S = r.host && r.host.indexOf("@") > 0 ? r.host.split("@") : !1;
+			S && (r.auth = S.shift(), r.hostname = S.shift(), r.host = r.hostname);
+		}
+		return v ||= r.host && b.length, v && !D && b.unshift(""), b.length > 0 ? r.pathname = b.join("/") : (r.pathname = null, r.path = null), (r.pathname !== null || r.search !== null) && (r.path = (r.pathname ? r.pathname : "") + (r.search ? r.search : "")), r.auth = e.auth || r.auth, r.slashes = r.slashes || e.slashes, r.href = r.format(), r;
+	}, t.prototype.parseHost = function() {
+		var e = this.host, t = r.exec(e);
+		t && (t = t[0], t !== ":" && (this.port = t.substr(1)), e = e.substr(0, e.length - t.length)), e && (this.hostname = e);
+	}, Td.parse = h, Td.resolve = _, Td.resolveObject = v, Td.format = g, Td.Url = t, Td;
+}
+function ad(e) {
+	if (typeof e == "string") e = new URL(e);
+	else if (!(e instanceof URL)) throw new Deno.errors.InvalidData("invalid argument path , must be a string or URL");
+	if (e.protocol !== "file:") throw new Deno.errors.InvalidData("invalid url scheme");
+	return zd ? od(e) : sd(e);
+}
+function od(e) {
+	let t = e.hostname, n = e.pathname;
+	for (let e = 0; e < n.length; e++) if (n[e] === "%") {
+		let t = n.codePointAt(e + 2) || 32;
+		if (n[e + 1] === "2" && t === 102 || n[e + 1] === "5" && t === 99) throw new Deno.errors.InvalidData("must not include encoded \\ or / characters");
+	}
+	if (n = n.replace(Bd, "\\"), n = decodeURIComponent(n), t !== "") return `\\\\${t}${n}`;
+	{
+		let e = n.codePointAt(1) | 32, t = n[2];
+		if (e < Ld || e > Rd || t !== ":") throw new Deno.errors.InvalidData("file url path must be absolute");
+		return n.slice(1);
+	}
+}
+function sd(e) {
+	if (e.hostname !== "") throw new Deno.errors.InvalidData("invalid file url hostname");
+	let t = e.pathname;
+	for (let e = 0; e < t.length; e++) if (t[e] === "%") {
+		let n = t.codePointAt(e + 2) || 32;
+		if (t[e + 1] === "2" && n === 102) throw new Deno.errors.InvalidData("must not include encoded / characters");
+	}
+	return decodeURIComponent(t);
+}
+function cd(e) {
+	let t = Ju.resolve(e), n = e.charCodeAt(e.length - 1);
+	(n === Id || zd && n === Fd) && t[t.length - 1] !== Ju.sep && (t += "/");
+	let r = new URL("file://");
+	return t.includes("%") && (t = t.replace(Vd, "%25")), !zd && t.includes("\\") && (t = t.replace(Hd, "%5C")), t.includes("\n") && (t = t.replace(Ud, "%0A")), t.includes("\r") && (t = t.replace(Wd, "%0D")), t.includes("	") && (t = t.replace(Gd, "%09")), r.pathname = t, r;
+}
+var ld, ud, dd, fd, pd, md, hd, gd, _d, vd, yd, bd, xd, Sd, Cd, wd, Td, Ed, Dd, Od, kd, Ad, jd, Md, Nd, Pd, Fd, Id, Ld, Rd, zd, Bd, Vd, Hd, Ud, Wd, Gd, Kd = ui(() => {
+	X(), $(), Q(), ac(), hl(), Yu(), Wu(), ld = Object.freeze(Object.create(null)), ud = {}, dd = !1, fd = typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : global, pd = {}, md = !1, hd = {}, gd = !1, _d = {}, vd = !1, yd = {}, bd = !1, xd = {}, Sd = !1, Cd = {}, wd = !1, Td = {}, Ed = !1, Dd = id(), Dd.parse, Dd.resolve, Dd.resolveObject, Dd.format, Dd.Url, Od = typeof Deno < "u" ? Deno.build.os === "windows" ? "win32" : Deno.build.os : void 0, Dd.URL = typeof URL < "u" ? URL : null, Dd.pathToFileURL = cd, Dd.fileURLToPath = ad, kd = Dd.Url, Ad = Dd.format, jd = Dd.resolve, Md = Dd.resolveObject, Nd = Dd.parse, Pd = Dd.URL, Fd = 92, Id = 47, Ld = 97, Rd = 122, zd = Od === "win32", Bd = /\//g, Vd = /%/g, Hd = /\\/g, Ud = /\n/g, Wd = /\r/g, Gd = /\t/g;
+}), qd = J((e, t) => {
+	X(), $(), Q(), t.exports = function() {
+		throw Error("ws does not work in the browser. Browser clients must use the native WebSocket object");
+	};
+}), Jd = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 }), e.BufferedDuplex = void 0, e.writev = r;
+	var t = Ko(), n = (io(), Y($a));
+	function r(e, t) {
+		let r = Array(e.length);
+		for (let t = 0; t < e.length; t++) typeof e[t].chunk == "string" ? r[t] = n.Buffer.from(e[t].chunk, "utf8") : r[t] = e[t].chunk;
+		this._write(n.Buffer.concat(r), "binary", t);
+	}
+	e.BufferedDuplex = class extends t.Duplex {
+		socket;
+		proxy;
+		isSocketOpen;
+		writeQueue;
+		constructor(e, t, n) {
+			super({ objectMode: !0 }), this.proxy = t, this.socket = n, this.writeQueue = [], e.objectMode || (this._writev = r.bind(this)), this.isSocketOpen = !1, this.proxy.on("data", (e) => {
+				!this.destroyed && this.readable && this.push(e);
+			});
+		}
+		_read(e) {
+			this.proxy.read(e);
+		}
+		_write(e, t, n) {
+			this.isSocketOpen ? this.writeToProxy(e, t, n) : this.writeQueue.push({
+				chunk: e,
+				encoding: t,
+				cb: n
+			});
+		}
+		_final(e) {
+			this.writeQueue = [], this.proxy.end(e);
+		}
+		_destroy(e, t) {
+			this.writeQueue = [], this.proxy.destroy(), t(e);
+		}
+		socketReady() {
+			this.emit("connect"), this.isSocketOpen = !0, this.processWriteQueue();
+		}
+		writeToProxy(e, t, n) {
+			this.proxy.write(e, t) === !1 ? this.proxy.once("drain", n) : n();
+		}
+		processWriteQueue() {
+			for (; this.writeQueue.length > 0;) {
+				let { chunk: e, encoding: t, cb: n } = this.writeQueue.shift();
+				this.writeToProxy(e, t, n);
+			}
+		}
+	};
+}), Yd = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 }), e.streamBuilder = e.browserStreamBuilder = void 0;
+	var n = (io(), Y($a)), r = t(qd()), i = t(es()), a = Ko(), o = t(Xs()), s = Jd(), c = (0, i.default)("mqttjs:ws"), l = [
+		"rejectUnauthorized",
+		"ca",
+		"cert",
+		"key",
+		"pfx",
+		"passphrase"
+	];
+	function u(e, t) {
+		let n = `${e.protocol}://${e.hostname}:${e.port}${e.path}`;
+		return typeof e.transformWsUrl == "function" && (n = e.transformWsUrl(n, e, t)), n;
+	}
+	function d(e) {
+		let t = e;
+		return e.port || (t.port = e.protocol === "wss" ? 443 : 80), e.path || (t.path = "/"), e.wsOptions || (t.wsOptions = {}), !o.default && !e.forceNativeWebSocket && e.protocol === "wss" && l.forEach((n) => {
+			Object.prototype.hasOwnProperty.call(e, n) && !Object.prototype.hasOwnProperty.call(e.wsOptions, n) && (t.wsOptions[n] = e[n]);
+		}), t;
+	}
+	function f(e) {
+		let t = d(e);
+		if (t.hostname ||= t.host, !t.hostname) {
+			if (typeof document > "u") throw Error("Could not determine host. Specify host manually.");
+			let e = new URL(document.URL);
+			t.hostname = e.hostname, t.port ||= Number(e.port);
+		}
+		return t.objectMode === void 0 && (t.objectMode = t.binary !== !0 && t.binary !== void 0), t;
+	}
+	function p(e, t, n) {
+		c("createWebSocket"), c(`protocol: ${n.protocolId} ${n.protocolVersion}`);
+		let i = n.protocolId === "MQIsdp" && n.protocolVersion === 3 ? "mqttv3.1" : "mqtt";
+		c(`creating new Websocket for url: ${t} and protocol: ${i}`);
+		let a;
+		return a = n.createWebsocket ? n.createWebsocket(t, [i], n) : new r.default(t, [i], n.wsOptions), a;
+	}
+	function m(e, t) {
+		let n = t.protocolId === "MQIsdp" && t.protocolVersion === 3 ? "mqttv3.1" : "mqtt", r = u(t, e), i;
+		return i = t.createWebsocket ? t.createWebsocket(r, [n], t) : new WebSocket(r, [n]), i.binaryType = "arraybuffer", i;
+	}
+	e.streamBuilder = (e, t) => {
+		c("streamBuilder");
+		let n = d(t);
+		n.hostname = n.hostname || n.host || "localhost";
+		let i = u(n, e), a = p(e, i, n), o = r.default.createWebSocketStream(a, n.wsOptions);
+		return o.url = i, a.on("close", () => {
+			o.destroy();
+		}), o;
+	}, e.browserStreamBuilder = (e, t) => {
+		c("browserStreamBuilder");
+		let r, i = f(t).browserBufferSize || 524288, o = t.browserBufferTimeout || 1e3, l = !t.objectMode, u = m(e, t), d = h(t, b, x);
+		t.objectMode || (d._writev = s.writev.bind(d)), d.on("close", () => {
+			u.close();
+		});
+		let p = typeof u.addEventListener < "u";
+		u.readyState === u.OPEN ? (r = d, r.socket = u) : (r = new s.BufferedDuplex(t, d, u), p ? u.addEventListener("open", g) : u.onopen = g), p ? (u.addEventListener("close", _), u.addEventListener("error", v), u.addEventListener("message", y)) : (u.onclose = _, u.onerror = v, u.onmessage = y);
+		function h(e, t, n) {
+			let r = new a.Transform({ objectMode: e.objectMode });
+			return r._write = t, r._flush = n, r;
+		}
+		function g() {
+			c("WebSocket onOpen"), r instanceof s.BufferedDuplex && r.socketReady();
+		}
+		function _(e) {
+			c("WebSocket onClose", e), r.end(), r.destroy();
+		}
+		function v(e) {
+			c("WebSocket onError", e);
+			let t = /* @__PURE__ */ Error("WebSocket error");
+			t.event = e, r.destroy(t);
+		}
+		async function y(e) {
+			if (!d || !d.readable || !d.writable) return;
+			let { data: t } = e;
+			t = t instanceof ArrayBuffer ? n.Buffer.from(t) : t instanceof Blob ? n.Buffer.from(await new Response(t).arrayBuffer()) : n.Buffer.from(t, "utf8"), d.push(t);
+		}
+		function b(e, t, r) {
+			if (u.bufferedAmount > i) {
+				setTimeout(b, o, e, t, r);
+				return;
+			}
+			l && typeof e == "string" && (e = n.Buffer.from(e, "utf8"));
+			try {
+				u.send(e);
+			} catch (e) {
+				return r(e);
+			}
+			r();
+		}
+		function x(e) {
+			u.close(), e();
+		}
+		return r;
+	};
+}), Xd = {};
+di(Xd, {
+	Server: () => Zd,
+	Socket: () => Zd,
+	Stream: () => Zd,
+	_createServerHandle: () => Zd,
+	_normalizeArgs: () => Zd,
+	_setSimultaneousAccepts: () => Zd,
+	connect: () => Zd,
+	createConnection: () => Zd,
+	createServer: () => Zd,
+	default: () => Qd,
+	isIP: () => Zd,
+	isIPv4: () => Zd,
+	isIPv6: () => Zd
+});
+function Zd() {
+	throw Error("Node.js net module is not supported by JSPM core outside of Node.js");
+}
+var Qd, $d = ui(() => {
+	X(), $(), Q(), Qd = {
+		_createServerHandle: Zd,
+		_normalizeArgs: Zd,
+		_setSimultaneousAccepts: Zd,
+		connect: Zd,
+		createConnection: Zd,
+		createServer: Zd,
+		isIP: Zd,
+		isIPv4: Zd,
+		isIPv6: Zd,
+		Server: Zd,
+		Socket: Zd,
+		Stream: Zd
+	};
+}), ef = J((e, t) => {
+	X(), $(), Q(), t.exports = {};
+}), tf = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 });
+	var n = t(($d(), Y(Xd))), r = t(es()), i = t(ef()), a = (0, r.default)("mqttjs:tcp");
+	e.default = (e, t) => {
+		if (t.port = t.port || 1883, t.hostname = t.hostname || t.host || "localhost", t.socksProxy) return (0, i.default)(t.hostname, t.port, t.socksProxy, { timeout: t.socksTimeout });
+		let { port: r, path: o } = t, s = t.hostname;
+		return a("port %d and host %s", r, s), n.default.createConnection({
+			port: r,
+			host: s,
+			path: o
+		});
+	};
+}), nf = {};
+di(nf, { default: () => rf });
+var rf, af = ui(() => {
+	X(), $(), Q(), rf = {};
+}), of = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 });
+	var n = (af(), Y(nf)), r = t(($d(), Y(Xd))), i = t(es()), a = t(ef()), o = (0, i.default)("mqttjs:tls");
+	function s(e) {
+		let { host: t, port: r, socksProxy: i, ...o } = e;
+		if (i !== void 0) {
+			let s = (0, a.default)(t, r, i, { timeout: e.socksTimeout });
+			return (0, n.connect)({
+				...o,
+				socket: s
+			});
+		}
+		return (0, n.connect)(e);
+	}
+	e.default = (e, t) => {
+		t.port = t.port || 8883, t.host = t.hostname || t.host || "localhost", r.default.isIP(t.host) === 0 && !t.servername && (t.servername = t.host), t.rejectUnauthorized = t.rejectUnauthorized !== !1, delete t.path, o("port %d host %s rejectUnauthorized %b", t.port, t.host, t.rejectUnauthorized);
+		let n = s(t);
+		n.on("secureConnect", () => {
+			t.rejectUnauthorized && !n.authorized ? n.emit("error", /* @__PURE__ */ Error("TLS not authorized")) : n.removeListener("error", i);
+		});
+		function i(r) {
+			t.rejectUnauthorized && e.emit("error", r), n.end();
+		}
+		return n.on("error", i), n;
+	};
+}), sf = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 });
+	var t = (io(), Y($a)), n = Ko(), r = Jd(), i, a, o;
+	function s() {
+		let e = new n.Transform();
+		return e._write = (e, t, n) => {
+			i.send({
+				data: e.buffer,
+				success() {
+					n();
+				},
+				fail(e) {
+					n(Error(e));
+				}
+			});
+		}, e._flush = (e) => {
+			i.close({ success() {
+				e();
+			} });
+		}, e;
+	}
+	function c(e) {
+		e.hostname ||= "localhost", e.path ||= "/", e.wsOptions ||= {};
+	}
+	function l(e, t) {
+		let n = e.protocol === "wxs" ? "wss" : "ws", r = `${n}://${e.hostname}${e.path}`;
+		return e.port && e.port !== 80 && e.port !== 443 && (r = `${n}://${e.hostname}:${e.port}${e.path}`), typeof e.transformWsUrl == "function" && (r = e.transformWsUrl(r, e, t)), r;
+	}
+	function u() {
+		i.onOpen(() => {
+			o.socketReady();
+		}), i.onMessage((e) => {
+			let { data: n } = e;
+			n = n instanceof ArrayBuffer ? t.Buffer.from(n) : t.Buffer.from(n, "utf8"), a.push(n);
+		}), i.onClose(() => {
+			o.emit("close"), o.end(), o.destroy();
+		}), i.onError((e) => {
+			let t = Error(e.errMsg);
+			o.destroy(t);
+		});
+	}
+	e.default = (e, t) => {
+		if (t.hostname = t.hostname || t.host, !t.hostname) throw Error("Could not determine host. Specify host manually.");
+		let n = t.protocolId === "MQIsdp" && t.protocolVersion === 3 ? "mqttv3.1" : "mqtt";
+		c(t);
+		let d = l(t, e);
+		i = wx.connectSocket({
+			url: d,
+			protocols: [n]
+		}), a = s(), o = new r.BufferedDuplex(t, a, i), o._destroy = (e, t) => {
+			i.close({ success() {
+				t && t(e);
+			} });
+		};
+		let f = o.destroy;
+		return o.destroy = (e, t) => (o.destroy = f, setTimeout(() => {
+			i.close({ fail() {
+				o._destroy(e, t);
+			} });
+		}, 0), o), u(), o;
+	};
+}), cf = J((e) => {
+	X(), $(), Q(), Object.defineProperty(e, "__esModule", { value: !0 });
+	var t = (io(), Y($a)), n = Ko(), r = Jd(), i, a, o, s = !1;
+	function c() {
+		let e = new n.Transform();
+		return e._write = (e, t, n) => {
+			i.sendSocketMessage({
+				data: e.buffer,
+				success() {
+					n();
+				},
+				fail() {
+					n(/* @__PURE__ */ Error());
+				}
+			});
+		}, e._flush = (e) => {
+			i.closeSocket({ success() {
+				e();
+			} });
+		}, e;
+	}
+	function l(e) {
+		e.hostname ||= "localhost", e.path ||= "/", e.wsOptions ||= {};
+	}
+	function u(e, t) {
+		let n = e.protocol === "alis" ? "wss" : "ws", r = `${n}://${e.hostname}${e.path}`;
+		return e.port && e.port !== 80 && e.port !== 443 && (r = `${n}://${e.hostname}:${e.port}${e.path}`), typeof e.transformWsUrl == "function" && (r = e.transformWsUrl(r, e, t)), r;
+	}
+	function d() {
+		s || (s = !0, i.onSocketOpen(() => {
+			o.socketReady();
+		}), i.onSocketMessage((e) => {
+			if (typeof e.data == "string") {
+				let n = t.Buffer.from(e.data, "base64");
+				a.push(n);
+			} else {
+				let n = new FileReader();
+				n.addEventListener("load", () => {
+					if (n.result instanceof ArrayBuffer) {
+						a.push(t.Buffer.from(n.result));
+						return;
+					}
+					a.push(t.Buffer.from(n.result, "utf-8"));
+				}), n.readAsArrayBuffer(e.data);
+			}
+		}), i.onSocketClose(() => {
+			o.end(), o.destroy();
+		}), i.onSocketError((e) => {
+			o.destroy(e);
+		}));
+	}
+	e.default = (e, t) => {
+		if (t.hostname = t.hostname || t.host, !t.hostname) throw Error("Could not determine host. Specify host manually.");
+		let n = t.protocolId === "MQIsdp" && t.protocolVersion === 3 ? "mqttv3.1" : "mqtt";
+		l(t);
+		let s = u(t, e);
+		return i = t.my, i.connectSocket({
+			url: s,
+			protocols: n
+		}), a = c(), o = new r.BufferedDuplex(t, a, i), d(), o;
+	};
+}), lf = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 }), e.connectAsync = d;
+	var n = t(es()), r = t((Kd(), Y(Xu))), i = t($s()), a = t(Xs());
+	typeof Z?.nextTick != "function" && (Z.nextTick = setImmediate);
+	var o = (0, n.default)("mqttjs"), s = null;
+	function c() {
+		return typeof location < "u" ? location.protocol === "https:" ? "wss" : "ws" : typeof document < "u" && new URL(document.URL).protocol === "https:" ? "wss" : "ws";
+	}
+	function l(e) {
+		let t;
+		if (e.auth) {
+			if (t = e.auth.match(/^(.+):(.+)$/), t) {
+				let [, n, r] = t;
+				e.username = n, e.password = r;
+			} else e.username = e.auth;
+		}
+	}
+	function u(e, t) {
+		if (o("connecting to an MQTT broker..."), typeof e == "object" && !t && (t = e, e = ""), t ||= {}, e && typeof e == "string") {
+			let n = r.default.parse(e, !0), i = {}, o = !n.protocol && !n.hostname && n.path?.startsWith("/") && (a.default || t.forceNativeWebSocket);
+			if (n.port != null && (i.port = Number(n.port)), i.host = n.hostname, i.query = n.query, i.auth = n.auth, i.protocol = n.protocol, i.path = n.path, t = {
+				...i,
+				...t
+			}, !t.protocol && !o) throw Error("Missing protocol");
+			t.protocol = (t.protocol || c()).replace(/:$/, "");
+		}
+		if (t.unixSocket = t.unixSocket || t.protocol?.includes("+unix"), t.unixSocket ? t.protocol = t.protocol.replace("+unix", "") : !t.protocol?.startsWith("ws") && !t.protocol?.startsWith("wx") && delete t.path, l(t), t.query && typeof t.query.clientId == "string" && (t.clientId = t.query.clientId), a.default || t.unixSocket ? t.socksProxy = void 0 : t.socksProxy === void 0 && typeof Z < "u" && (t.socksProxy = Z.env.MQTTJS_SOCKS_PROXY), t.cert && t.key) {
+			if (t.protocol) {
+				if ([
+					"mqtts",
+					"wss",
+					"wxs",
+					"alis"
+				].indexOf(t.protocol) === -1) switch (t.protocol) {
+					case "mqtt":
+						t.protocol = "mqtts";
+						break;
+					case "ws":
+						t.protocol = "wss";
+						break;
+					case "wx":
+						t.protocol = "wxs";
+						break;
+					case "ali":
+						t.protocol = "alis";
+						break;
+					default: throw Error(`Unknown protocol for secure connection: "${t.protocol}"!`);
+				}
+			} else throw Error("Missing secure protocol key");
+		}
+		if (s || (s = {}, !a.default && !t.forceNativeWebSocket ? (s.ws = Yd().streamBuilder, s.wss = Yd().streamBuilder, s.mqtt = tf().default, s.tcp = tf().default, s.ssl = of().default, s.tls = s.ssl, s.mqtts = of().default) : (s.ws = Yd().browserStreamBuilder, s.wss = Yd().browserStreamBuilder, s.wx = sf().default, s.wxs = sf().default, s.ali = cf().default, s.alis = cf().default)), !s[t.protocol]) {
+			let e = ["mqtts", "wss"].indexOf(t.protocol) !== -1;
+			t.protocol = [
+				"mqtt",
+				"mqtts",
+				"ws",
+				"wss",
+				"wx",
+				"wxs",
+				"ali",
+				"alis"
+			].filter((t, n) => e && n % 2 == 0 ? !1 : typeof s[t] == "function")[0];
+		}
+		if (t.clean === !1 && !t.clientId) throw Error("Missing clientId for unclean clients");
+		t.protocol && (t.defaultProtocol = t.protocol);
+		function n(e) {
+			return t.servers && ((!e._reconnectCount || e._reconnectCount === t.servers.length) && (e._reconnectCount = 0), t.host = t.servers[e._reconnectCount].host, t.port = t.servers[e._reconnectCount].port, t.protocol = t.servers[e._reconnectCount].protocol ? t.servers[e._reconnectCount].protocol : t.defaultProtocol, t.hostname = t.host, e._reconnectCount++), o("calling streambuilder for", t.protocol), s[t.protocol](e, t);
+		}
+		let u = new i.default(n, t);
+		return u.on("error", () => {}), u;
+	}
+	function d(e, t, n = !0) {
+		return new Promise((r, i) => {
+			let a = u(e, t), o = {
+				connect: (e) => {
+					s(), r(a);
+				},
+				end: () => {
+					s(), r(a);
+				},
+				error: (e) => {
+					s(), a.end(), i(e);
+				}
+			};
+			n === !1 && (o.close = () => {
+				o.error(/* @__PURE__ */ Error("Couldn't connect to server"));
+			});
+			function s() {
+				Object.keys(o).forEach((e) => {
+					a.off(e, o[e]);
+				});
+			}
+			Object.keys(o).forEach((e) => {
+				a.on(e, o[e]);
+			});
+		});
+	}
+	e.default = u;
+}), uf = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__createBinding || (Object.create ? (function(e, t, n, r) {
+		r === void 0 && (r = n);
+		var i = Object.getOwnPropertyDescriptor(t, n);
+		(!i || ("get" in i ? !t.__esModule : i.writable || i.configurable)) && (i = {
+			enumerable: !0,
+			get: function() {
+				return t[n];
+			}
+		}), Object.defineProperty(e, r, i);
+	}) : (function(e, t, n, r) {
+		r === void 0 && (r = n), e[r] = t[n];
+	})), n = e && e.__setModuleDefault || (Object.create ? (function(e, t) {
+		Object.defineProperty(e, "default", {
+			enumerable: !0,
+			value: t
+		});
+	}) : function(e, t) {
+		e.default = t;
+	}), r = e && e.__importStar || (function() {
+		var e = function(t) {
+			return e = Object.getOwnPropertyNames || function(e) {
+				var t = [];
+				for (var n in e) Object.prototype.hasOwnProperty.call(e, n) && (t[t.length] = n);
+				return t;
+			}, e(t);
+		};
+		return function(r) {
+			if (r && r.__esModule) return r;
+			var i = {};
+			if (r != null) for (var a = e(r), o = 0; o < a.length; o++) a[o] !== "default" && t(i, r, a[o]);
+			return n(i, r), i;
+		};
+	})(), i = e && e.__exportStar || function(e, n) {
+		for (var r in e) r !== "default" && !Object.prototype.hasOwnProperty.call(n, r) && t(n, e, r);
+	}, a = e && e.__importDefault || function(e) {
+		return e && e.__esModule ? e : { default: e };
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 }), e.ReasonCodes = e.KeepaliveManager = e.UniqueMessageIdProvider = e.DefaultMessageIdProvider = e.Store = e.MqttClient = e.connectAsync = e.connect = e.Client = void 0;
+	var o = a($s());
+	e.MqttClient = o.default, e.DefaultMessageIdProvider = a(Ss()).default, e.UniqueMessageIdProvider = a(ec()).default, e.Store = a(us()).default;
+	var s = r(lf());
+	e.connect = s.default, Object.defineProperty(e, "connectAsync", {
+		enumerable: !0,
+		get: function() {
+			return s.connectAsync;
+		}
+	}), e.KeepaliveManager = a(Qs()).default, e.Client = o.default, i($s(), e), i(fs(), e), i(ls(), e);
+	var c = hs();
+	Object.defineProperty(e, "ReasonCodes", {
+		enumerable: !0,
+		get: function() {
+			return c.ReasonCodes;
+		}
+	});
+}), df = J((e) => {
+	X(), $(), Q();
+	var t = e && e.__createBinding || (Object.create ? (function(e, t, n, r) {
+		r === void 0 && (r = n);
+		var i = Object.getOwnPropertyDescriptor(t, n);
+		(!i || ("get" in i ? !t.__esModule : i.writable || i.configurable)) && (i = {
+			enumerable: !0,
+			get: function() {
+				return t[n];
+			}
+		}), Object.defineProperty(e, r, i);
+	}) : (function(e, t, n, r) {
+		r === void 0 && (r = n), e[r] = t[n];
+	})), n = e && e.__setModuleDefault || (Object.create ? (function(e, t) {
+		Object.defineProperty(e, "default", {
+			enumerable: !0,
+			value: t
+		});
+	}) : function(e, t) {
+		e.default = t;
+	}), r = e && e.__importStar || (function() {
+		var e = function(t) {
+			return e = Object.getOwnPropertyNames || function(e) {
+				var t = [];
+				for (var n in e) Object.prototype.hasOwnProperty.call(e, n) && (t[t.length] = n);
+				return t;
+			}, e(t);
+		};
+		return function(r) {
+			if (r && r.__esModule) return r;
+			var i = {};
+			if (r != null) for (var a = e(r), o = 0; o < a.length; o++) a[o] !== "default" && t(i, r, a[o]);
+			return n(i, r), i;
+		};
+	})(), i = e && e.__exportStar || function(e, n) {
+		for (var r in e) r !== "default" && !Object.prototype.hasOwnProperty.call(n, r) && t(n, e, r);
+	};
+	Object.defineProperty(e, "__esModule", { value: !0 }), e.default = r(uf()), i(uf(), e);
+})(), ff = 4, pf = st((e) => e.stream?.socket), mf = pf.scoped(), hf = pf.scoped(), gf = pf.scoped(), _f = pf.scoped(), vf = Sr({
+	init: (e) => Ye(e, yf, ff).map((e) => {
+		let t = pf.register(e, () => df.connect(e, {
+			queueQoSZero: !1,
+			resubscribe: !1
+		})), n = mf.forRelay(t);
+		return t.listenerCount("message") === 0 && t.on("message", (e, t) => n[e]?.(e, t.toString())).on("connect", () => {
+			let e = Object.keys(gf.forRelay(t));
+			e.length !== 0 && t.subscribeAsync(e).then(() => {
+				Object.entries(_f.forRelay(t)).forEach(([e, n]) => t.publish(e, n));
+			}).catch(console.error);
+		}).on("error", console.error), t.connected ? Promise.resolve(t) : new Promise((e) => t.once("connect", () => e(t)));
+	}),
+	subscribeTopic: async (e, t, n) => {
+		let r = mf.forRelay(e), i = hf.forRelay(e), a = gf.forRelay(e), o = Symbol(t), s = (e, t) => n(e, t);
+		return r[t] = s, i[t] = o, a[t] = (a[t] ?? 0) + 1, a[t] === 1 && await e.subscribeAsync(t), () => {
+			a[t] = Math.max(0, (a[t] ?? 1) - 1), a[t] === 0 && (e.unsubscribe(t), delete a[t], delete _f.forRelay(e)[t]), r[t] === s && delete r[t], i[t] === o && delete i[t];
+		};
+	},
+	publishTopic: (e, t, n, { kind: r }) => {
+		let i = typeof n == "string" ? n : Xe(n);
+		r === "announce" && (_f.forRelay(e)[t] = i), e.connected && e.publish(t, i);
+	}
+});
+pf.getSockets;
+var yf = [
+	"test.mosquitto.org:8081/mqtt",
+	"broker.emqx.io:8084/mqtt",
+	"public:public@public.cloud.shiftr.io",
+	"broker-cn.emqx.io:8084/mqtt",
+	"broker.hivemq.com:8884/mqtt"
+].map((e) => "wss://" + e);
 //#endregion
-export { Qr as joinRoom, W as selfId };
+//#region scripts/multipath.mjs
+function bf(e) {
+	let t = /* @__PURE__ */ new Set(), n = /* @__PURE__ */ new Map(), r = !1, i;
+	function a() {
+		return Object.assign({}, ...e.map((e) => e.getPeers()));
+	}
+	function o() {
+		if (r) return;
+		let e = new Set(Object.keys(a())), n = [...e].filter((e) => !t.has(e)), i = [...t].filter((t) => !e.has(t));
+		for (let e of i) t.delete(e);
+		for (let e of n) t.add(e);
+		for (let e of i) s.onPeerLeave?.(e);
+		for (let e of n) s.onPeerJoin?.(e);
+	}
+	let s = {
+		onPeerJoin: null,
+		onPeerLeave: null,
+		getPeers() {
+			return o(), r ? {} : a();
+		},
+		makeAction(i) {
+			if (n.has(i)) return n.get(i);
+			let s = e.map((e) => e.makeAction(i)), c = {
+				onMessage: null,
+				async send(t, n) {
+					if (r) throw Error("Room closed");
+					let i = n?.target === void 0 ? Object.keys(a()) : [n.target].flat();
+					return Promise.all([...new Set(i)].map(async (n) => {
+						let r = e.map((e, t) => Object.hasOwn(e.getPeers(), n) ? t : -1).filter((e) => e >= 0), i = /* @__PURE__ */ Error("Peer not connected");
+						for (let e of r) try {
+							return await s[e].send(t, { target: n });
+						} catch (e) {
+							i = e;
+						}
+						throw i;
+					}));
+				}
+			};
+			return s.forEach((e) => {
+				e.onMessage = (e, n) => {
+					r || (o(), t.has(n.peerId) && c.onMessage?.(e, n));
+				};
+			}), n.set(i, c), c;
+		},
+		leave() {
+			return i ||= (r = !0, t.clear(), n.clear(), Promise.allSettled(e.map((e) => e.leave()))), i;
+		}
+	};
+	for (let t of e) t.onPeerJoin = o, t.onPeerLeave = o;
+	return queueMicrotask(o), s;
+}
+//#endregion
+//#region scripts/transport.mjs
+function xf(e, t, n) {
+	let r = [], i = [];
+	for (let a of [ii, vf]) try {
+		r.push(a(e, t, n));
+	} catch (e) {
+		i.push(e);
+	}
+	if (!r.length) throw i[0];
+	return bf(r);
+}
+//#endregion
+export { xf as joinRoom, je as selfId };

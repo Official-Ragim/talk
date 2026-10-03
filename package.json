@@ -11,9 +11,10 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "playwright test",
     "test:arena": "node scripts/check-arena.mjs",
-    "test:mesh": "node scripts/check-mesh.mjs"
+    "test:mesh": "node scripts/check-mesh.mjs && node scripts/check-transport.mjs"
   },
   "dependencies": {
+    "@trystero-p2p/mqtt": "0.25.4",
     "trystero": "0.25.4"
   },
   "devDependencies": {
