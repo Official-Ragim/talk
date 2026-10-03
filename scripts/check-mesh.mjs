@@ -4,7 +4,12 @@ import { createRoomMesh } from '../src/room-mesh.js';
 const raw = new Map(), rooms = new Map(), members = new Map(), received = new Map(), packets = [];
 function add(id) {
   const links = new Set(), handlers = new Map();
+  let joinHandler, leaveHandler;
   const transport = {
+    set onPeerJoin(fn) { joinHandler = fn; },
+    set onPeerLeave(fn) { leaveHandler = fn; },
+    notifyJoin: peer => joinHandler?.(peer),
+    notifyLeave: peer => leaveHandler?.(peer),
     links, getPeers: () => Object.fromEntries([...links].map(peer => [peer, {}])),
     makeAction(name) {
       if (!handlers.has(name)) handlers.set(name, {
@@ -32,11 +37,11 @@ function add(id) {
 }
 function link(a, b, notify = true) {
   raw.get(a).links.add(b); raw.get(b).links.add(a);
-  if (notify) { raw.get(a).onPeerJoin(b); raw.get(b).onPeerJoin(a); }
+  if (notify) { raw.get(a).notifyJoin(b); raw.get(b).notifyJoin(a); }
 }
 function unlink(a, b) {
   raw.get(a).links.delete(b); raw.get(b).links.delete(a);
-  raw.get(a).onPeerLeave(b); raw.get(b).onPeerLeave(a);
+  raw.get(a).notifyLeave(b); raw.get(b).notifyLeave(a);
 }
 async function until(check, label) {
   const deadline = Date.now() + 4000;

@@ -134,7 +134,7 @@ export function createRoomMesh(raw, selfId, { heartbeatMs = 2000, expiryMs = 120
     incoming.set(origin, task);
     void task.finally(() => { if (incoming.get(origin) === task) incoming.delete(origin); }).catch(() => {});
   };
-  raw.onPeerJoin = async id => {
+  const handleJoin = async id => {
     if (closed || direct.has(id)) return;
     direct.add(id);
     await announce().catch(() => {});
@@ -142,15 +142,17 @@ export function createRoomMesh(raw, selfId, { heartbeatMs = 2000, expiryMs = 120
     // Topology/key announcements only: never send prior chat or DM history.
     for (const node of nodes.values()) void sendWire({ ...node.packet, hops: 16 }, [id]).catch(() => {});
   };
-  raw.onPeerLeave = id => { direct.delete(id); prune(); void announce().catch(() => {}); };
+  const handleLeave = id => { direct.delete(id); prune(); void announce().catch(() => {}); };
+  raw.onPeerJoin = handleJoin;
+  raw.onPeerLeave = handleLeave;
   const timer = setInterval(() => {
     if (closed) return;
     // Also recover a missed join/leave callback using the transport's live inventory.
     const connected = new Set(Object.keys(raw.getPeers()));
-    for (const id of connected) if (!direct.has(id)) raw.onPeerJoin(id);
-    for (const id of direct) if (!connected.has(id)) raw.onPeerLeave(id);
+    for (const id of connected) if (!direct.has(id)) void handleJoin(id);
+    for (const id of direct) if (!connected.has(id)) handleLeave(id);
     prune(); void announce().catch(() => {});
   }, heartbeatMs);
-  queueMicrotask(() => { for (const id of Object.keys(raw.getPeers())) raw.onPeerJoin(id); });
+  queueMicrotask(() => { for (const id of Object.keys(raw.getPeers())) void handleJoin(id); });
   return api;
 }
